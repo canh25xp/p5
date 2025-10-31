@@ -9,21 +9,27 @@ It's add features that `p4` does not have and improve features that `p4` already
 
 The command line interface should be identical or at least close to the existing `p4` tool to help user easily migrate to `p5`.
 
-## Development setup
+## Development Guide
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/canh25xp/p5.git
-   ```
-2. Init submodule:
-   ```bash
-   git submodule update --init --recursive
-   ```
-3. Install dependency
-   ```bash
-   sudo apt install libssl-dev
-   ```
-4. Build it with cmake
-   ```bash
-   cmake --workflow default
-   ```
+### Build and test
+
+```sh
+cmake --workflow default # both generate and build in a single workflow
+# or
+cmake --preset default && cmake --build --preset default
+# or
+cmake -B build && cmake --build build
+```
+
+Test it
+
+```sh
+p5 --help
+# or
+./build/p5 --help
+```
+
+### Command line guide
+
+This project uses `CLI11` library for command line handling.
+The documents is at `vendor/CLI11/book/`
