@@ -1,0 +1,9 @@
+[submodule "vendor/minitrace"]
+	path = vendor/minitrace
+	url = https://github.com/hrydgard/minitrace
+[submodule "vendor/CLI11"]
+	path = vendor/CLI11
+	url = https://github.com/CLIUtils/CLI11
+[submodule "vendor/dbg-macro"]
+	path = vendor/dbg-macro
+	url = https://github.com/sharkdp/dbg-macro
