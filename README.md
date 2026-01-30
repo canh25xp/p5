@@ -2,6 +2,11 @@
 
 > Complementary p4 command-line tools
 
+> [!WARNING]
+> WIP: Barely even started.
+> Start this project thinking "How hard can it be".
+> Turns out it is darn hard.
+
 ## Dependencies
 
 ### Linux
