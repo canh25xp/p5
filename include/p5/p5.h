@@ -57,7 +57,8 @@ public:
 
     void AddClientSpecView(const std::vector<std::string> &viewStrings);
 
-    Result RunCmd(const char *command, int argc, char **argv);
+    Result Run(const char *command, int argc, char **argv);
+    Result Run(const std::string &commandLine);
     TestResult TestConnection(const int retries = 5);
     ChangesResult ShortChanges(const std::string &path);
     ChangesResult Changes(const std::string &path);

@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
             std::string command = remaining[0];
             std::vector<std::string> args(remaining.begin() + 1, remaining.end());
 
-            // Convert to char* array for RunCmd
+            // Convert to char* array for Run
             std::vector<char *> argv_array;
             argv_array.push_back(const_cast<char *>(command.c_str()));
             for (const auto &arg : args) {
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
                 dbg(arg);
             }
 
-            p5.RunCmd(command.c_str(), static_cast<int>(args.size()), argv_array.data() + 1);
+            p5.Run(command.c_str(), static_cast<int>(args.size()), argv_array.data() + 1);
         }
 
         if (!P5::ShutdownLibraries()) {

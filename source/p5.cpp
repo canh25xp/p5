@@ -15,6 +15,7 @@
 #include "log.h"
 #include "std_helpers.h"
 #include "stream_result.h"
+#include "cli_helpers.h"
 
 ClientResult::ClientSpecData P5::ClientSpec;
 std::string P5::P4PORT;
@@ -290,13 +291,39 @@ InfoResult P5::Info() {
     return Run<InfoResult>("info", {});
 }
 
-Result P5::RunCmd(const char *command, int argumentCount, char **arguments) {
+Result P5::Run(const char *command, int argumentCount, char **arguments) {
     Result clientUser;
 
     m_ClientAPI.SetArgv(argumentCount, arguments);
     m_ClientAPI.Run(command, &clientUser);
 
     return clientUser;
+}
+
+Result P5::Run(const std::string &commandLine) {
+    // Split string into tokens
+    std::vector<std::string> tokens = SplitCommandLine(commandLine);
+
+    if (tokens.empty()) {
+        return Result();
+    }
+
+    // First token is the p4 command
+    const std::string &command = tokens[0];
+
+    // Remaining tokens are arguments
+    std::vector<std::string> args(tokens.begin() + 1, tokens.end());
+
+    // Build argv (must stay alive during Run)
+    std::vector<const char *> argv;
+
+    argv.reserve(args.size());
+
+    for (std::string &arg : args) {
+        argv.push_back(arg.c_str()); // safe: std::string owns memory
+    }
+
+    return Run(command.c_str(), static_cast<int>(argv.size()), const_cast<char **>(argv.data()));
 }
 
 template <class T>
