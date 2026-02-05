@@ -65,3 +65,6 @@ endif()
 if(DBG_MACRO_NO_WARNING)
   target_compile_definitions(${PROJECT_NAME} PRIVATE DBG_MACRO_NO_WARNING)
 endif()
+
+# TODO: exclude `include/dbg.h` from install
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
