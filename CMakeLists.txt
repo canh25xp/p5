@@ -13,6 +13,10 @@ project(
 option(DBG_MACRO_DISABLE "disable debug macro" FALSE)
 option(DBG_MACRO_NO_WARNING "disable debug macro warning" TRUE)
 
+# Work-arround cmake error:
+# Compatibility with CMake < 3.5 has been removed from CMake.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 # Generate compile_commands.json, will be used by lsp_server
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
