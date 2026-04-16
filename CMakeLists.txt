@@ -13,6 +13,10 @@ project(
 option(DBG_MACRO_DISABLE "disable debug macro" FALSE)
 option(DBG_MACRO_NO_WARNING "disable debug macro warning" TRUE)
 
+# PRINT/INFO/WARN are compiled in when CMAKE_BUILD_TYPE/Debug config is Debug, or when this is ON (e.g. Release + diagnostics).
+option(P5_VERBOSE_LOGGING "Enable PRINT/INFO/WARN log macros in all configs (Release, etc.)" OFF)
+message(STATUS "P5_VERBOSE_LOGGING:" ${P5_VERBOSE_LOGGING})
+
 # Work-arround cmake error:
 # Compatibility with CMake < 3.5 has been removed from CMake.
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
@@ -69,6 +73,8 @@ endif()
 if(DBG_MACRO_NO_WARNING)
   target_compile_definitions(${PROJECT_NAME} PRIVATE DBG_MACRO_NO_WARNING)
 endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<BOOL:${P5_VERBOSE_LOGGING}>>:P5_VERBOSE_LOGGING=1>)
 
 # TODO: exclude `include/dbg.h` from install
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
