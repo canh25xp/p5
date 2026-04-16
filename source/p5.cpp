@@ -175,8 +175,8 @@ ChangesResult P5::Changes(const std::string &path) {
 
 ChangesResult P5::Changes(const std::string &path, const std::string &from, int32_t maxCount) {
     std::vector<std::string> args = {
-        "-l",              // Get full descriptions instead of sending cut-short ones
-        "-s", "submitted", // Only include submitted CLs
+        "-l",             // Get full descriptions instead of sending cut-short ones
+        "-s", "submitted" // Only include submitted CLs
     };
 
     // This needs to be declared outside the if scope below to
@@ -335,7 +335,7 @@ inline T P5::Run(const char *command, const std::vector<std::string> &stringArgu
 
     std::vector<char *> argsCharArray;
     for (const std::string &arg : stringArguments) {
-        argsCharArray.push_back((char *) arg.c_str());
+        argsCharArray.push_back((char *)arg.c_str());
     }
 
     T clientUser;
@@ -354,8 +354,7 @@ inline T P5::Run(const char *command, const std::vector<std::string> &stringArgu
 
         if (Reinitialize()) {
             INFO("Reinitialized P4API");
-        }
-        else {
+        } else {
             ERROR("Could not reinitialize P4API");
         }
 

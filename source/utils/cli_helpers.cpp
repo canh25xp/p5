@@ -31,4 +31,3 @@ std::vector<std::string> SplitCommandLine(const std::string &input) {
 
     return args;
 }
-
