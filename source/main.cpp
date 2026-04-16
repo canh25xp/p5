@@ -5,6 +5,8 @@
 #include "dbg.h"
 
 #include "log.h"
+#include "p4_cli/registry.h"
+#include "p4_cli/run_forwarded.h"
 #include "p5.h"
 
 int main(int argc, char **argv);
@@ -20,6 +22,8 @@ int main(int argc, char **argv) {
     app.add_option("-u,--user", user, "P4USER");
     app.add_option("-p,--port", port, "P4PORT");
     app.add_option("-c,--client", client, "P4CLIENT");
+
+    p4_cli::register_commands(app);
 
     // Allow extra arguments for legacy command handling
     app.allow_extras();
@@ -42,25 +46,17 @@ int main(int argc, char **argv) {
 
         P5 p5;
 
-        // Get remaining arguments for legacy command handling
         auto remaining = app.remaining();
         if (!remaining.empty()) {
             std::string command = remaining[0];
             std::vector<std::string> args(remaining.begin() + 1, remaining.end());
-
-            // Convert to char* array for Run
-            std::vector<char *> argv_array;
-            argv_array.push_back(const_cast<char *>(command.c_str()));
-            for (const auto &arg : args) {
-                argv_array.push_back(const_cast<char *>(arg.c_str()));
-            }
 
             dbg(command);
             for (const auto &arg : args) {
                 dbg(arg);
             }
 
-            p5.Run(command.c_str(), static_cast<int>(args.size()), argv_array.data() + 1);
+            p4_cli::run_forwarded(p5, command.c_str(), args);
         }
 
         if (!P5::ShutdownLibraries()) {
