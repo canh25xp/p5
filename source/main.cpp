@@ -5,6 +5,7 @@
 #include "dbg.h"
 
 #include "log.h"
+#include "p4_cli/global_options.h"
 #include "p4_cli/registry.h"
 #include "p4_cli/run_forwarded.h"
 #include "p5.h"
@@ -19,9 +20,7 @@ int main(int argc, char **argv) {
     std::string port = "";
     std::string client = "";
 
-    app.add_option("-u,--user", user, "P4USER");
-    app.add_option("-p,--port", port, "P4PORT");
-    app.add_option("-c,--client", client, "P4CLIENT");
+    p4_cli::register_global_options(app, user, port, client);
 
     p4_cli::register_commands(app);
 

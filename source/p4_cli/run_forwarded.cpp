@@ -10,6 +10,12 @@
 
 namespace p4_cli {
 
+void apply_connection_options(const std::string &user, const std::string &port, const std::string &client) {
+    P5::P4USER = user;
+    P5::P4PORT = port;
+    P5::P4CLIENT = client;
+}
+
 void run_forwarded(P5 &p5, const char *command, const std::vector<std::string> &args) {
     std::vector<char *> argv_array;
     argv_array.reserve(args.size());
