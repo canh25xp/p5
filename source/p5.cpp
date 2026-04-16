@@ -34,7 +34,6 @@ bool P5::Initialize() {
     m_ClientAPI.SetPort(P4PORT.c_str());
     m_ClientAPI.SetUser(P4USER.c_str());
     m_ClientAPI.SetClient(P4CLIENT.c_str());
-    m_ClientAPI.SetProtocol("tag", "");
     for (const auto &proto : P4PROTOCOL_Z) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
