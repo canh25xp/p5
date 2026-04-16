@@ -32,8 +32,7 @@ void run_p4_passthrough(const char *command, const std::vector<std::string> &arg
         throw CLI::RuntimeError(1);
     }
 
-    bool ok = P5().TestConnection().IsError();
-    if (ok) {
+    if (P5().TestConnection().IsError()) {
         INFO("Perforce server is available");
     } else {
         ERROR("Error occurred while connecting to " << P5::P4PORT);
