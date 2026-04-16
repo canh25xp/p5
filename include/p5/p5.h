@@ -77,6 +77,6 @@ public:
     void UpdateClientSpec();
     ClientResult Client();
     StreamResult Stream(const std::string &path);
-    UsersResult Users();
+    UsersResult Users(const std::vector<std::string> &extraArgs = {});
     InfoResult Info();
 };
