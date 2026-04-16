@@ -8,8 +8,8 @@ function(download_and_extract_p4api)
   if(UNIX)
     set(P4API_ARCHIVE_URLS "https://filehost.perforce.com/perforce/r25.1/bin.linux26x86_64/p4api-glibc2.3-openssl3.tgz")
     set(P4API_ROOT_DIR "${P4API_VENDOR_DIR}/p4api-${P4API_VERSION}")
-  elseif (MSVC)
-    if (CMAKE_GENERATOR MATCHES "Visual Studio 17 2022")
+  elseif(MSVC)
+    if(CMAKE_GENERATOR MATCHES "Visual Studio 17 2022")
       set(P4API_ARCHIVE_URLS
         "https://filehost.perforce.com/perforce/r25.1/bin.ntx64/p4api_vs2022_static_openssl3.zip"
         "https://filehost.perforce.com/perforce/r25.1/bin.ntx64/p4api_vs2022_static_vsdebug_openssl3.zip"

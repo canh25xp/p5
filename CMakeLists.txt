@@ -47,7 +47,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     include/p5/utils
 )
 
-if (MSVC)
+if(MSVC)
   # NOTE: I'm not sure if these lines below are the same, so better to keep all
   # add_compile_options("/MT$<$<CONFIG:Debug>:d>")
   # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
