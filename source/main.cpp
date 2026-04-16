@@ -16,11 +16,8 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
-    std::string user = "";
-    std::string port = "";
-    std::string client = "";
-
-    p4_cli::register_global_options(app, user, port, client);
+    p4_cli::GlobalOptions connection;
+    p4_cli::register_global_options(app, connection);
 
     p4_cli::register_commands(app);
 
