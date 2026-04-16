@@ -16,10 +16,14 @@ void register_global_options(CLI::App &app, GlobalOptions &opts) {
     app.add_option("-c,--client", opts.client, "Override P4CLIENT (default: $P4CLIENT)")
         ->group("Global options")
         ->envname("P4CLIENT");
+    app.add_option("-z", opts.protocol_z, "Set Helix protocol variable (name or name=value); repeat for multiple")
+        ->group("Global options");
 
     // Runs after argv and env merge, before any subcommand callback (CLI11 root `run_callback` order).
-    app.parse_complete_callback(
-        [&opts]() { apply_connection_options(opts.user, opts.port, opts.client); });
+    app.parse_complete_callback([&opts]() {
+        apply_connection_options(opts.user, opts.port, opts.client);
+        apply_protocol_options(opts.protocol_z);
+    });
 }
 
 } // namespace p4

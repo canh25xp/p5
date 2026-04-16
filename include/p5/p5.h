@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "commands/result.h"
@@ -39,6 +40,8 @@ public:
     static std::string P4PORT;
     static std::string P4USER;
     static std::string P4CLIENT;
+    /// Parsed from global `-z` (empty if none); applied in `Initialize` via `SetProtocol`.
+    static std::vector<std::pair<std::string, std::string>> P4PROTOCOL_Z;
     static ClientResult::ClientSpecData ClientSpec;
 
     // Helix Core C++ API seems to crash while making connections parallely.

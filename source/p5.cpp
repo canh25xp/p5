@@ -21,6 +21,7 @@ ClientResult::ClientSpecData P5::ClientSpec;
 std::string P5::P4PORT;
 std::string P5::P4USER;
 std::string P5::P4CLIENT;
+std::vector<std::pair<std::string, std::string>> P5::P4PROTOCOL_Z;
 std::mutex P5::InitializationMutex;
 
 P5::P5() {
@@ -44,6 +45,9 @@ bool P5::Initialize() {
     m_ClientAPI.SetUser(P4USER.c_str());
     m_ClientAPI.SetClient(P4CLIENT.c_str());
     m_ClientAPI.SetProtocol("tag", "");
+    for (const auto &proto : P4PROTOCOL_Z) {
+        m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
+    }
     m_ClientAPI.Init(&e);
 
     if (!CheckErrors(e, msg)) {
