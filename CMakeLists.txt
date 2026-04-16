@@ -51,7 +51,7 @@ add_subdirectory(vendor)
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/p5
     include/p5/commands
-    include/p5/p4_cli
+    include/p5/p4
     include/p5/utils
 )
 

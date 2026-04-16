@@ -2,7 +2,7 @@
 
 #include "CLI/CLI.hpp"
 
-namespace p4_cli {
+namespace p4 {
 
 void register_commands(CLI::App &app);
 
