@@ -4,19 +4,25 @@
 
 #include "log.h"
 
+#include <algorithm>
+#include <ostream>
+#include <vector>
+
 void UsersResult::OutputStat(StrDict *varList) {
     StrPtr *userIDPtr = varList->GetVar("User");
-    StrPtr *emailPtr = varList->GetVar("Email");
 
-    if (!userIDPtr || !emailPtr) {
-        ERROR("UserID or email not found for a Perforce user");
+    if (!userIDPtr) {
+        ERROR("User not found for a Perforce user");
         return;
     }
 
     UserID userID = userIDPtr->Text();
     UserData userData;
 
-    userData.email = emailPtr->Text();
+    StrPtr *emailPtr = varList->GetVar("Email");
+    if (emailPtr) {
+        userData.email = emailPtr->Text();
+    }
 
     StrPtr *fullNamePtr = varList->GetVar("FullName");
     if (fullNamePtr) {
@@ -26,4 +32,18 @@ void UsersResult::OutputStat(StrDict *varList) {
     }
 
     m_Users.insert({userID, userData});
+}
+
+void UsersResult::PrintSortedTsv(std::ostream &out) const {
+    std::vector<UserID> ids;
+    ids.reserve(m_Users.size());
+    for (const auto &entry : m_Users) {
+        ids.push_back(entry.first);
+    }
+    std::sort(ids.begin(), ids.end());
+
+    for (const UserID &id : ids) {
+        const UserData &data = m_Users.at(id);
+        out << id << '\t' << data.fullName << '\t' << data.email << '\n';
+    }
 }

@@ -39,6 +39,6 @@ public:
     Result Run(const char *command, int argc, char **argv);
     Result Run(const std::string &commandLine);
     TestResult TestConnection(const int retries = 5);
-    UsersResult Users();
+    UsersResult Users(const std::vector<std::string> &extraArgs = {});
     InfoResult Info();
 };

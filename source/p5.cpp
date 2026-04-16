@@ -112,10 +112,12 @@ TestResult P5::TestConnection(const int retries) {
     return Run<TestResult>("changes", {"-m", "1", "//..."}, retries);
 }
 
-UsersResult P5::Users() {
-    return Run<UsersResult>("users", {
-                                         "-a" // Include service accounts
-                                     });
+UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
+    std::vector<std::string> args;
+    args.reserve(1 + extraArgs.size());
+    args.push_back("-a"); // Include service accounts
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<UsersResult>("users", args);
 }
 
 InfoResult P5::Info() {

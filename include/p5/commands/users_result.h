@@ -2,6 +2,7 @@
 
 #include "result.h"
 
+#include <iosfwd>
 #include <string>
 #include <unordered_map>
 
@@ -21,4 +22,7 @@ public:
     const std::unordered_map<UserID, UserData> &GetUserEmails() const { return m_Users; }
 
     void OutputStat(StrDict *varList) override;
+
+    /// One line per user, sorted by user id: UserId TAB FullName TAB Email
+    void PrintSortedTsv(std::ostream &out) const;
 };
