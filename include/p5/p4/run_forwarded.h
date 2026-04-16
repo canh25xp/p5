@@ -5,7 +5,7 @@
 
 class P5;
 
-namespace p4_cli {
+namespace p4 {
 
 /// Copy parsed global `-u` / `-p` / `-c` values (and any CLI11 `envname` fill) into `P5` statics.
 /// Intended for use from the root app's `parse_complete_callback` so it runs before subcommand callbacks.
@@ -15,4 +15,4 @@ void run_forwarded(P5 &p5, const char *command, const std::vector<std::string> &
 
 void run_p4_passthrough(const char *command, const std::vector<std::string> &args);
 
-} // namespace p4_cli
+} // namespace p4

@@ -1,4 +1,4 @@
-#include "p4_cli/run_forwarded.h"
+#include "p4/run_forwarded.h"
 
 #include <vector>
 
@@ -8,7 +8,7 @@
 #include "log.h"
 #include "p5.h"
 
-namespace p4_cli {
+namespace p4 {
 
 void apply_connection_options(const std::string &user, const std::string &port, const std::string &client) {
     P5::P4USER = user;
@@ -54,4 +54,4 @@ void run_p4_passthrough(const char *command, const std::vector<std::string> &arg
     }
 }
 
-} // namespace p4_cli
+} // namespace p4

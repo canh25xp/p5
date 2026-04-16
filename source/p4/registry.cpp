@@ -1,8 +1,8 @@
-#include "p4_cli/registry.h"
+#include "p4/registry.h"
 
-#include "p4_cli/command_registrars.h"
+#include "p4/command_registrars.h"
 
-namespace p4_cli {
+namespace p4 {
 
 void register_commands(CLI::App &app) {
     register_info(app);
@@ -12,4 +12,4 @@ void register_commands(CLI::App &app) {
     register_files(app);
 }
 
-} // namespace p4_cli
+} // namespace p4

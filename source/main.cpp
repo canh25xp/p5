@@ -5,9 +5,9 @@
 #include "dbg.h"
 
 #include "log.h"
-#include "p4_cli/global_options.h"
-#include "p4_cli/registry.h"
-#include "p4_cli/run_forwarded.h"
+#include "p4/global_options.h"
+#include "p4/registry.h"
+#include "p4/run_forwarded.h"
 #include "p5.h"
 
 int main(int argc, char **argv);
@@ -16,10 +16,10 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
-    p4_cli::GlobalOptions connection;
-    p4_cli::register_global_options(app, connection);
+    p4::GlobalOptions connection;
+    p4::register_global_options(app, connection);
 
-    p4_cli::register_commands(app);
+    p4::register_commands(app);
 
     // Allow extra arguments for legacy command handling
     app.allow_extras();
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
                 dbg(arg);
             }
 
-            p4_cli::run_forwarded(p5, command.c_str(), args);
+            p4::run_forwarded(p5, command.c_str(), args);
         }
 
         if (!P5::ShutdownLibraries()) {

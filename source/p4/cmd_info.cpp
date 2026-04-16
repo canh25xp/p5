@@ -1,9 +1,9 @@
 #include "CLI/CLI.hpp"
 
-#include "p4_cli/command_registrars.h"
-#include "p4_cli/run_forwarded.h"
+#include "p4/command_registrars.h"
+#include "p4/run_forwarded.h"
 
-namespace p4_cli {
+namespace p4 {
 
 void register_info(CLI::App &app) {
     auto *cmd = app.add_subcommand("info", "Print out client/server information");
@@ -11,4 +11,4 @@ void register_info(CLI::App &app) {
     cmd->callback([cmd]() { run_p4_passthrough("info", cmd->remaining()); });
 }
 
-} // namespace p4_cli
+} // namespace p4

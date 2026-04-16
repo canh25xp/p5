@@ -1,8 +1,8 @@
-#include "p4_cli/global_options.h"
+#include "p4/global_options.h"
 
-#include "p4_cli/run_forwarded.h"
+#include "p4/run_forwarded.h"
 
-namespace p4_cli {
+namespace p4 {
 
 void register_global_options(CLI::App &app, GlobalOptions &opts) {
     app.usage("[GLOBAL OPTIONS...] <subcommand> [arguments...]");
@@ -22,4 +22,4 @@ void register_global_options(CLI::App &app, GlobalOptions &opts) {
         [&opts]() { apply_connection_options(opts.user, opts.port, opts.client); });
 }
 
-} // namespace p4_cli
+} // namespace p4
