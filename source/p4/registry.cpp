@@ -10,6 +10,7 @@ void register_commands(CLI::App &app) {
     register_changes(app);
     register_describe(app);
     register_files(app);
+    register_clients(app);
 }
 
 } // namespace p4
