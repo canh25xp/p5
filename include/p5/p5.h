@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "commands/result.h"
@@ -26,10 +27,6 @@ class P5 {
     T Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries = COMMAND_RETRIES);
 
 public:
-    static std::string P4PORT;
-    static std::string P4USER;
-    static std::string P4CLIENT;
-
     static bool InitializeLibraries();
     static bool ShutdownLibraries();
 
