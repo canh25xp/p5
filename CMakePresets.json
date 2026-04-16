@@ -11,8 +11,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -20,8 +19,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -29,8 +27,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/Release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
@@ -39,8 +36,7 @@
       "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "OPENSSL_ROOT_DIR": "/usr/local",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "OPENSSL_ROOT_DIR": "/usr/local"
       }
     },
     {
@@ -49,8 +45,7 @@
       "binaryDir": "${sourceDir}/build/Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "OPENSSL_ROOT_DIR": "/usr/local",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "OPENSSL_ROOT_DIR": "/usr/local"
       }
     },
     {
@@ -59,8 +54,7 @@
       "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64"
       }
     },
     {
@@ -69,8 +63,7 @@
       "binaryDir": "${sourceDir}/build/Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437"
+        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64"
       }
     },
     {
@@ -82,8 +75,7 @@
         "strategy": "set"
       },
       "cacheVariables": {
-        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437-vs2017_static"
+        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3"
       }
     },
     {
@@ -95,8 +87,7 @@
         "strategy": "set"
       },
       "cacheVariables": {
-        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3",
-        "P4API_ROOT_DIR": "${sourceDir}/vendor/p4api/p4api-2025.1.2907437-vs2022_static"
+        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3"
       }
     }
   ],
