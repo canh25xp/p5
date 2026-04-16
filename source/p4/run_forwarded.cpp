@@ -5,7 +5,6 @@
 #include "CLI/CLI.hpp"
 #include "dbg.h"
 
-#include "log.h"
 #include "p5.h"
 
 namespace p4 {
@@ -29,13 +28,6 @@ void run_forwarded(P5 &p5, const char *command, const std::vector<std::string> &
 
 void run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
     if (!P5::InitializeLibraries()) {
-        throw CLI::RuntimeError(1);
-    }
-
-    if (P5().TestConnection().IsError()) {
-        INFO("Perforce server is available");
-    } else {
-        ERROR("Error occurred while connecting to " << P5::P4PORT);
         throw CLI::RuntimeError(1);
     }
 
