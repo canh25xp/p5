@@ -22,6 +22,7 @@ curl -Lo p4api.zip https://filehost.perforce.com/perforce/r25.1/bin.mingw64x64/p
 
 ```sh
 sudo apt install libssl-dev
+sudo apt install libzstd-dev
 ```
 
 ### Windows

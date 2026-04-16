@@ -4,6 +4,16 @@ cmake_minimum_required(VERSION 3.15)
 project(P4API)
 
 set(OPENSSL_USE_STATIC_LIBS TRUE)
+# Distro static libcrypto.a is often built with zstd; the link line then needs
+# -lzstd, which only resolves if libzstd-dev is installed (unversioned libzstd.so).
+# Without it, fall back to shared OpenSSL so the app links without a separate zstd dev symlink.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_library(_P5_ZSTD_DEV NAMES zstd)
+  if(NOT _P5_ZSTD_DEV)
+    message(STATUS "libzstd not found for static OpenSSL (install libzstd-dev for static libs); using shared OpenSSL")
+    set(OPENSSL_USE_STATIC_LIBS FALSE)
+  endif()
+endif()
 
 # Find openssl on the system
 if(NOT OPENSSL_ROOT_DIR)
