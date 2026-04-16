@@ -42,10 +42,25 @@ In an elevated PowerShell window if a package prompts for it:
 ```powershell
 winget install -e --id Git.Git
 winget install -e --id Kitware.CMake
-winget install -e --id Microsoft.VisualStudio.2022.BuildTools
 ```
 
-After **Visual Studio Build Tools** finishes, open **Visual Studio Installer**, choose **Modify** on the installation, and enable the **Desktop development with C++** workload (MSVC toolset such as **v143**, and a **Windows 10/11 SDK**). CMake needs a C++ compiler and the SDK to configure the project.
+**Visual Studio Build Tools** with the MSVC **C++ build tools** workload (`Microsoft.VisualStudio.Workload.VCTools`, includes a Windows SDK via recommended components). Prefer doing it from the shell in one step:
+
+```powershell
+winget install -e --id Microsoft.VisualStudio.2022.BuildTools --override "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+
+If Build Tools is already installed without that workload, add it with **Visual Studio Installer**’s CLI (same tool `winget` uses under the hood):
+
+```powershell
+$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+$vsi     = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+$installPath = & $vswhere -latest -products Microsoft.VisualStudio.Product.BuildTools -property installationPath
+if (-not $installPath) { $installPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools" }
+& $vsi modify --installPath $installPath --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --passive --wait --norestart
+```
+
+You can still use the **Visual Studio Installer** GUI (**Modify** → **Desktop development with C++** / **C++ build tools**) if you prefer.
 
 For **OpenSSL**, the `msvc2022` / `msvc2017` CMake presets in this repo default to FireDaemon’s layout under `C:/Program Files/FireDaemon OpenSSL 3`. Installing that distribution avoids extra flags:
 
@@ -69,7 +84,7 @@ scoop bucket add extras
 scoop install vs2022buildtools
 ```
 
-Use **Visual Studio Installer** to add **Desktop development with C++** if the Build Tools installer did not already. If CMake cannot find OpenSSL, set `OPENSSL_ROOT_DIR` to the root directory that contains `include/openssl` and `lib` (for Scoop packages, inspect the app directory under `%USERPROFILE%\scoop\apps`).
+If the Scoop package only bootstraps the installer, add the same **C++ build tools** workload with the `vs_installer modify` PowerShell block above. If CMake cannot find OpenSSL, set `OPENSSL_ROOT_DIR` to the directory that contains `include/openssl` and `lib` (for Scoop, that is often the path printed by `scoop prefix openssl`).
 
 **Build with MSVC (recommended)**
 
