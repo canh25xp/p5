@@ -10,7 +10,8 @@ project(
     DESCRIPTION "P4 Tool"
 )
 
-option(DBG_MACRO_DISABLE "disable debug macro" FALSE)
+# When OFF, dbg is still disabled for Release-like configs via a generator expression below.
+option(DBG_MACRO_DISABLE "Force-disable dbg macro in all configurations (including Debug)" OFF)
 option(DBG_MACRO_NO_WARNING "disable debug macro warning" TRUE)
 
 # PRINT/INFO/WARN are compiled in when CMAKE_BUILD_TYPE/Debug config is Debug, or when this is ON (e.g. Release + diagnostics).
@@ -68,6 +69,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE P4API::client CLI11::CLI11 dbg_mac
 
 if(DBG_MACRO_DISABLE)
   target_compile_definitions(${PROJECT_NAME} PRIVATE DBG_MACRO_DISABLE)
+else()
+  # Release / RelWithDebInfo / MinSizeRel: no dbg(); Debug keeps dbg() unless DBG_MACRO_DISABLE is ON.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:DBG_MACRO_DISABLE>)
 endif()
 
 if(DBG_MACRO_NO_WARNING)
