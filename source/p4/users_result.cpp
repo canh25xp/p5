@@ -1,4 +1,4 @@
-#include "users_result.h"
+#include "p4/users_result.h"
 
 #include "p4/clientapi.h"
 
@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <ostream>
 #include <vector>
+
+namespace p4 {
 
 void UsersResult::OutputStat(StrDict *varList) {
     StrPtr *userIDPtr = varList->GetVar("User");
@@ -47,3 +49,5 @@ void UsersResult::PrintSortedTsv(std::ostream &out) const {
         out << id << '\t' << data.fullName << '\t' << data.email << '\n';
     }
 }
+
+} // namespace p4
