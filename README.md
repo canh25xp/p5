@@ -9,14 +9,9 @@
 
 ## Dependencies
 
-> [!NOTE]
-> cmake will download p4api for you, so no need for manual download, it just here for references
+### P4 api
 
-You can download p4api from the [official website](https://www.perforce.com/downloads/helix-core-c/c-api) or the [archive](https://filehost.perforce.com/perforce/r25.1/bin.mingw64x64/p4api-openssl3_gcc8_win32_seh.zip)
-
-```sh
-curl -Lo p4api.zip https://filehost.perforce.com/perforce/r25.1/bin.mingw64x64/p4api-openssl3_gcc8_win32_seh.zip
-```
+[cmake](./cmake/downloadP4api.cmake) will automatically download p4api from the [official website](https://www.perforce.com/downloads/helix-core-c/c-api) or the [archive](https://filehost.perforce.com/perforce/r25.2)
 
 ### Linux
 
