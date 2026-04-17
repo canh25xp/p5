@@ -9,7 +9,7 @@
 void register_global_options(CLI::App &app, GlobalOptions &opts) {
     app.usage("[GLOBAL OPTIONS...] <subcommand> [arguments...]");
 
-    app.set_version_flag("-v,--version", P5_VERSION_STRING)->group("Global options");
+    app.set_version_flag("-v,-V,--version", P5_VERSION_STRING)->group("Global options");
 
     app.add_option("-u,--user", opts.user, "Override P4USER (default: $P4USER)")
         ->group("Global options")
