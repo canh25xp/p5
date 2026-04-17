@@ -62,7 +62,7 @@ target_compile_definitions(
   ${PROJECT_NAME}
   PRIVATE
     "P5_APP_DESCRIPTION=\"${PROJECT_DESCRIPTION}\""
-    "P5_VERSION_STRING=\"p5 ${PROJECT_VERSION} (p4api ${P4API_VERSION})\""
+    "P5_VERSION_STRING=\"p5 version ${PROJECT_VERSION} (p4api version ${P4API_VERSION})\""
 )
 
 add_subdirectory(vendor)
