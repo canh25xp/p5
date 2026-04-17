@@ -1,6 +1,6 @@
 #include "CLI/CLI.hpp"
 
-#include "p4/command_registrars.h"
+#include "command_registrars.h"
 #include "p5.h"
 
 #include <iostream>

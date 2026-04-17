@@ -3,9 +3,9 @@
 
 #include "CLI/CLI.hpp"
 
-#include "p4/global_options.h"
-#include "p4/registry.h"
-#include "p4/run_forwarded.h"
+#include "global_options.h"
+#include "registry.h"
+#include "run_forwarded.h"
 
 int main(int argc, char **argv);
 int main(int argc, char **argv) {

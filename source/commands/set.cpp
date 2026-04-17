@@ -2,11 +2,11 @@
 
 #include "p5.h"
 
-#include "p4/command_registrars.h"
+#include "command_registrars.h"
 #include "p4/enviro.h"
 #include "p4/error.h"
 #include "p4/hostenv.h"
-#include "p4/run_forwarded.h"
+#include "run_forwarded.h"
 
 namespace p4 {
 

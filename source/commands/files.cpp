@@ -1,7 +1,7 @@
 #include "CLI/CLI.hpp"
 
-#include "p4/command_registrars.h"
-#include "p4/run_forwarded.h"
+#include "command_registrars.h"
+#include "run_forwarded.h"
 
 namespace p4 {
 

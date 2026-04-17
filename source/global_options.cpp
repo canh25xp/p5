@@ -1,6 +1,6 @@
-#include "p4/global_options.h"
+#include "global_options.h"
 
-#include "p4/run_forwarded.h"
+#include "run_forwarded.h"
 
 namespace p4 {
 
