@@ -153,6 +153,5 @@ void register_set(CLI::App &app) {
     auto *sub = app.add_subcommand("set", "Set or display Perforce variables");
     sub->add_flag("-a,--all", opts->all, "List all supported P4* variables");
     sub->add_flag("-q,--quiet", opts->quiet, "When listing settings, omit where each value is stored");
-    sub->prefix_command();
     sub->callback([sub, opts]() { run_set(sub, *opts); });
 }
