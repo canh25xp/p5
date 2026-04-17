@@ -7,9 +7,13 @@
 #include "registry.h"
 #include "run_forwarded.h"
 
+#ifndef P5_APP_DESCRIPTION
+#define P5_APP_DESCRIPTION "p5"
+#endif
+
 int main(int argc, char **argv);
 int main(int argc, char **argv) {
-    CLI::App app("p5: Complementary p4 command-line tools");
+    CLI::App app(P5_APP_DESCRIPTION);
 
     argv = app.ensure_utf8(argv);
 
