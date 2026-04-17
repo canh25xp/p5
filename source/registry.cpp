@@ -1,6 +1,6 @@
-#include "p4/registry.h"
+#include "registry.h"
 
-#include "p4/command_registrars.h"
+#include "command_registrars.h"
 
 namespace p4 {
 
