@@ -35,9 +35,19 @@ if(NOT P4API_ROOT_DIR)
   # p4api-${P4API_VERSION}-vs2017_static
   # p4api-${P4API_VERSION}-vs2022_static
   set(P4API_ROOT_DIR "${P4API_VENDOR_DIR}/p4api-${P4API_VERSION}")
+else()
+  if(NOT DEFINED P4API_VERSION OR P4API_VERSION STREQUAL "")
+    get_filename_component(_p4api_dir_name "${P4API_ROOT_DIR}" NAME)
+    if(_p4api_dir_name MATCHES "^p4api-(.+)$")
+      set(P4API_VERSION "${CMAKE_MATCH_1}")
+    else()
+      set(P4API_VERSION "unknown")
+    endif()
+  endif()
 endif()
 
 message(STATUS "P4API_ROOT_DIR:" ${P4API_ROOT_DIR})
+message(STATUS "P4API_VERSION:" ${P4API_VERSION})
 
 if(NOT EXISTS "${P4API_ROOT_DIR}")
   download_and_extract_p4api()
@@ -46,6 +56,12 @@ endif()
 file(GLOB_RECURSE INCLUDES include/**.h)
 file(GLOB_RECURSE SOURCES source/**.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})
+
+# Version string for --version / -v (PROJECT_VERSION from project(); P4API_VERSION set above)
+target_compile_definitions(
+  ${PROJECT_NAME}
+  PRIVATE "P5_VERSION_STRING=\"p5 ${PROJECT_VERSION} (p4api ${P4API_VERSION})\""
+)
 
 add_subdirectory(vendor)
 

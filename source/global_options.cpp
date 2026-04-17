@@ -2,8 +2,14 @@
 
 #include "run_forwarded.h"
 
+#ifndef P5_VERSION_STRING
+#define P5_VERSION_STRING "p5 (unknown version) (p4api unknown)"
+#endif
+
 void register_global_options(CLI::App &app, GlobalOptions &opts) {
     app.usage("[GLOBAL OPTIONS...] <subcommand> [arguments...]");
+
+    app.set_version_flag("-v,--version", P5_VERSION_STRING)->group("Global options");
 
     app.add_option("-u,--user", opts.user, "Override P4USER (default: $P4USER)")
         ->group("Global options")
