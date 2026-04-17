@@ -7,7 +7,7 @@ project(
     p5
     LANGUAGES CXX
     VERSION 1.0
-    DESCRIPTION "P4 Tool"
+    DESCRIPTION "p5: Complementary p4 command-line tools"
 )
 
 # When OFF, dbg is still disabled for Release-like configs via a generator expression below.
@@ -57,10 +57,12 @@ file(GLOB_RECURSE INCLUDES include/**.h)
 file(GLOB_RECURSE SOURCES source/**.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})
 
-# Version string for --version / -v (PROJECT_VERSION from project(); P4API_VERSION set above)
+# CLI description / --version (PROJECT_* and P4API_VERSION from above)
 target_compile_definitions(
   ${PROJECT_NAME}
-  PRIVATE "P5_VERSION_STRING=\"p5 ${PROJECT_VERSION} (p4api ${P4API_VERSION})\""
+  PRIVATE
+    "P5_APP_DESCRIPTION=\"${PROJECT_DESCRIPTION}\""
+    "P5_VERSION_STRING=\"p5 ${PROJECT_VERSION} (p4api ${P4API_VERSION})\""
 )
 
 add_subdirectory(vendor)
