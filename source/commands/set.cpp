@@ -6,9 +6,6 @@
 #include "p4/enviro.h"
 #include "p4/error.h"
 #include "p4/hostenv.h"
-#include "run_forwarded.h"
-
-namespace {
 
 /// Same sources as `p4 set` with no arguments: local `Enviro` only (no `ClientApi::Init`, no server).
 void print_local_enviro() {
@@ -33,8 +30,6 @@ void print_local_enviro() {
     env.List(0);
 }
 
-} // namespace
-
 static void run_set(CLI::App *cmd) {
     const std::vector<std::string> args = cmd->remaining();
 
@@ -48,8 +43,6 @@ static void run_set(CLI::App *cmd) {
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
         }
-    } else {
-        run_p4_passthrough("set", args);
     }
 }
 
