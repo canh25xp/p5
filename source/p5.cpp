@@ -284,12 +284,12 @@ Result P5::Sync(const std::string &path) {
                                });
 }
 
-p4::UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
+UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
     std::vector<std::string> args;
     args.reserve(1 + extraArgs.size());
     args.push_back("-a"); // Include service accounts
     args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<p4::UsersResult>("users", args);
+    return Run<UsersResult>("users", args);
 }
 
 InfoResult P5::Info() {

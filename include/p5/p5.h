@@ -80,6 +80,6 @@ public:
     void UpdateClientSpec();
     ClientResult Client();
     StreamResult Stream(const std::string &path);
-    p4::UsersResult Users(const std::vector<std::string> &extraArgs = {});
+    UsersResult Users(const std::vector<std::string> &extraArgs = {});
     InfoResult Info();
 };

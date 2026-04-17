@@ -6,8 +6,6 @@
 #include <string>
 #include <unordered_map>
 
-namespace p4 {
-
 class UsersResult : public Result {
 public:
     using UserID = std::string;
@@ -28,5 +26,3 @@ public:
     /// One line per user, sorted by user id: UserId TAB FullName TAB Email
     void PrintSortedTsv(std::ostream &out) const;
 };
-
-} // namespace p4

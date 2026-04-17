@@ -2,8 +2,6 @@
 
 #include "run_forwarded.h"
 
-namespace p4 {
-
 void register_global_options(CLI::App &app, GlobalOptions &opts) {
     app.usage("[GLOBAL OPTIONS...] <subcommand> [arguments...]");
 
@@ -25,5 +23,3 @@ void register_global_options(CLI::App &app, GlobalOptions &opts) {
         apply_protocol_options(opts.protocol_z);
     });
 }
-
-} // namespace p4

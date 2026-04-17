@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-namespace p4 {
-
 static void run_p5_users(const std::vector<std::string> &args) {
     if (!P5::InitializeLibraries()) {
         throw CLI::RuntimeError(1);
@@ -37,5 +35,3 @@ void register_users(CLI::App &app) {
     cmd->prefix_command();
     cmd->callback([cmd]() { run_p5_users(cmd->remaining()); });
 }
-
-} // namespace p4

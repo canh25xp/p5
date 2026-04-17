@@ -2,8 +2,6 @@
 
 #include "command_registrars.h"
 
-namespace p4 {
-
 void register_commands(CLI::App &app) {
     register_info(app);
     register_sync(app);
@@ -14,5 +12,3 @@ void register_commands(CLI::App &app) {
     register_users(app);
     register_set(app);
 }
-
-} // namespace p4
