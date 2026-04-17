@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(P4ApiVersion)
 include(downloadP4api)
 
 project(
@@ -30,7 +31,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT P4API_ROOT_DIR)
   set(P4API_VENDOR_DIR "${CMAKE_SOURCE_DIR}/vendor/p4api")
-  set(P4API_VERSION "2025.1.2907437")
   # TODO: prepend vs2017_static when build for windows, like:
   # p4api-${P4API_VERSION}-vs2017_static
   # p4api-${P4API_VERSION}-vs2022_static

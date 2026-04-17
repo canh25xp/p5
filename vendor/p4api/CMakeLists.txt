@@ -37,8 +37,9 @@ message(STATUS "OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
 
 add_library(p4api_client INTERFACE)
 
-# TODO: refactor p4 api version in this and CMakePresets
-set(P4API_VERSION "2025.1.2907437")
+if(NOT DEFINED P4API_VERSION OR P4API_VERSION STREQUAL "")
+  include("${CMAKE_SOURCE_DIR}/cmake/P4ApiVersion.cmake")
+endif()
 
 if(MSVC)
   if(CMAKE_GENERATOR MATCHES "Visual Studio 17 2022")
