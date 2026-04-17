@@ -89,6 +89,24 @@
       "cacheVariables": {
         "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3"
       }
+    },
+    {
+      "name": "mingw-w64-cross-release",
+      "inherits": ["ninja-release"],
+      "binaryDir": "${sourceDir}/build/mingw-w64-release",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-mingw-w64-linux.cmake",
+      "cacheVariables": {
+        "OPENSSL_ROOT_DIR": "/usr/x86_64-w64-mingw32"
+      }
+    },
+    {
+      "name": "mingw-w64-cross-debug",
+      "inherits": ["ninja-debug"],
+      "binaryDir": "${sourceDir}/build/mingw-w64-debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-mingw-w64-linux.cmake",
+      "cacheVariables": {
+        "OPENSSL_ROOT_DIR": "/usr/x86_64-w64-mingw32"
+      }
     }
   ],
   "buildPresets": [
@@ -143,6 +161,14 @@
       "name": "msvc2022-release",
       "configurePreset": "msvc2022",
       "configuration": "Release"
+    },
+    {
+      "name": "mingw-w64-cross-release",
+      "configurePreset": "mingw-w64-cross-release"
+    },
+    {
+      "name": "mingw-w64-cross-debug",
+      "configurePreset": "mingw-w64-cross-debug"
     }
   ],
   "workflowPresets": [
@@ -268,6 +294,32 @@
         {
           "type": "build",
           "name": "msvc2022-release"
+        }
+      ]
+    },
+    {
+      "name": "mingw-w64-cross-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "mingw-w64-cross-release"
+        },
+        {
+          "type": "build",
+          "name": "mingw-w64-cross-release"
+        }
+      ]
+    },
+    {
+      "name": "mingw-w64-cross-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "mingw-w64-cross-debug"
+        },
+        {
+          "type": "build",
+          "name": "mingw-w64-cross-debug"
         }
       ]
     }
