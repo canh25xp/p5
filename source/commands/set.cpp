@@ -47,7 +47,7 @@ static void run_set(CLI::App *cmd) {
 }
 
 void register_set(CLI::App &app) {
-    auto *sub = app.add_subcommand("set", "Show or set Helix client variables (see p4 set)");
+    auto *sub = app.add_subcommand("set", "Set or display Perforce variables");
     sub->prefix_command();
     sub->callback([sub]() { run_set(sub); });
 }
