@@ -89,21 +89,22 @@ void load_enviro_for_set(Enviro &env) {
 }
 
 /// Same sources as `p4 set` with no arguments: local `Enviro` only (no `ClientApi::Init`, no server).
-void print_local_enviro() {
+void print_local_enviro(bool quiet) {
     Enviro env;
     load_enviro_for_set(env);
-    env.List(0);
+    env.List(quiet ? 1 : 0);
 }
 
-void print_all_supported_p4_variables() {
+void print_all_supported_p4_variables(bool quiet) {
     Enviro env;
     load_enviro_for_set(env);
+    const int format_flags = quiet ? 1 : 0;
     for (const char *name : kP4EnvVarCandidates) {
         if (!Enviro::IsKnown(name)) {
             continue;
         }
         StrBuf formatted;
-        env.Format(name, &formatted, 0);
+        env.Format(name, &formatted, format_flags);
         if (formatted.Length() > 0) {
             std::cout << formatted.Text() << '\n';
         } else {
@@ -114,15 +115,16 @@ void print_all_supported_p4_variables() {
 
 struct SetCommandOpts {
     bool all{false};
+    bool quiet{false};
 };
 
-static void run_set(CLI::App *cmd, bool list_all_supported) {
-    if (list_all_supported) {
+static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
+    if (opts.all) {
         if (!P5::InitializeLibraries()) {
             throw CLI::RuntimeError(1);
         }
 
-        print_all_supported_p4_variables();
+        print_all_supported_p4_variables(opts.quiet);
 
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
@@ -137,7 +139,7 @@ static void run_set(CLI::App *cmd, bool list_all_supported) {
             throw CLI::RuntimeError(1);
         }
 
-        print_local_enviro();
+        print_local_enviro(opts.quiet);
 
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
@@ -150,6 +152,7 @@ void register_set(CLI::App &app) {
 
     auto *sub = app.add_subcommand("set", "Set or display Perforce variables");
     sub->add_flag("-a,--all", opts->all, "List all supported P4* variables");
+    sub->add_flag("-q,--quiet", opts->quiet, "When listing settings, omit where each value is stored");
     sub->prefix_command();
-    sub->callback([sub, opts]() { run_set(sub, opts->all); });
+    sub->callback([sub, opts]() { run_set(sub, *opts); });
 }
