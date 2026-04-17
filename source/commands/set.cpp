@@ -8,8 +8,6 @@
 #include "p4/hostenv.h"
 #include "run_forwarded.h"
 
-namespace p4 {
-
 namespace {
 
 /// Same sources as `p4 set` with no arguments: local `Enviro` only (no `ClientApi::Init`, no server).
@@ -60,5 +58,3 @@ void register_set(CLI::App &app) {
     sub->prefix_command();
     sub->callback([sub]() { run_set(sub); });
 }
-
-} // namespace p4

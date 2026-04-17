@@ -120,7 +120,7 @@ UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
     args.reserve(1 + extraArgs.size());
     args.push_back("-a"); // Include service accounts
     args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<p4::UsersResult>("users", args);
+    return Run<UsersResult>("users", args);
 }
 
 InfoResult P5::Info() {

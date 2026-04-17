@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace p4 {
-
 /// Values bound to global `-u` / `-p` / `-c` (CLI + `envname`); filled during parse.
 struct GlobalOptions {
     std::string user;
@@ -17,5 +15,3 @@ struct GlobalOptions {
 
 /// Registers global `-u` / `-p` / `-c` / `-z` and `parse_complete_callback` to apply them to `P5` before subcommands run.
 void register_global_options(CLI::App &app, GlobalOptions &opts);
-
-} // namespace p4

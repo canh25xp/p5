@@ -8,8 +8,6 @@
 
 #include "p5.h"
 
-namespace p4 {
-
 void apply_connection_options(const std::string &user, const std::string &port, const std::string &client) {
     P5::P4USER = user;
     P5::P4PORT = port;
@@ -58,5 +56,3 @@ void run_p4_passthrough(const char *command, const std::vector<std::string> &arg
         throw CLI::RuntimeError(1);
     }
 }
-
-} // namespace p4

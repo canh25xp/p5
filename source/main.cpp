@@ -13,10 +13,10 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
-    p4::GlobalOptions connection;
-    p4::register_global_options(app, connection);
+    GlobalOptions connection;
+    register_global_options(app, connection);
 
-    p4::register_commands(app);
+    register_commands(app);
 
     // Allow extra arguments for legacy command handling
     app.allow_extras();
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         const std::string &command = remaining[0];
         const std::vector<std::string> args(remaining.begin() + 1, remaining.end());
         try {
-            p4::run_p4_passthrough(command.c_str(), args);
+            run_p4_passthrough(command.c_str(), args);
         } catch (const CLI::RuntimeError &e) {
             return e.get_exit_code();
         }
