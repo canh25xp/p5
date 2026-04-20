@@ -16,8 +16,7 @@
 ### Linux
 
 ```sh
-sudo apt install libssl-dev
-sudo apt install libzstd-dev
+sudo apt install -y build-essential ninja-build libssl-dev libzstd-dev
 ```
 
 ### Windows
