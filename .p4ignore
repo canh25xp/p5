@@ -1,2 +1,4 @@
 build/
 .git/
+.p4tickets
+.p4config
