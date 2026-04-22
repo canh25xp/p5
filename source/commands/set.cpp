@@ -335,17 +335,11 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
         const std::string name = arg.substr(0, eq);
         const std::string value = arg.substr(eq + 1);
 #if defined(_WIN32)
-        e.Clear();
-        env.Set(name.c_str(), value.c_str(), &e);
-        if (e.Test()) {
-            StrBuf msg;
-            e.Fmt(&msg);
-            ERROR(msg.Text());
-            if (!P5::ShutdownLibraries()) {
-                throw CLI::RuntimeError(1);
-            }
+        ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
+        if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
         }
+        throw CLI::RuntimeError(1);
 #else
         if (!p4_set_persistent_unix(env, name, value)) {
             if (!P5::ShutdownLibraries()) {
