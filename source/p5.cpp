@@ -6,36 +6,26 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#include <mutex>
 
 #include "p4/clientapi.h"
 #include "p4/p4libs.h"
 #include "p4/signaler.h"
 
 #include "log.h"
-#include "std_helpers.h"
-#include "stream_result.h"
 #include "cli_helpers.h"
 
-ClientResult::ClientSpecData P5::ClientSpec;
 std::string P5::P4PORT;
 std::string P5::P4USER;
 std::string P5::P4CLIENT;
-std::mutex P5::InitializationMutex;
 
 P5::P5() {
     if (!Initialize()) {
         ERROR("Could not initialize P4");
         return;
     }
-
-    AddClientSpecView(ClientSpec.mapping);
 }
 
 bool P5::Initialize() {
-    // Helix Core C++ API seems to crash while making connections parallely.
-    std::unique_lock<std::mutex> lock(InitializationMutex);
-
     Error e;
     StrBuf msg;
 
@@ -55,8 +45,6 @@ bool P5::Initialize() {
 }
 
 bool P5::Deinitialize() {
-    std::unique_lock<std::mutex> lock(InitializationMutex);
-
     Error e;
     StrBuf msg;
 
@@ -75,22 +63,6 @@ P5::~P5() {
     if (!Deinitialize()) {
         ERROR("P4 context was not destroyed successfully");
     }
-}
-
-bool P5::IsDepotPathValid(const std::string &depotPath) {
-    return STDHelpers::EndsWith(depotPath, "/...") && STDHelpers::StartsWith(depotPath, "//");
-}
-
-bool P5::IsFileUnderDepotPath(const std::string &fileRevision, const std::string &depotPath) {
-    return STDHelpers::Contains(fileRevision, depotPath.substr(0, depotPath.size() - 3)); // -3 to remove the trailing "..."
-}
-
-bool P5::IsDepotPathUnderClientSpec(const std::string &depotPath) {
-    return m_ClientMapping.IsInLeft(depotPath);
-}
-
-bool P5::IsFileUnderClientSpec(const std::string &fileRevision) {
-    return m_ClientMapping.IsInRight(fileRevision);
 }
 
 bool P5::CheckErrors(Error &e, StrBuf &msg) {
@@ -136,149 +108,8 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-void P5::AddClientSpecView(const std::vector<std::string> &viewStrings) {
-    m_ClientMapping.InsertTranslationMapping(viewStrings);
-}
-
-void P5::UpdateClientSpec() {
-    Run<Result>("client", {});
-}
-
-ClientResult P5::Client() {
-    return Run<ClientResult>("client", {"-o"});
-}
-
-StreamResult P5::Stream(const std::string &path) {
-    return Run<StreamResult>("stream", {"-o", path});
-}
-
 TestResult P5::TestConnection(const int retries) {
     return Run<TestResult>("changes", {"-m", "1", "//..."}, retries);
-}
-
-ChangesResult P5::ShortChanges(const std::string &path) {
-    ChangesResult changes = Run<ChangesResult>("changes", {
-                                                              "-s", "submitted", // Only include submitted CLs
-                                                              path               // Depot path to get CLs from
-                                                          });
-    changes.reverse();
-    return changes;
-}
-
-ChangesResult P5::Changes(const std::string &path) {
-    return Run<ChangesResult>("changes", {
-                                             "-l",              // Get full descriptions instead of sending cut-short ones
-                                             "-s", "submitted", // Only include submitted CLs
-                                             path               // Depot path to get CLs from
-                                         });
-}
-
-ChangesResult P5::Changes(const std::string &path, const std::string &from, int32_t maxCount) {
-    std::vector<std::string> args = {
-        "-l",             // Get full descriptions instead of sending cut-short ones
-        "-s", "submitted" // Only include submitted CLs
-    };
-
-    // This needs to be declared outside the if scope below to
-    // keep the internal character array alive till the p4 call is made
-    std::string maxCountStr;
-    if (maxCount != -1) {
-        maxCountStr = std::to_string(maxCount);
-
-        args.push_back("-m"); // Only send max this many number of CLs
-        args.push_back(maxCountStr);
-    }
-
-    std::string pathAddition;
-    if (!from.empty()) {
-        // Appending "@CL_NUMBER,@now" seems to include the current CL,
-        // which makes this awkward to deal with in general. So instead,
-        // we append "@>CL_NUMBER" so that we only receive the CLs after
-        // the current one.
-        pathAddition = "@>" + from;
-    }
-
-    args.push_back(path + pathAddition);
-
-    ChangesResult result = Run<ChangesResult>("changes", args);
-    result.reverse();
-    return result;
-}
-
-ChangesResult P5::ChangesFromTo(const std::string &path, const std::string &from, const std::string &to) {
-    std::string pathArg = path + "@" + from + "," + to;
-    return Run<ChangesResult>("changes", {
-                                             "-s", "submitted", // Only include submitted CLs
-                                             pathArg            // Depot path to get CLs from
-                                         });
-}
-
-ChangesResult P5::LatestChange(const std::string &path) {
-    return Run<ChangesResult>("changes", {
-                                             "-s", "submitted", // Only include submitted CLs,
-                                             "-m", "1",         // Get top-most change
-                                             path               // Depot path to get CLs from
-                                         });
-}
-
-ChangesResult P5::OldestChange(const std::string &path) {
-    ChangesResult changes = Run<ChangesResult>("changes", {
-                                                              "-s", "submitted", // Only include submitted CLs,
-                                                              "-m", "1",         // Get top-most change
-                                                              path               // Depot path to get CLs from
-                                                          });
-    changes.reverse();
-    return changes;
-}
-
-DescribeResult P5::Describe(const std::string &cl) {
-    return Run<DescribeResult>("describe", {"-s", // Omit the diffs
-                                            cl});
-}
-
-FileLogResult P5::FileLog(const std::string &changelist) {
-    return Run<FileLogResult>("filelog", {
-                                             "-c", // restrict output to a single changelist
-                                             changelist,
-                                             "-m1",  // don't get the full history, just the first entry.
-                                             "//..." // rather than require the path to be passed in, just list all files.
-                                         });
-}
-
-SizesResult P5::Size(const std::string &file) {
-    return Run<SizesResult>("sizes", {"-a", "-s", file});
-}
-
-Result P5::Sync() {
-    return Run<Result>("sync", {});
-}
-
-SyncResult P5::GetFilesToSyncAtCL(const std::string &path, const std::string &cl) {
-    std::string clCommand = "@" + cl;
-    return Run<SyncResult>("sync", {
-                                       "-n", // Only preview the files to sync. Don't send file contents...yet
-                                       clCommand,
-                                   });
-}
-
-PrintResult P5::PrintFile(const std::string &filePathRevision) {
-    return Run<PrintResult>("print", {
-                                         filePathRevision,
-                                     });
-}
-
-PrintResult P5::PrintFiles(const std::vector<std::string> &fileRevisions) {
-    if (fileRevisions.empty()) {
-        return PrintResult();
-    }
-
-    return Run<PrintResult>("print", fileRevisions);
-}
-
-Result P5::Sync(const std::string &path) {
-    return Run<Result>("sync", {
-                                   path // Sync a particular depot path
-                               });
 }
 
 UsersResult P5::Users() {
