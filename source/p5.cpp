@@ -111,7 +111,7 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-TestResult P5::TestConnection(const int retries) {
+TestResult P5::Test(const int retries) {
     return Run<TestResult>("changes", {"-m", "1", "//..."}, retries);
 }
 
