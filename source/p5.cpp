@@ -111,10 +111,6 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-TestResult P5::Test(const int retries) {
-    return Run<TestResult>("changes", {"-m", "1", "//..."}, retries);
-}
-
 UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
     std::vector<std::string> args;
     args.reserve(1 + extraArgs.size());

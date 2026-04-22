@@ -8,7 +8,6 @@
 #include "p4/clientapi.h"
 
 #include "users_result.h"
-#include "test_result.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -34,6 +33,5 @@ public:
 
     Result Run(const char *command, int argc, char **argv);
     Result Run(const std::string &commandLine);
-    TestResult Test(const int retries = 5);
     UsersResult Users(const std::vector<std::string> &extraArgs = {});
 };
