@@ -10,6 +10,7 @@ compile_commands.json
 
 .vscode/*
 !.vscode/launch.json
+!.vscode/tasks.json
 
 .p4tickets
 .p4config
