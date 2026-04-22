@@ -2,7 +2,6 @@
 
 #include "p5.h"
 
-#include "command_registrars.h"
 #include "p4/enviro.h"
 #include "p4/error.h"
 #include "p4/hostenv.h"
