@@ -9,7 +9,7 @@
     {
       "name": "default",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -94,7 +94,7 @@
   "buildPresets": [
     {
       "name": "default",
-      "configurePreset": "default"
+      "configurePreset": "ninja-debug"
     },
     {
       "name": "ninja-debug",
@@ -151,11 +151,11 @@
       "steps": [
         {
           "type": "configure",
-          "name": "default"
+          "name": "ninja-debug"
         },
         {
           "type": "build",
-          "name": "default"
+          "name": "ninja-debug"
         }
       ]
     },
