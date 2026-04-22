@@ -248,20 +248,6 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-P5::LibrariesGuard::LibrariesGuard() : m_initialized(false) {
-    m_initialized = InitializeLibraries();
-}
-
-P5::LibrariesGuard::~LibrariesGuard() {
-    if (m_initialized) {
-        ShutdownLibraries();
-    }
-}
-
-bool P5::LibrariesGuard::initialized() const {
-    return m_initialized;
-}
-
 Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
     std::vector<std::string> args;
     args.reserve(1 + extraArgs.size());
