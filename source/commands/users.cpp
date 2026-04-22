@@ -52,10 +52,6 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 }
 
 void run_users(const std::vector<std::string> &args) {
-    if (!P5::InitializeLibraries()) {
-        throw CLI::RuntimeError(1);
-    }
-
     bool printDone = false;
     {
         P5 p5;
@@ -65,10 +61,6 @@ void run_users(const std::vector<std::string> &args) {
             r.PrintSortedTsv(std::cout);
             printDone = true;
         }
-    }
-
-    if (!P5::ShutdownLibraries()) {
-        throw CLI::RuntimeError(1);
     }
 
     if (!printDone) {

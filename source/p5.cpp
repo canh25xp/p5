@@ -21,14 +21,19 @@ std::string P5::P4USER;
 std::string P5::P4CLIENT;
 std::vector<std::pair<std::string, std::string>> P5::P4PROTOCOL_Z;
 
-P5::P5() : m_Usage(0) {
+P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
+    if (!InitializeLibraries()) {
+        ERROR("Could not initialize P4 libraries");
+        return;
+    }
+    m_LibrariesInitialized = true;
     if (!Initialize()) {
         ERROR("Could not initialize P4");
         return;
     }
 }
 
-P5::P5(P5ForCliConfig) : m_Usage(0) {}
+P5::P5(P5ForCliConfig) : m_Usage(0), m_LibrariesInitialized(false) {}
 
 void P5::register_cli(CLI::App &app) {
     register_global_options(app, m_globalOptions);
@@ -84,6 +89,9 @@ P5::~P5() {
     if (!Deinitialize()) {
         ERROR("P4 context was not destroyed successfully");
     }
+    if (m_LibrariesInitialized && !ShutdownLibraries()) {
+        ERROR("P4 libraries were not shut down successfully");
+    }
 }
 
 bool P5::CheckErrors(Error &e, StrBuf &msg) {
@@ -127,6 +135,20 @@ bool P5::ShutdownLibraries() {
 
     INFO("Shutdown Initialized P4Libraries successfully");
     return true;
+}
+
+P5::LibrariesGuard::LibrariesGuard() : m_initialized(false) {
+    m_initialized = InitializeLibraries();
+}
+
+P5::LibrariesGuard::~LibrariesGuard() {
+    if (m_initialized) {
+        ShutdownLibraries();
+    }
+}
+
+bool P5::LibrariesGuard::initialized() const {
+    return m_initialized;
 }
 
 Users P5::ListUsers(const std::vector<std::string> &extraArgs) {

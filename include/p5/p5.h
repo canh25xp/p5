@@ -21,6 +21,7 @@ class App;
 class P5 {
     ClientApi m_ClientAPI;
     int m_Usage;
+    bool m_LibrariesInitialized;
 
     GlobalOptions m_globalOptions;
     Commands m_commands;
@@ -39,6 +40,19 @@ class P5 {
 public:
     static bool InitializeLibraries();
     static bool ShutdownLibraries();
+
+    /// RAII guard: calls InitializeLibraries on construction, ShutdownLibraries on destruction.
+    class LibrariesGuard {
+    public:
+        LibrariesGuard();
+        ~LibrariesGuard();
+        LibrariesGuard(const LibrariesGuard &) = delete;
+        LibrariesGuard &operator=(const LibrariesGuard &) = delete;
+        bool initialized() const;
+
+    private:
+        bool m_initialized;
+    };
 
     P5();
     explicit P5(P5ForCliConfig);

@@ -39,10 +39,6 @@ void run_forwarded(P5 &p5, const char *command, const std::vector<std::string> &
 }
 
 void run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
-    if (!P5::InitializeLibraries()) {
-        throw CLI::RuntimeError(1);
-    }
-
     P5 p5;
 
     dbg(command);
@@ -51,8 +47,4 @@ void run_p4_passthrough(const char *command, const std::vector<std::string> &arg
     }
 
     run_forwarded(p5, command, args);
-
-    if (!P5::ShutdownLibraries()) {
-        throw CLI::RuntimeError(1);
-    }
 }

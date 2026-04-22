@@ -293,15 +293,12 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
     const std::vector<std::string> args = cmd->remaining();
 
     if (args.empty()) {
-        if (!P5::InitializeLibraries()) {
+        P5::LibrariesGuard guard;
+        if (!guard.initialized()) {
             throw CLI::RuntimeError(1);
         }
 
         print_env(opts.quiet, opts.all);
-
-        if (!P5::ShutdownLibraries()) {
-            throw CLI::RuntimeError(1);
-        }
 
         return;
     }
@@ -324,7 +321,8 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
         }
     }
 
-    if (!P5::InitializeLibraries()) {
+    P5::LibrariesGuard guard;
+    if (!guard.initialized()) {
         throw CLI::RuntimeError(1);
     }
 
@@ -341,31 +339,18 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
         }
         if (eq == 0) {
             ERROR("p5 set: empty variable name");
-            if (!P5::ShutdownLibraries()) {
-                throw CLI::RuntimeError(1);
-            }
             throw CLI::RuntimeError(1);
         }
         const std::string name = arg.substr(0, eq);
         const std::string value = arg.substr(eq + 1);
 #if defined(_WIN32)
         ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
-        if (!P5::ShutdownLibraries()) {
-            throw CLI::RuntimeError(1);
-        }
         throw CLI::RuntimeError(1);
 #else
         if (!p4_set_persistent_unix(env, name, value)) {
-            if (!P5::ShutdownLibraries()) {
-                throw CLI::RuntimeError(1);
-            }
             throw CLI::RuntimeError(1);
         }
 #endif
-    }
-
-    if (!P5::ShutdownLibraries()) {
-        throw CLI::RuntimeError(1);
     }
 }
 
