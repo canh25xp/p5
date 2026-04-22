@@ -293,11 +293,6 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
     const std::vector<std::string> args = cmd->remaining();
 
     if (args.empty()) {
-        P5::LibrariesGuard guard;
-        if (!guard.initialized()) {
-            throw CLI::RuntimeError(1);
-        }
-
         print_env(opts.quiet, opts.all);
 
         return;
@@ -319,11 +314,6 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
             std::cerr << "p5 set: invalid variable name: " << arg.substr(0, eq) << '\n';
             throw CLI::RuntimeError(1);
         }
-    }
-
-    P5::LibrariesGuard guard;
-    if (!guard.initialized()) {
-        throw CLI::RuntimeError(1);
     }
 
     Enviro env;
