@@ -286,21 +286,13 @@ static void print_env(bool quiet, bool all, const Options &options) {
     }
 }
 
-struct SetCommandOpts {
-    bool all{false};
-    bool quiet{false};
-};
-
-static void run_set(CLI::App *cmd, const SetCommandOpts &opts, const Options &options) {
-    const std::vector<std::string> args = cmd->remaining();
-
+void Set::run(const std::vector<std::string> &args) {
     if (args.empty()) {
-        print_env(opts.quiet, opts.all, options);
-
+        print_env(m_quiet, m_all, m_options);
         return;
     }
 
-    if (opts.all) {
+    if (m_all) {
         std::cerr << "p5 set: -a/--all cannot be used with variable arguments\n";
         throw CLI::RuntimeError(1);
     }
@@ -319,9 +311,9 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts, const Options &op
     }
 
     Enviro env;
-    load_enviro_for_set(env, options);
+    load_enviro_for_set(env, m_options);
     Error e;
-    const int print_quiet = opts.quiet ? 1 : 0;
+    const int print_quiet = m_quiet ? 1 : 0;
 
     for (const std::string &arg : args) {
         const std::string::size_type eq = arg.find('=');
@@ -346,12 +338,10 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts, const Options &op
     }
 }
 
-void register_set(CLI::App &app, const Options &options) {
-    auto opts = std::make_shared<SetCommandOpts>();
-
-    auto *sub = app.add_subcommand("set", "Set or display Perforce variables");
+void Set::register_cli(CLI::App &app) {
+    auto *sub = app.add_subcommand(name, description);
     sub->allow_extras();
-    sub->add_flag("-a,--all", opts->all, "List all supported P4* variables");
-    sub->add_flag("-q,--quiet", opts->quiet, "When listing settings, omit where each value is stored");
-    sub->callback([sub, opts, &options]() { run_set(sub, *opts, options); });
+    sub->add_flag("-a,--all", m_all, "List all supported P4* variables");
+    sub->add_flag("-q,--quiet", m_quiet, "When listing settings, omit where each value is stored");
+    sub->callback([this, sub]() { this->run(sub->remaining()); });
 }

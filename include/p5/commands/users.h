@@ -1,13 +1,13 @@
 #pragma once
 
-#include "result.h"
+#include "command.h"
 
 #include <iosfwd>
 #include <vector>
 #include <string>
 #include <unordered_map>
 
-class Users : public Result {
+class Users : public Command {
 public:
     using UserID = std::string;
 
@@ -15,6 +15,8 @@ public:
         std::string fullName;
         std::string email;
     };
+
+    Users() : Command("users", "List Perforce users (p5 formatted output)", {"u"}) {}
 
 private:
     std::unordered_map<UserID, UserData> m_Users;
@@ -26,6 +28,6 @@ public:
 
     /// One line per user, sorted by user id: UserId TAB FullName TAB Email
     void PrintSortedTsv(std::ostream &out) const;
-};
 
-void run_users(const std::vector<std::string> &);
+    void run(const std::vector<std::string> &args) override;
+};

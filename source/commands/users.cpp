@@ -51,7 +51,7 @@ void Users::PrintSortedTsv(std::ostream &out) const {
     }
 }
 
-void run_users(const std::vector<std::string> &args) {
+void Users::run(const std::vector<std::string> &args) {
     bool printDone = false;
     {
         P5 p5;

@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     commands.add_passthrough("fixes", "List what changelists fix what job");
 
     // --- User / group ---
-    commands.add("users", "List Perforce users (p5 formatted output)", run_users);
+    commands.add(std::make_unique<Users>());
     commands.add_passthrough("user", "Create or edit a user specification");
     commands.add_passthrough("group", "Change members of a user group");
     commands.add_passthrough("groups", "List groups (of users)");
@@ -140,8 +140,9 @@ int main(int argc, char **argv) {
     commands.add_passthrough("aliases", "Display the content of the P4ALIASES file");
     commands.add_passthrough("help", "Print the requested help message");
 
+    commands.add(std::make_unique<Set>(g_options));
+
     commands.install(app);
-    register_set(app, g_options);
 
     CLI11_PARSE(app, argc, argv);
 
