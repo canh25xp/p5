@@ -88,16 +88,15 @@ void load_enviro_for_set(Enviro &env) {
     }
 }
 
-/// Same sources as `p4 set` with no arguments: local `Enviro` only (no `ClientApi::Init`, no server).
-void print_local_enviro(bool quiet) {
+/// `all == false`: same as `p4 set` with no arguments (local `Enviro` only).
+/// `all == true`: all supported P4* names known to the linked API.
+static void print_env(bool quiet, bool all) {
     Enviro env;
     load_enviro_for_set(env);
-    env.List(quiet ? 1 : 0);
-}
-
-void print_all_supported_p4_variables(bool quiet) {
-    Enviro env;
-    load_enviro_for_set(env);
+    if (!all) {
+        env.List(quiet ? 1 : 0);
+        return;
+    }
     const int format_flags = quiet ? 1 : 0;
     for (const char *name : kP4EnvVarCandidates) {
         if (!Enviro::IsKnown(name)) {
@@ -124,7 +123,7 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
             throw CLI::RuntimeError(1);
         }
 
-        print_all_supported_p4_variables(opts.quiet);
+        print_env(opts.quiet, true);
 
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
@@ -139,7 +138,7 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
             throw CLI::RuntimeError(1);
         }
 
-        print_local_enviro(opts.quiet);
+        print_env(opts.quiet, false);
 
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
