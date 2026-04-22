@@ -1,5 +1,7 @@
 #include "options.h"
 
+Options g_options;
+
 #include <utility>
 
 #ifndef P5_VERSION_STRING
