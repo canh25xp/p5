@@ -25,7 +25,6 @@ void register_global_options(CLI::App &app, GlobalOptions &opts) {
 
     // Runs after argv and env merge, before any subcommand callback (CLI11 root `run_callback` order).
     app.parse_complete_callback([&opts]() {
-        apply_connection_options(opts.user, opts.port, opts.client);
-        apply_protocol_options(opts.protocol_z);
+        apply_global_options(opts.user, opts.port, opts.client, opts.protocol_z);
     });
 }

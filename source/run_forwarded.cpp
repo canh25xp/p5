@@ -8,13 +8,11 @@
 
 #include "p5.h"
 
-void apply_connection_options(const std::string &user, const std::string &port, const std::string &client) {
+void apply_global_options(const std::string &user, const std::string &port, const std::string &client, const std::vector<std::string> &protocol_z) {
     P5::P4USER = user;
     P5::P4PORT = port;
     P5::P4CLIENT = client;
-}
 
-void apply_protocol_options(const std::vector<std::string> &protocol_z) {
     P5::P4PROTOCOL_Z.clear();
     P5::P4PROTOCOL_Z.reserve(protocol_z.size());
     for (const std::string &entry : protocol_z) {
