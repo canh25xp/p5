@@ -38,13 +38,129 @@ P5::P5(P5ForCliConfig) : m_Usage(0), m_LibrariesInitialized(false) {}
 void P5::register_cli(CLI::App &app) {
     register_global_options(app, m_globalOptions);
     m_commands.clear();
-    m_commands.add_passthrough("info", "Print out client/server information");
-    m_commands.add_passthrough("sync", "Synchronize the client with its view of the depot");
-    m_commands.add_passthrough("changes", "Display list of pending and submitted changelists");
+
+    // --- File operations ---
+    m_commands.add_passthrough("add", "Open a new file to add it to the depot");
+    m_commands.add_passthrough("delete", "Open an existing file to delete it from the depot");
+    m_commands.add_passthrough("edit", "Open an existing file for edit");
+    m_commands.add_passthrough("move", "Moves files from one location to another", {"rename"});
+    m_commands.add_passthrough("reopen", "Change the type or changelist number of an opened file");
+    m_commands.add_passthrough("revert", "Discard changes from an opened file");
+    m_commands.add_passthrough("lock", "Lock an opened file against changelist submission");
+    m_commands.add_passthrough("unlock", "Release a locked file but leave it open");
+
+    // --- Changelist operations ---
+    m_commands.add_passthrough("change", "Create or edit a changelist description", {"changelist"});
+    m_commands.add_passthrough("changes", "Display list of pending and submitted changelists", {"changelists"});
     m_commands.add_passthrough("describe", "Display a changelist description");
+    m_commands.add_passthrough("shelve", "Store files from a pending changelist into the depot");
+    m_commands.add_passthrough("unshelve", "Restore shelved files from a pending changelist");
+    m_commands.add_passthrough("reshelve", "Copy shelved files to a new or existing shelf");
+    m_commands.add_passthrough("submit", "Submit open files to the depot");
+    m_commands.add_passthrough("resolve", "Merge open files with other revisions or files");
+    m_commands.add_passthrough("resolved", "Show files that have been merged but not submitted");
+
+    // --- Sync / workspace state ---
+    m_commands.add_passthrough("sync", "Synchronize the client with its view of the depot");
+    m_commands.add_passthrough("update", "Update the client with its view of the depot");
+    m_commands.add_passthrough("flush", "Fake a 'p4 sync' by not moving files");
+    m_commands.add_passthrough("clean", "Delete or refresh local files to match depot state");
+    m_commands.add_passthrough("reconcile", "Reconcile client to offline workspace changes", {"rec"});
+    m_commands.add_passthrough("status", "Preview reconcile of client to offline workspace changes");
+    m_commands.add_passthrough("have", "List revisions last synced");
+    m_commands.add_passthrough("opened", "Display list of files opened for pending changelist");
+    m_commands.add_passthrough("where", "Show how file names map through the client view");
+    m_commands.add_passthrough("ignores", "List P4IGNORE mappings");
+
+    // --- Client / workspace ---
+    m_commands.add_passthrough("client", "Create or edit a client specification and its view", {"workspace"});
+    m_commands.add_passthrough("clients", "Display list of known clients", {"workspaces"});
+
+    // --- Depot / file info ---
     m_commands.add_passthrough("files", "List files in the depot");
-    m_commands.add_passthrough("clients", "List users' clients (p4 clients)");
+    m_commands.add_passthrough("fstat", "Dump file info");
+    m_commands.add_passthrough("filelog", "List revision history of files");
+    m_commands.add_passthrough("annotate", "Print file lines along with their revisions");
+    m_commands.add_passthrough("diff", "Display diff of client file with depot file");
+    m_commands.add_passthrough("diff2", "Display diff of two depot files");
+    m_commands.add_passthrough("print", "Retrieve a depot file to the standard output");
+    m_commands.add_passthrough("dirs", "List subdirectories of a given depot directory");
+    m_commands.add_passthrough("sizes", "Display size information for files in the depot");
+    m_commands.add_passthrough("grep", "Print lines from text files matching a pattern");
+    m_commands.add_passthrough("cstat", "Dump change/sync status for current client");
+
+    // --- Integration ---
+    m_commands.add_passthrough("integrate", "Schedule integration from one file to another");
+    m_commands.add_passthrough("integrated", "Show integrations that have been submitted");
+    m_commands.add_passthrough("interchanges", "Report changes that have not yet been integrated");
+    m_commands.add_passthrough("merge", "Schedule merge (integration) from one file to another");
+    m_commands.add_passthrough("copy", "Schedule copy of latest rev from one file to another");
+    m_commands.add_passthrough("undo", "Undo a range of revisions");
+
+    // --- Branch / label / tag ---
+    m_commands.add_passthrough("branch", "Create or edit a branch specification");
+    m_commands.add_passthrough("branches", "Display list of branches");
+    m_commands.add_passthrough("label", "Create or edit a label specification and its view");
+    m_commands.add_passthrough("labels", "Display list of labels");
+    m_commands.add_passthrough("labelsync", "Synchronize label with the current client contents");
+    m_commands.add_passthrough("list", "Create an in-memory (label) list of depot files");
+    m_commands.add_passthrough("tag", "Tag files with a label");
+
+    // --- Stream ---
+    m_commands.add_passthrough("stream", "Create or edit a stream specification");
+    m_commands.add_passthrough("streams", "Display list of streams");
+    m_commands.add_passthrough("streamlog", "List revision history of streams");
+    m_commands.add_passthrough("streamspec", "Edit the stream template");
+    m_commands.add_passthrough("switch", "Switch to a different stream, or create a new stream");
+    m_commands.add_passthrough("istat", "Show integrations needed for a stream");
+    m_commands.add_passthrough("populate", "Populate a branch or stream with files");
+    m_commands.add_passthrough("prune", "Remove unmodified branched files from a stream");
+
+    // --- Job ---
+    m_commands.add_passthrough("job", "Create or edit a job (defect) specification");
+    m_commands.add_passthrough("jobs", "Display list of jobs");
+    m_commands.add_passthrough("fix", "Mark jobs as being fixed by named changelists");
+    m_commands.add_passthrough("fixes", "List what changelists fix what job");
+
+    // --- User / group ---
     m_commands.add("users", "List Perforce users (p5 formatted output)", run_users);
+    m_commands.add_passthrough("user", "Create or edit a user specification");
+    m_commands.add_passthrough("group", "Change members of a user group");
+    m_commands.add_passthrough("groups", "List groups (of users)");
+    m_commands.add_passthrough("passwd", "Set the user's password on the server (and Windows client)");
+
+    // --- Depot / repo admin ---
+    m_commands.add_passthrough("depot", "Create or edit a depot specification");
+    m_commands.add_passthrough("depots", "Display list of depots");
+    m_commands.add_passthrough("repo", "Create, edit or delete a repo specification");
+    m_commands.add_passthrough("repos", "Display a list of repos (depots of type graph)");
+
+    // --- Counter / key ---
+    m_commands.add_passthrough("counter", "Display, set, or delete a counter");
+    m_commands.add_passthrough("counters", "Display list of known counters");
+    m_commands.add_passthrough("key", "Display, set, or delete a key/value pair");
+    m_commands.add_passthrough("keys", "Display list of known keys and their values");
+
+    // --- Protection / review ---
+    m_commands.add_passthrough("protect", "Modify protections in the server namespace");
+    m_commands.add_passthrough("protects", "Display protections in place for a given user/path");
+    m_commands.add_passthrough("review", "List and track changelists (for the review daemon)");
+    m_commands.add_passthrough("reviews", "Show what users are subscribed to review files");
+    m_commands.add_passthrough("attribute", "Set per-revision attributes on revisions");
+
+    // --- Auth ---
+    m_commands.add_passthrough("login", "Login to Perforce by obtaining a session ticket");
+    m_commands.add_passthrough("login2", "Perform a multi factor authentication");
+    m_commands.add_passthrough("logout", "Logout of Perforce by removing or invalidating a ticket");
+    m_commands.add_passthrough("tickets", "Display list of session tickets for this user");
+    m_commands.add_passthrough("trust", "Establish trust of an SSL connection");
+
+    // --- Info / logging ---
+    m_commands.add_passthrough("info", "Print out client/server information");
+    m_commands.add_passthrough("logger", "Report what jobs and changelists have changed");
+    m_commands.add_passthrough("aliases", "Display the content of the P4ALIASES file");
+    m_commands.add_passthrough("help", "Print the requested help message");
+
     m_commands.install(app);
     register_set(app);
 }

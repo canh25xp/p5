@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     cli.register_cli(app);
 
     // Allow extra arguments for legacy command handling
-    app.allow_extras();
+    app.allow_extras(false);
 
     CLI11_PARSE(app, argc, argv);
 
