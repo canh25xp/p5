@@ -18,6 +18,8 @@ public:
 
     void clear();
 
+    static void run_p4_passthrough(const char *command, const std::vector<std::string> &args);
+
 private:
     struct Entry {
         bool passthrough;
