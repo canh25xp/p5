@@ -1,4 +1,7 @@
-build/
-.git/
-.p4tickets
-.p4config
+/build/
+/.git/
+/.p4tickets
+/.p4config
+/.cache/
+/.cache/
+compile_commands.json
