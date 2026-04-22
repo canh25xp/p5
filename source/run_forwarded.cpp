@@ -1,29 +1,11 @@
 #include "run_forwarded.h"
 
-#include <utility>
 #include <vector>
 
 #include "CLI/CLI.hpp"
 #include "dbg.h"
 
 #include "p5.h"
-
-void apply_global_options(const std::string &user, const std::string &port, const std::string &client, const std::vector<std::string> &protocol_z) {
-    P5::P4USER = user;
-    P5::P4PORT = port;
-    P5::P4CLIENT = client;
-
-    P5::P4PROTOCOL_Z.clear();
-    P5::P4PROTOCOL_Z.reserve(protocol_z.size());
-    for (const std::string &entry : protocol_z) {
-        const std::string::size_type eq = entry.find('=');
-        std::string key = eq == std::string::npos ? entry : entry.substr(0, eq);
-        std::string value = eq == std::string::npos ? std::string() : entry.substr(eq + 1);
-        if (!key.empty()) {
-            P5::P4PROTOCOL_Z.emplace_back(std::move(key), std::move(value));
-        }
-    }
-}
 
 void run_forwarded(P5 &p5, const char *command, const std::vector<std::string> &args) {
     std::vector<char *> argv_array;

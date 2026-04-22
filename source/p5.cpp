@@ -36,7 +36,7 @@ P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
 P5::P5(P5ForCliConfig) : m_Usage(0), m_LibrariesInitialized(false) {}
 
 void P5::register_cli(CLI::App &app) {
-    register_global_options(app, m_globalOptions);
+    m_options.add(app);
     m_commands.clear();
 
     // --- File operations ---

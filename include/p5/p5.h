@@ -6,7 +6,7 @@
 
 #include "commands.h"
 #include "commands/result.h"
-#include "global_options.h"
+#include "options.h"
 #include "p4/clientapi.h"
 
 #include "users.h"
@@ -23,7 +23,7 @@ class P5 {
     int m_Usage;
     bool m_LibrariesInitialized;
 
-    GlobalOptions m_globalOptions;
+    Options m_options;
     Commands m_commands;
 
     bool Initialize();
