@@ -26,7 +26,7 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 # Generate compile_commands.json, will be used by lsp_server
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT P4API_ROOT_DIR)

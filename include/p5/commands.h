@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <memory>
 
 #include "CLI/CLI.hpp"
+#include "commands/command.h"
 
 /// Batches CLI11 subcommand definitions; call install to attach them to a root `CLI::App`.
 class Commands {
@@ -21,12 +21,5 @@ public:
     static void run_p4_passthrough(const char *command, const std::vector<std::string> &args);
 
 private:
-    struct Entry {
-        bool passthrough;
-        const char *name;
-        const char *description;
-        void (*fn)(const std::vector<std::string> &);
-        std::vector<const char *> aliases;
-    };
-    std::vector<Entry> m_entries;
+    std::vector<std::unique_ptr<Command>> m_entries;
 };
