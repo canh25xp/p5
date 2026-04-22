@@ -1,9 +1,9 @@
 # TODO
 
 - [ ] Drop-in replaceable implementation for `p4`:
-  - [ ] All `p4` subcommands (See `p4 help commands`)
-  - [ ] All `p4` global arguments (See `p4 help usage`)
-  - [ ] All `p4` environment variables and configuration files(See `p4 help environment`)
+  - [x] All `p4` subcommands (See `p4 help commands`)
+  - [/] All `p4` global arguments (See `p4 help usage`)
+  - [/] All `p4` environment variables and configuration files(See `p4 help environment`)
 - [ ] Plan Improvements:
   - [ ] Add Feature:
     - [ ] Workspace awareness: `p5` should be able to set P4CLIENT based on current directory
