@@ -3,8 +3,7 @@
 
 #include "CLI/CLI.hpp"
 
-#include "global_options.h"
-#include "registry.h"
+#include "p5.h"
 #include "run_forwarded.h"
 
 #ifndef P5_APP_DESCRIPTION
@@ -17,10 +16,8 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
-    GlobalOptions connection;
-    register_global_options(app, connection);
-
-    register_commands(app);
+    P5 cli(P5ForCliConfig{});
+    cli.register_cli(app);
 
     // Allow extra arguments for legacy command handling
     app.allow_extras();

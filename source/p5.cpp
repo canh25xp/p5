@@ -7,10 +7,12 @@
 #include <chrono>
 #include <thread>
 
+#include "CLI/CLI.hpp"
 #include "p4/clientapi.h"
 #include "p4/p4libs.h"
 #include "p4/signaler.h"
 
+#include "command_runners.h"
 #include "log.h"
 #include "cli_helpers.h"
 
@@ -19,11 +21,27 @@ std::string P5::P4USER;
 std::string P5::P4CLIENT;
 std::vector<std::pair<std::string, std::string>> P5::P4PROTOCOL_Z;
 
-P5::P5() {
+P5::P5() : m_Usage(0) {
     if (!Initialize()) {
         ERROR("Could not initialize P4");
         return;
     }
+}
+
+P5::P5(P5ForCliConfig) : m_Usage(0) {}
+
+void P5::register_cli(CLI::App &app) {
+    register_global_options(app, m_globalOptions);
+    m_commands.clear();
+    m_commands.add_passthrough("info", "Print out client/server information");
+    m_commands.add_passthrough("sync", "Synchronize the client with its view of the depot");
+    m_commands.add_passthrough("changes", "Display list of pending and submitted changelists");
+    m_commands.add_passthrough("describe", "Display a changelist description");
+    m_commands.add_passthrough("files", "List files in the depot");
+    m_commands.add_passthrough("clients", "List users' clients (p4 clients)");
+    m_commands.add("users", "List Perforce users (p5 formatted output)", run_users);
+    m_commands.install(app);
+    register_set(app);
 }
 
 bool P5::Initialize() {
@@ -111,12 +129,12 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
+Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
     std::vector<std::string> args;
     args.reserve(1 + extraArgs.size());
     args.push_back("-a"); // Include service accounts
     args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<UsersResult>("users", args);
+    return Run<Users>("users", args);
 }
 
 Result P5::Run(const char *command, int argumentCount, char **arguments) {

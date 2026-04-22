@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-class UsersResult : public Result {
+class Users : public Result {
 public:
     using UserID = std::string;
 

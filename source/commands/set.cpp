@@ -1,6 +1,7 @@
 #include "CLI/CLI.hpp"
 
 #include "p5.h"
+#include "set.h"
 
 #include "p4/enviro.h"
 #include "p4/error.h"

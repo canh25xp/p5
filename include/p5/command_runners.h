@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "CLI/CLI.hpp"
+#include "set.h"
 
 void run_users(const std::vector<std::string> &);
-
-void register_set(CLI::App &app);

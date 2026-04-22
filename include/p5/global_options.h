@@ -13,5 +13,6 @@ struct GlobalOptions {
     std::vector<std::string> protocol_z;
 };
 
-/// Registers global `-u` / `-p` / `-c` / `-z` and `parse_complete_callback` to apply them to `P5` before subcommands run.
+/// Registers global `-u` / `-p` / `-c` / `-z` and `parse_complete_callback` to copy values into `P5` statics before subcommands run.
+/// Used by `P5::register_cli`.
 void register_global_options(CLI::App &app, GlobalOptions &opts);

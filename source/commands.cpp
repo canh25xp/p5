@@ -20,6 +20,10 @@ void Commands::add_passthrough(const char *p4_name, const char *description) {
     m_entries.push_back(e);
 }
 
+void Commands::clear() {
+    m_entries.clear();
+}
+
 void Commands::install(CLI::App &app) const {
     for (const auto &e : m_entries) {
         CLI::App *sub = app.add_subcommand(e.name, e.description);
