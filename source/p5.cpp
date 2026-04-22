@@ -123,10 +123,6 @@ UsersResult P5::Users(const std::vector<std::string> &extraArgs) {
     return Run<UsersResult>("users", args);
 }
 
-InfoResult P5::Info() {
-    return Run<InfoResult>("info", {});
-}
-
 Result P5::Run(const char *command, int argumentCount, char **arguments) {
     Result clientUser;
 
