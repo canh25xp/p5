@@ -118,19 +118,6 @@ struct SetCommandOpts {
 };
 
 static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
-    if (opts.all) {
-        if (!P5::InitializeLibraries()) {
-            throw CLI::RuntimeError(1);
-        }
-
-        print_env(opts.quiet, true);
-
-        if (!P5::ShutdownLibraries()) {
-            throw CLI::RuntimeError(1);
-        }
-        return;
-    }
-
     const std::vector<std::string> args = cmd->remaining();
 
     if (args.empty()) {
@@ -138,12 +125,15 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
             throw CLI::RuntimeError(1);
         }
 
-        print_env(opts.quiet, false);
+        print_env(opts.quiet, opts.all);
 
         if (!P5::ShutdownLibraries()) {
             throw CLI::RuntimeError(1);
         }
     }
+
+    // TODO: Implement set/update env:
+    // p5 set P4USER=user
 }
 
 void register_set(CLI::App &app) {
