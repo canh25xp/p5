@@ -310,6 +310,20 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
         std::cerr << "p5 set: -a/--all cannot be used with variable arguments\n";
         throw CLI::RuntimeError(1);
     }
+
+    for (const std::string &arg : args) {
+        const std::string::size_type eq = arg.find('=');
+        if (eq == std::string::npos) {
+            if (!arg.empty() && arg[0] == '-') {
+                std::cerr << "p5 set: unknown option: " << arg << '\n';
+                throw CLI::RuntimeError(1);
+            }
+        } else if (eq > 0 && arg[0] == '-') {
+            std::cerr << "p5 set: invalid variable name: " << arg.substr(0, eq) << '\n';
+            throw CLI::RuntimeError(1);
+        }
+    }
+
     if (!P5::InitializeLibraries()) {
         throw CLI::RuntimeError(1);
     }
