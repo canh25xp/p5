@@ -1,7 +1,5 @@
 #include "options.h"
 
-#include "p5.h"
-
 #include <utility>
 
 #ifndef P5_VERSION_STRING
@@ -30,18 +28,14 @@ void Options::add(CLI::App &app) {
 }
 
 void Options::apply() {
-    P5::P4USER = m_user;
-    P5::P4PORT = m_port;
-    P5::P4CLIENT = m_client;
-
-    P5::P4PROTOCOL_Z.clear();
-    P5::P4PROTOCOL_Z.reserve(m_protocol_z.size());
+    m_p4_protocol.clear();
+    m_p4_protocol.reserve(m_protocol_z.size());
     for (const std::string &entry : m_protocol_z) {
         const std::string::size_type eq = entry.find('=');
         std::string key = eq == std::string::npos ? entry : entry.substr(0, eq);
         std::string value = eq == std::string::npos ? std::string() : entry.substr(eq + 1);
         if (!key.empty()) {
-            P5::P4PROTOCOL_Z.emplace_back(std::move(key), std::move(value));
+            m_p4_protocol.emplace_back(std::move(key), std::move(value));
         }
     }
 }

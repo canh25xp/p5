@@ -1,9 +1,11 @@
 #include "CLI/CLI.hpp"
 
-#include "p5.h"
 #include "set.h"
+
+#include "options.h"
 #include "log.h"
 
+#include "p4/clientapi.h"
 #include "p4/enviro.h"
 #include "p4/error.h"
 #include "p4/hostenv.h"
@@ -81,7 +83,7 @@ static const char *const kP4EnvVarCandidates[] = {
     "P4ZEROSYNC",
 };
 
-void load_enviro_for_set(Enviro &env) {
+void load_enviro_for_set(Enviro &env, const Options &options) {
     Error e;
     StrBuf cwd;
     HostEnv host;
@@ -89,14 +91,14 @@ void load_enviro_for_set(Enviro &env) {
     env.Config(cwd);
     env.LoadEnviro(1);
 
-    if (!P5::P4PORT.empty()) {
-        env.Update("P4PORT", P5::P4PORT.c_str());
+    if (!options.port().empty()) {
+        env.Update("P4PORT", options.port().c_str());
     }
-    if (!P5::P4USER.empty()) {
-        env.Update("P4USER", P5::P4USER.c_str());
+    if (!options.user().empty()) {
+        env.Update("P4USER", options.user().c_str());
     }
-    if (!P5::P4CLIENT.empty()) {
-        env.Update("P4CLIENT", P5::P4CLIENT.c_str());
+    if (!options.client().empty()) {
+        env.Update("P4CLIENT", options.client().c_str());
     }
 }
 
@@ -262,9 +264,9 @@ static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const s
 
 /// `all == false`: same as `p4 set` with no arguments (local `Enviro` only).
 /// `all == true`: all supported P4* names known to the linked API.
-static void print_env(bool quiet, bool all) {
+static void print_env(bool quiet, bool all, const Options &options) {
     Enviro env;
-    load_enviro_for_set(env);
+    load_enviro_for_set(env, options);
     if (!all) {
         env.List(quiet ? 1 : 0);
         return;
@@ -289,11 +291,11 @@ struct SetCommandOpts {
     bool quiet{false};
 };
 
-static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
+static void run_set(CLI::App *cmd, const SetCommandOpts &opts, const Options &options) {
     const std::vector<std::string> args = cmd->remaining();
 
     if (args.empty()) {
-        print_env(opts.quiet, opts.all);
+        print_env(opts.quiet, opts.all, options);
 
         return;
     }
@@ -317,7 +319,7 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
     }
 
     Enviro env;
-    load_enviro_for_set(env);
+    load_enviro_for_set(env, options);
     Error e;
     const int print_quiet = opts.quiet ? 1 : 0;
 
@@ -344,12 +346,12 @@ static void run_set(CLI::App *cmd, const SetCommandOpts &opts) {
     }
 }
 
-void register_set(CLI::App &app) {
+void register_set(CLI::App &app, const Options &options) {
     auto opts = std::make_shared<SetCommandOpts>();
 
     auto *sub = app.add_subcommand("set", "Set or display Perforce variables");
     sub->allow_extras();
     sub->add_flag("-a,--all", opts->all, "List all supported P4* variables");
     sub->add_flag("-q,--quiet", opts->quiet, "When listing settings, omit where each value is stored");
-    sub->callback([sub, opts]() { run_set(sub, *opts); });
+    sub->callback([sub, opts, &options]() { run_set(sub, *opts, options); });
 }

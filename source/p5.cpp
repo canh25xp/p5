@@ -16,11 +16,6 @@
 #include "log.h"
 #include "cli_helpers.h"
 
-std::string P5::P4PORT;
-std::string P5::P4USER;
-std::string P5::P4CLIENT;
-std::vector<std::pair<std::string, std::string>> P5::P4PROTOCOL_Z;
-
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
         ERROR("Could not initialize P4 libraries");
@@ -162,7 +157,7 @@ void P5::register_cli(CLI::App &app) {
     m_commands.add_passthrough("help", "Print the requested help message");
 
     m_commands.install(app);
-    register_set(app);
+    register_set(app, m_options);
 }
 
 bool P5::Initialize() {
@@ -170,10 +165,10 @@ bool P5::Initialize() {
     StrBuf msg;
 
     m_Usage = 0;
-    m_ClientAPI.SetPort(P4PORT.c_str());
-    m_ClientAPI.SetUser(P4USER.c_str());
-    m_ClientAPI.SetClient(P4CLIENT.c_str());
-    for (const auto &proto : P4PROTOCOL_Z) {
+    m_ClientAPI.SetPort(m_options.port().c_str());
+    m_ClientAPI.SetUser(m_options.user().c_str());
+    m_ClientAPI.SetClient(m_options.client().c_str());
+    for (const auto &proto : m_options.p4Protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
     m_ClientAPI.Init(&e);
