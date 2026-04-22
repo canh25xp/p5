@@ -3,6 +3,7 @@
 #include "result.h"
 
 #include <iosfwd>
+#include <vector>
 #include <string>
 #include <unordered_map>
 
@@ -26,3 +27,5 @@ public:
     /// One line per user, sorted by user id: UserId TAB FullName TAB Email
     void PrintSortedTsv(std::ostream &out) const;
 };
+
+void run_users(const std::vector<std::string> &);
