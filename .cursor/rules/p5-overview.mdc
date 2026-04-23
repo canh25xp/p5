@@ -40,7 +40,7 @@ p5 --help
 or, from the build tree:
 
 ```sh
-./build/p5 --help
+./build/Debug/p5 --help
 ```
 
 ## Command-line implementation
