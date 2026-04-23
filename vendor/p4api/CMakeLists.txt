@@ -1,6 +1,7 @@
 # https://help.perforce.com/helix-core/apis/p4api/current/Content/P4API/client.programming.compiling.html
 cmake_minimum_required(VERSION 3.15)
 
+include("${CMAKE_SOURCE_DIR}/cmake/downloadOpensslWindows.cmake")
 project(P4API)
 
 set(OPENSSL_USE_STATIC_LIBS TRUE)
@@ -27,6 +28,10 @@ if(NOT OPENSSL_ROOT_DIR)
   message(STATUS "OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
 endif()
 
+find_package(OpenSSL QUIET)
+if(NOT OPENSSL_FOUND)
+  p5_download_openssl_msvc_if_needed()
+endif()
 find_package(OpenSSL REQUIRED)
 
 message(STATUS "OPENSSL_FOUND: ${OPENSSL_FOUND}")

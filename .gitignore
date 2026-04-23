@@ -4,6 +4,8 @@ build/
 vendor/p4api/*
 !vendor/p4api/CMakeLists.txt
 
+vendor/openssl-firedaemon/
+
 CMakeUserPresets.json
 
 compile_commands.json
