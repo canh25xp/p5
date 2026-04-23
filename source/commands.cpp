@@ -14,12 +14,12 @@ void Commands::add(std::unique_ptr<Command> cmd) {
     m_entries.push_back(std::move(cmd));
 }
 
-void Commands::add_passthrough(const char *p4_name, const char *description, std::vector<const char *> aliases) {
+void Commands::add(const char *name, const char *description, std::vector<const char *> aliases) {
     std::vector<std::string> aliases_str;
     for (const char *alias : aliases) {
         aliases_str.push_back(alias);
     }
-    m_entries.push_back(std::make_unique<Command>(p4_name, description, std::move(aliases_str), true, nullptr));
+    m_entries.push_back(std::make_unique<Command>(name, description, std::move(aliases_str), true, nullptr));
 }
 
 void Commands::clear() {

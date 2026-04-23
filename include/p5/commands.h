@@ -13,8 +13,8 @@ public:
 
     void add(std::unique_ptr<Command> cmd);
 
-    /// Same as add, but invokes `run_p4_passthrough(p4_name, args)`; `p4_name` is also the subcommand name.
-    void add_passthrough(const char *p4_name, const char *description, std::vector<const char *> aliases = {});
+    /// Passthrough overload: invokes `run_p4_passthrough(name, args)` instead of a custom callback.
+    void add(const char *name, const char *description, std::vector<const char *> aliases = {});
 
     void install(CLI::App &app) const;
 
