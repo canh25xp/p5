@@ -2,6 +2,12 @@
 
 > Complementary p4 command-line tools
 
+`p5` is a command-line tool meant to replace the `p4` CLI.
+It adds features `p4` lacks and improves existing behavior, visually and functionally.
+The interface is designed to match the existing `p4` tool as closely as possible so users can easily migrate to `p5`.
+
+See [Changes](#changes) for how `p5` is differ from `p4`.
+
 ## Usage
 
 ```
@@ -118,3 +124,7 @@ SUBCOMMANDS:
   help                        Print the requested help message
   set                         Set or display Perforce variables
 ```
+
+## Changes
+
+<!-- TODO: Add changes compare to `p4` -->
