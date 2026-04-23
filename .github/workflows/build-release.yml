@@ -1,11 +1,12 @@
-name: Build and release (main)
+name: Build and release
 
 on:
   push:
-    branches: [main]
+    branches: [main, ci-cd]
+  workflow_dispatch:
 
 concurrency:
-  group: build-release-main-${{ github.ref }}
+  group: build-release-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -120,9 +121,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v0.0.${{ github.run_id }}.${{ github.run_attempt }}
-          name: p5 main (run ${{ github.run_id }}.${{ github.run_attempt }})
+          name: p5 ${{ github.ref_name }} (run ${{ github.run_id }}.${{ github.run_attempt }})
           body: |
-            Automated build from branch **main** (commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
+            Automated build from branch **${{ github.ref_name }}** (commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
 
             - **p5-linux-x64-Debug** / **Release** — `p5` binary
             - **p5-windows-x64-Debug** / **Release** — `p5.exe` (static MS CRT + Perforce p4api)
