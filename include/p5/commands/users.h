@@ -26,7 +26,7 @@ public:
 
     void OutputStat(StrDict *varList) override;
 
-    /// One line per user, sorted by user id: UserId TAB FullName TAB Email
+    /// One line per user, sorted by user id: UserId  FullName  Email (columns aligned)
     void PrintSortedTsv(std::ostream &out) const;
 
     void run(const std::vector<std::string> &args) override;

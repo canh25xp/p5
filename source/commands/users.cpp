@@ -45,9 +45,20 @@ void Users::PrintSortedTsv(std::ostream &out) const {
     }
     std::sort(ids.begin(), ids.end());
 
+    // Compute column widths
+    size_t maxIdWidth = 0;
+    size_t maxNameWidth = 0;
     for (const UserID &id : ids) {
         const UserData &data = m_Users.at(id);
-        out << id << '\t' << data.fullName << '\t' << data.email << '\n';
+        maxIdWidth = std::max(maxIdWidth, id.size());
+        maxNameWidth = std::max(maxNameWidth, data.fullName.size());
+    }
+
+    for (const UserID &id : ids) {
+        const UserData &data = m_Users.at(id);
+        out << id << std::string(maxIdWidth - id.size() + 2, ' ')
+            << data.fullName << std::string(maxNameWidth - data.fullName.size() + 2, ' ')
+            << data.email << '\n';
     }
 }
 
