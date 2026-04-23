@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
+    app.require_subcommand(1);
+
     g_options.add(app);
 
     Commands commands;
