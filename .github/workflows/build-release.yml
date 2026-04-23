@@ -1,0 +1,135 @@
+name: Build and release (main)
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: build-release-main-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux:
+    name: Build (Linux)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build libssl-dev libzstd-dev zip
+
+      - name: Build Debug and Release
+        run: |
+          cmake --workflow ninja-debug
+          cmake --workflow ninja-release
+
+      - name: Pack artifacts
+        run: |
+          mkdir -p out
+          zip -j "out/p5-linux-x64-Debug.zip" build/Debug/p5
+          zip -j "out/p5-linux-x64-Release.zip" build/Release/p5
+          ls -la out
+
+      - name: Upload dist (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: out
+
+  build-windows:
+    name: Build (Windows)
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up MSVC (x64)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install OpenSSL 3 (Chocolatey)
+        run: choco install openssl -y --no-progress
+
+      - name: Build Debug and Release
+        env:
+          OPENSSL_ROOT_DIR: C:/Program Files/OpenSSL-Win64
+        run: |
+          if (-not (Test-Path "C:\Program Files\OpenSSL-Win64\include\openssl")) { throw "OpenSSL install not found; check OPENSSL_ROOT_DIR" }
+          cmake --preset msvc2022
+          cmake --build --preset msvc2022-debug
+          cmake --build --preset msvc2022-release
+
+      - name: Pack artifacts
+        run: |
+          $out = "out"
+          New-Item -ItemType Directory -Force -Path $out
+          $rels = @(
+            @{ path = "build\Debug\p5.exe";  zip = "p5-windows-x64-Debug.zip" },
+            @{ path = "build\Release\p5.exe"; zip = "p5-windows-x64-Release.zip" }
+          )
+          foreach ($r in $rels) {
+            if (-not (Test-Path $r.path)) { throw "Missing: $($r.path)" }
+            Compress-Archive -Path $r.path -DestinationPath (Join-Path $out $r.zip) -Force
+          }
+        shell: pwsh
+
+      - name: Upload dist (Windows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: out
+
+  release:
+    name: Create GitHub release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-linux
+          path: assets
+
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-windows
+          path: assets
+
+      - name: Checksums
+        run: |
+          (cd assets && sha256sum *.zip > SHASUMS256.txt)
+          head -n 20 assets/SHASUMS256.txt
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.0.${{ github.run_id }}.${{ github.run_attempt }}
+          name: p5 main (run ${{ github.run_id }}.${{ github.run_attempt }})
+          body: |
+            Automated build from branch **main** (commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
+
+            - **p5-linux-x64-Debug** / **Release** — `p5` binary
+            - **p5-windows-x64-Debug** / **Release** — `p5.exe` (static MS CRT + Perforce p4api)
+
+            `SHASUMS256.txt` lists SHA-256 hashes of the four zip files.
+          files: |
+            assets/*.zip
+            assets/SHASUMS256.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
