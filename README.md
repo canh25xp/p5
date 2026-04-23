@@ -95,7 +95,7 @@ SUBCOMMANDS:
   jobs                        Display list of jobs
   fix                         Mark jobs as being fixed by named changelists
   fixes                       List what changelists fix what job
-  users, u                    List Perforce users (p5 formatted output)
+  users                       List Perforce users (p5 formatted output)
   user                        Create or edit a user specification
   group                       Change members of a user group
   groups                      List groups (of users)

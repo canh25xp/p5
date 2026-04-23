@@ -16,7 +16,7 @@ public:
         std::string email;
     };
 
-    Users() : Command("users", "List Perforce users (p5 formatted output)", {"u"}) {}
+    Users() : Command("users", "List Perforce users (p5 formatted output)") {}
 
 private:
     std::unordered_map<UserID, UserData> m_Users;
