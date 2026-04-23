@@ -14,3 +14,5 @@ compile_commands.json
 
 .p4tickets
 .p4config
+
+docs/p4/commands/*
