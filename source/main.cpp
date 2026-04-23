@@ -6,6 +6,7 @@
 #include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/set.h"
+#include "p4enviro_defaults.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -14,6 +15,7 @@
 int main(int argc, char **argv) {
     // TODO: configuable at build time or run time.
     Log::ConciseLevel = 1;
+    p4enviro_apply_default_if_unset();
 
     CLI::App app(P5_APP_DESCRIPTION);
 
