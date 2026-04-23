@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
     // --- Info / logging ---
     commands.add_passthrough("info", "Print out client/server information");
     commands.add_passthrough("logger", "Report what jobs and changelists have changed");
-    commands.add_passthrough("aliases", "Display the content of the P4ALIASES file");
+    commands.add_passthrough("aliases", "Display the content of the P4ALIASES file"); // TODO: This does not support by P4API, client must implement
     commands.add_passthrough("help", "Print the requested help message");
 
     commands.add(std::make_unique<Set>(g_options));

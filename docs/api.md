@@ -1,6 +1,13 @@
 # Helix C/C++ client API (P4API) notes
 
-## `ClientAPI::SetProtocol(p, v)`
+## `m_ClientAPI.Run(const char *func, ClientUser *ui)`
+
+The following commands and functionality does not contains in p4 API, client must implement their own:
+
+- p4 set
+- p4 aliases
+
+## `ClientAPI::SetProtocol(const char *p, const char *v)`
 
 `SetProtocol` sets **Helix protocol variables** before the connection is established. It must be called **before** `ClientAPI::Init()`.
 
