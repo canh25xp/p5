@@ -126,6 +126,16 @@ Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
     return Run<Users>("users", args);
 }
 
+Clients P5::ListClients(const std::vector<std::string> &extraArgs) {
+    // Use tag protocol by default so OutputStat is called with structured data
+    m_ClientAPI.SetProtocol("tag", "");
+
+    std::vector<std::string> args;
+    args.reserve(extraArgs.size());
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<Clients>("clients", args);
+}
+
 Result P5::Run(const char *command, int argumentCount, char **arguments) {
     Result clientUser;
 

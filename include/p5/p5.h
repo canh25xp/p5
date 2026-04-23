@@ -7,6 +7,7 @@
 #include "p4/clientapi.h"
 
 #include "users.h"
+#include "clients.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -34,4 +35,5 @@ public:
     Result Run(const char *command, int argc, char **argv);
     Result Run(const std::string &commandLine);
     Users ListUsers(const std::vector<std::string> &extraArgs = {});
+    Clients ListClients(const std::vector<std::string> &extraArgs = {});
 };

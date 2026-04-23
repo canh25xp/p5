@@ -1,0 +1,88 @@
+#include "client_resolver.h"
+
+#include "p4/hostenv.h"
+#include "p4/enviro.h"
+#include "p4/error.h"
+
+#include <cstdlib>
+#include <unistd.h>
+
+std::string ClientResolver::Resolve(const std::string &cwd, const Clients::ClientMap &clients) {
+    std::string bestClient;
+    size_t bestMatchLen = 0;
+
+    for (const auto &[name, data] : clients) {
+        // Check the primary root
+        if (!data.root.empty()) {
+            const std::string &root = data.root;
+            // CWD must start with root followed by '/' or be exactly equal to root
+            if (cwd == root || (cwd.size() > root.size() && cwd.compare(0, root.size(), root) == 0 && cwd[root.size()] == '/')) {
+                if (root.size() > bestMatchLen) {
+                    bestMatchLen = root.size();
+                    bestClient = name;
+                }
+            }
+        }
+
+        // Check alternate roots
+        for (const auto &altRoot : data.altRoots) {
+            if (altRoot.empty()) {
+                continue;
+            }
+            if (cwd == altRoot || (cwd.size() > altRoot.size() && cwd.compare(0, altRoot.size(), altRoot) == 0 && cwd[altRoot.size()] == '/')) {
+                if (altRoot.size() > bestMatchLen) {
+                    bestMatchLen = altRoot.size();
+                    bestClient = name;
+                }
+            }
+        }
+    }
+
+    return bestClient;
+}
+
+std::string ClientResolver::GetCurrentWorkingDirectory() {
+    Error e;
+    StrBuf cwd;
+    Enviro env;
+    HostEnv hostEnv;
+
+    if (hostEnv.GetCwd(cwd, &e, &env) && !e.Test()) {
+        return cwd.Text();
+    }
+
+    // Fallback to POSIX getcwd
+    char *buf = getcwd(nullptr, 0);
+    if (buf) {
+        std::string result(buf);
+        free(buf);
+        return result;
+    }
+
+    return {};
+}
+
+std::string ClientResolver::GetCurrentHostname() {
+    StrBuf host;
+    HostEnv hostEnv;
+
+    if (hostEnv.GetHost(host)) {
+        return host.Text();
+    }
+
+    return {};
+}
+
+Clients::ClientMap ClientResolver::FilterByHost(const Clients::ClientMap &clients, const std::string &host) {
+    Clients::ClientMap result;
+
+    for (const auto &[name, data] : clients) {
+        // A client with an empty host field matches any host
+        // (e.g., Swarm clients often have no host set)
+        if (data.host.empty() || data.host == host) {
+            result.emplace(name, data);
+        }
+    }
+
+    return result;
+}
