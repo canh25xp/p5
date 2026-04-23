@@ -41,11 +41,11 @@ int main(int argc, char **argv) {
 
     // --- Sync / workspace state ---
     commands.add("sync", "Synchronize the client with its view of the depot");
-    commands.add("update", "Update the client with its view of the depot");
-    commands.add("flush", "Fake a 'p4 sync' by not moving files");
-    commands.add("clean", "Delete or refresh local files to match depot state");
-    commands.add({"reconcile", "rec"}, "Reconcile client to offline workspace changes");
-    commands.add("status", "Preview reconcile of client to offline workspace changes");
+    commands.add("update", "Synonym for 'sync -s'");
+    commands.add("flush", "Synonym for 'sync -k'");
+    commands.add("clean", "Synonym for 'reconcile -w'");
+    commands.add({"reconcile", "rec"}, "Reconcile client to offline workspace changes; 'rec' is a synonym for 'reconcile'");
+    commands.add("status", "Synonym for 'reconcile -ead' (output uses local paths)");
     commands.add("have", "List revisions last synced");
     commands.add("opened", "Display list of files opened for pending changelist");
     commands.add("where", "Show how file names map through the client view");

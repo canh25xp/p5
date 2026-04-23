@@ -4,6 +4,11 @@
   - [/] All `p4` subcommands (See `p4 help commands`)
     - [x] p4 set
     - [ ] p4 aliases
+    - [x] reconcile -- Open files for add, delete, and/or edit to reconcile client with workspace changes made outside of P4
+    - [x] rec -- synonym for 'reconcile'
+    - [x] status -- 'reconcile -n + opened' (output uses local paths)
+    - [x] status -A -- synonym for 'reconcile -ead' (output uses local paths)
+    - [x] clean -- synonym for 'reconcile -w'
   - [/] All `p4` global arguments (See `p4 help usage`)
     - [x] p4 -c client
     - [x] p4 -u user
