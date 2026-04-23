@@ -16,6 +16,10 @@ public:
     /// Passthrough overload: invokes `run_p4_passthrough(name, args)` instead of a custom callback.
     void add(const char *name, const char *description, std::vector<const char *> aliases = {});
 
+    /// First command is the main command, the rest is aliases.
+    /// Example: add({"client", "workspace"}, "Create or edit a client specification")
+    void add(std::vector<const char *> commands, const char *description);
+
     void install(CLI::App &app) const;
 
     void clear();

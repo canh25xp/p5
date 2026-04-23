@@ -22,15 +22,15 @@ int main(int argc, char **argv) {
     commands.add("add", "Open a new file to add it to the depot");
     commands.add("delete", "Open an existing file to delete it from the depot");
     commands.add("edit", "Open an existing file for edit");
-    commands.add("move", "Moves files from one location to another", {"rename"});
+    commands.add({"move", "rename"}, "Moves files from one location to another");
     commands.add("reopen", "Change the type or changelist number of an opened file");
     commands.add("revert", "Discard changes from an opened file");
     commands.add("lock", "Lock an opened file against changelist submission");
     commands.add("unlock", "Release a locked file but leave it open");
 
     // --- Changelist operations ---
-    commands.add("change", "Create or edit a changelist description", {"changelist"});
-    commands.add("changes", "Display list of pending and submitted changelists", {"changelists"});
+    commands.add({"change", "changelist"}, "Create or edit a changelist description");
+    commands.add({"changes", "changelists"}, "Display list of pending and submitted changelists");
     commands.add("describe", "Display a changelist description");
     commands.add("shelve", "Store files from a pending changelist into the depot");
     commands.add("unshelve", "Restore shelved files from a pending changelist");
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     commands.add("update", "Update the client with its view of the depot");
     commands.add("flush", "Fake a 'p4 sync' by not moving files");
     commands.add("clean", "Delete or refresh local files to match depot state");
-    commands.add("reconcile", "Reconcile client to offline workspace changes", {"rec"});
+    commands.add({"reconcile", "rec"}, "Reconcile client to offline workspace changes");
     commands.add("status", "Preview reconcile of client to offline workspace changes");
     commands.add("have", "List revisions last synced");
     commands.add("opened", "Display list of files opened for pending changelist");
@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
     commands.add("ignores", "List P4IGNORE mappings");
 
     // --- Client / workspace ---
-    commands.add("client", "Create or edit a client specification and its view", {"workspace"});
-    commands.add("clients", "Display list of known clients", {"workspaces"});
+    commands.add({"client", "workspace"}, "Create or edit a client specification and its view");
+    commands.add({"clients", "workspaces"}, "Display list of known clients");
 
     // --- Depot / file info ---
     commands.add("files", "List files in the depot");

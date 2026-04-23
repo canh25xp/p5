@@ -22,6 +22,15 @@ void Commands::add(const char *name, const char *description, std::vector<const 
     m_entries.push_back(std::make_unique<Command>(name, description, std::move(aliases_str), true, nullptr));
 }
 
+void Commands::add(std::vector<const char *> commands, const char *description) {
+    const char *name = commands[0];
+    std::vector<std::string> aliases;
+    for (size_t i = 1; i < commands.size(); ++i) {
+        aliases.push_back(commands[i]);
+    }
+    m_entries.push_back(std::make_unique<Command>(name, description, std::move(aliases), true, nullptr));
+}
+
 void Commands::clear() {
     m_entries.clear();
 }
