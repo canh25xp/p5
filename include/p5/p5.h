@@ -6,6 +6,7 @@
 #include "commands/result.h"
 #include "p4/clientapi.h"
 
+#include "clients.h"
 #include "users.h"
 #include "clients.h"
 
@@ -13,11 +14,13 @@ class P5 {
     ClientApi m_ClientAPI;
     int m_Usage;
     bool m_LibrariesInitialized;
+    bool m_AutoResolving{false};
 
     bool Initialize();
     bool Deinitialize();
     bool Reinitialize();
     bool CheckErrors(Error &e, StrBuf &msg);
+    void AutoResolveClient();
 
     static const int COMMAND_RETRIES = 1;
     static const int COMMAND_REFRESH_THRESHOLD = 1;

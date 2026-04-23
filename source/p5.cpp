@@ -14,6 +14,7 @@
 #include "log.h"
 #include "options.h"
 #include "cli_helpers.h"
+#include "client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -45,7 +46,50 @@ bool P5::Initialize() {
         return false;
     }
 
+    // Auto-resolve client based on CWD if no explicit client was provided
+    // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
+    if (g_options.client().empty() && !g_options.noAutoClient() && !m_AutoResolving) {
+        AutoResolveClient();
+    }
+
     return true;
+}
+
+void P5::AutoResolveClient() {
+    m_AutoResolving = true;
+
+    std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
+    if (cwd.empty()) {
+        WARN("Auto-resolve: could not determine current working directory");
+        m_AutoResolving = false;
+        return;
+    }
+
+    std::string hostname = ClientResolver::GetCurrentHostname();
+
+    // Fetch clients owned by the current user
+    Clients clientsResult = ListClients({"--me"});
+
+    // Filter to clients on the current host
+    Clients::ClientMap filtered = ClientResolver::FilterByHost(
+        clientsResult.GetClients(), hostname);
+
+    if (filtered.empty()) {
+        INFO("Auto-resolve: no clients found for user on host " << hostname);
+        m_AutoResolving = false;
+        return;
+    }
+
+    // Resolve the best-matching client based on CWD
+    std::string resolved = ClientResolver::Resolve(cwd, filtered);
+    if (!resolved.empty()) {
+        INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
+        m_ClientAPI.SetClient(resolved.c_str());
+    } else {
+        INFO("Auto-resolve: no client root matches CWD " << cwd);
+    }
+
+    m_AutoResolving = false;
 }
 
 bool P5::Deinitialize() {
