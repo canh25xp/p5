@@ -12,13 +12,15 @@
 #include "p4/signaler.h"
 
 #include "log.h"
+#include "options.h"
 #include "cli_helpers.h"
 
-std::string P5::P4PORT;
-std::string P5::P4USER;
-std::string P5::P4CLIENT;
-
-P5::P5() {
+P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
+    if (!InitializeLibraries()) {
+        ERROR("Could not initialize P4 libraries");
+        return;
+    }
+    m_LibrariesInitialized = true;
     if (!Initialize()) {
         ERROR("Could not initialize P4");
         return;
@@ -30,10 +32,12 @@ bool P5::Initialize() {
     StrBuf msg;
 
     m_Usage = 0;
-    m_ClientAPI.SetPort(P4PORT.c_str());
-    m_ClientAPI.SetUser(P4USER.c_str());
-    m_ClientAPI.SetClient(P4CLIENT.c_str());
-    m_ClientAPI.SetProtocol("tag", "");
+    m_ClientAPI.SetPort(g_options.port().c_str());
+    m_ClientAPI.SetUser(g_options.user().c_str());
+    m_ClientAPI.SetClient(g_options.client().c_str());
+    for (const auto &proto : g_options.p4Protocol()) {
+        m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
+    }
     m_ClientAPI.Init(&e);
 
     if (!CheckErrors(e, msg)) {
@@ -62,6 +66,9 @@ bool P5::Reinitialize() {
 P5::~P5() {
     if (!Deinitialize()) {
         ERROR("P4 context was not destroyed successfully");
+    }
+    if (m_LibrariesInitialized && !ShutdownLibraries()) {
+        ERROR("P4 libraries were not shut down successfully");
     }
 }
 
@@ -108,18 +115,15 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-TestResult P5::TestConnection(const int retries) {
-    return Run<TestResult>("changes", {"-m", "1", "//..."}, retries);
-}
+Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
+    // Use tag protocol by default so OutputStat is called with structured data
+    m_ClientAPI.SetProtocol("tag", "");
 
-UsersResult P5::Users() {
-    return Run<UsersResult>("users", {
-                                         "-a" // Include service accounts
-                                     });
-}
-
-InfoResult P5::Info() {
-    return Run<InfoResult>("info", {});
+    std::vector<std::string> args;
+    args.reserve(1 + extraArgs.size());
+    args.push_back("-a"); // Include service accounts
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<Users>("users", args);
 }
 
 Result P5::Run(const char *command, int argumentCount, char **arguments) {

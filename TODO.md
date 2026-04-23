@@ -1,9 +1,19 @@
 # TODO
 
 - [ ] Drop-in replaceable implementation for `p4`:
-  - [ ] All `p4` subcommands (See `p4 help commands`)
-  - [ ] All `p4` global arguments (See `p4 help usage`)
-  - [ ] All `p4` environment variables and configuration files(See `p4 help environment`)
+  - [/] All `p4` subcommands (See `p4 help commands`)
+    - [x] p4 set
+    - [ ] p4 aliases
+    - [x] reconcile -- Open files for add, delete, and/or edit to reconcile client with workspace changes made outside of P4
+    - [x] rec -- synonym for 'reconcile'
+    - [x] status -- 'reconcile -n + opened' (output uses local paths)
+    - [x] status -A -- synonym for 'reconcile -ead' (output uses local paths)
+    - [x] clean -- synonym for 'reconcile -w'
+  - [/] All `p4` global arguments (See `p4 help usage`)
+    - [x] p4 -c client
+    - [x] p4 -u user
+    - [x] p4 -p port
+  - [x] All `p4` environment variables and configuration files(See `p4 help environment`)
 - [ ] Plan Improvements:
   - [ ] Add Feature:
     - [ ] Workspace awareness: `p5` should be able to set P4CLIENT based on current directory
@@ -13,6 +23,7 @@
   - [ ] Improve Feature:
     - [ ] `p4 blame` filter by lines
     - [ ] `p4 login` remember password and auto login
+    - [ ] `p4 rec` Faster implementation
   - [ ] Improve Visual
     - [ ] Output coloring
     - [ ] Diff coloring
