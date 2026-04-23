@@ -11,7 +11,7 @@ alwaysApply: true
 
 ## CLI compatibility
 
-The interface should match the existing `p4` tool as closely as practical so users can migrate to `p5` without relearning commands.
+The interface should match the existing `p4` tool as closely as possible so users can migrate to `p5` without relearning commands.
 
 ## Build and test
 
