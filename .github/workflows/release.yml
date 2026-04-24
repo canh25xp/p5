@@ -25,23 +25,19 @@ jobs:
     steps:
       - if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != 'nightly')
         run: |
-          echo 'CMAKE_BUILD_TYPE=Release' >> $GITHUB_ENV
           echo 'TAG_NAME=${{ github.ref_name }}' >> $GITHUB_ENV
       - if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name == 'nightly')
         run: |
-          echo 'CMAKE_BUILD_TYPE=RelWithDebInfo' >> $GITHUB_ENV
           echo 'TAG_NAME=nightly' >> $GITHUB_ENV
       - name: Export build information
         id: build
         run: |
-          printf "build_type=${CMAKE_BUILD_TYPE}\n" >> $GITHUB_OUTPUT
           printf "tag_name=${TAG_NAME}\n" >> $GITHUB_OUTPUT
 
   build-linux:
     needs: setup
     runs-on: ubuntu-22.04
     env:
-      CMAKE_BUILD_TYPE: ${{ needs.setup.outputs.build_type }}
       TAG_NAME: ${{ needs.setup.outputs.tag_name }}
     outputs:
       version: ${{ steps.build.outputs.version }}
@@ -85,8 +81,6 @@ jobs:
   build-windows:
     needs: setup
     runs-on: windows-2022
-    env:
-      CMAKE_BUILD_TYPE: ${{ needs.setup.outputs.build_type }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
