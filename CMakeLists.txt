@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(P4ApiVersion)
 include(downloadP4api)
+include(Submodules)
 
 project(
     p5
@@ -65,12 +66,16 @@ target_compile_definitions(
     "P5_VERSION_STRING=\"p5 version ${PROJECT_VERSION} (p4api version ${P4API_VERSION})\""
 )
 
+# Auto-initialize git submodules if needed (e.g., repo cloned without --recursive)
+init_git_submodules()
+
 add_subdirectory(vendor)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/p5
     include/p5/commands
     include/p5/utils
+    vendor/dbg-macro
 )
 
 if(MSVC)
@@ -82,7 +87,7 @@ if(MSVC)
   set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE P4API::client CLI11::CLI11 dbg_macro)
+target_link_libraries(${PROJECT_NAME} PRIVATE P4API::client CLI11::CLI11)
 
 if(DBG_MACRO_DISABLE)
   target_compile_definitions(${PROJECT_NAME} PRIVATE DBG_MACRO_DISABLE)
