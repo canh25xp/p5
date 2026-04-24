@@ -14,6 +14,8 @@
     - [x] p4 -u user
     - [x] p4 -p port
   - [x] All `p4` environment variables and configuration files(See `p4 help environment`)
+  - [ ] Customizable features added or changed by `p5`:
+        Any feature that make `p5` behaves different than `p4` should have a corresponding config to allow user enable or disable it.
 - [ ] Plan Improvements:
   - [ ] Add Feature:
     - [ ] Workspace awareness: `p5` should be able to set P4CLIENT based on current directory
