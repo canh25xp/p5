@@ -209,12 +209,20 @@ static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const s
 
     std::vector<std::string> out;
     out.reserve(lines.size() + 1);
+    bool found = false;
     for (const std::string &line : lines) {
-        if (!line_assigns_name(line, name)) {
+        if (line_assigns_name(line, name)) {
+            if (!found) {
+                if (!value.empty()) {
+                    out.push_back(name + "=" + value);
+                }
+                found = true;
+            }
+        } else {
             out.push_back(line);
         }
     }
-    if (!value.empty()) {
+    if (!found && !value.empty()) {
         out.push_back(name + "=" + value);
     }
 
