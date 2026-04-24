@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       CMAKE_BUILD_TYPE: ${{ needs.setup.outputs.build_type }}
+      TAG_NAME: ${{ needs.setup.outputs.tag_name }}
     outputs:
       version: ${{ steps.build.outputs.version }}
     steps:
