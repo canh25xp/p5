@@ -67,8 +67,29 @@ void P5::AutoResolveClient() {
 
     std::string hostname = ClientResolver::GetCurrentHostname();
 
-    // Fetch clients owned by the current user
-    Clients clientsResult = ListClients({"--me"});
+    // Fetch clients owned by the current user using a transient API
+    // to avoid polluting the main m_ClientAPI with "tag" protocol.
+    ClientApi bootstrapApi;
+    bootstrapApi.SetPort(g_options.port().c_str());
+    bootstrapApi.SetUser(g_options.user().c_str());
+    bootstrapApi.SetProtocol("tag", "");
+
+    Error e;
+    bootstrapApi.Init(&e);
+    if (e.Test()) {
+        StrBuf msg;
+        e.Fmt(&msg);
+        WARN("Auto-resolve: could not initialize bootstrap connection: " << msg.Text());
+        m_AutoResolving = false;
+        return;
+    }
+
+    Clients clientsResult;
+    const char *args[] = {"-u", g_options.user().c_str()};
+    bootstrapApi.SetArgv(2, const_cast<char **>(args));
+    bootstrapApi.Run("clients", &clientsResult);
+
+    bootstrapApi.Final(&e);
 
     // Filter to clients on the current host
     Clients::ClientMap filtered = ClientResolver::FilterByHost(
