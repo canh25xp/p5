@@ -4,15 +4,15 @@ on:
   push:
     branches:
       - main
-      - 'release-[0-9]+.[0-9]+'
+      - "release-[0-9]+.[0-9]+"
     paths:
-      - '**.cmake'
-      - '**/CMakeLists.txt'
-      - '**/CMakePresets.json'
-      - 'cmake/**'
-      - '.github/**'
-      - 'source/**'
-      - 'include/**'
+      - "**.cmake"
+      - "**/CMakeLists.txt"
+      - "**/CMakePresets.json"
+      - "cmake/**"
+      - ".github/**"
+      - "source/**"
+      - "include/**"
   workflow_dispatch:
 
 permissions:
@@ -39,16 +39,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build libssl-dev libzstd-dev
 
-      - name: Build Debug
-        run: cmake --workflow ninja-debug
-
-      - name: Build Release
-        run: cmake --workflow ninja-release
+      - name: Build Debug and Release
+        run: |
+          cmake --workflow ninja-debug
+          cmake --workflow ninja-release
 
       - name: Test binary
         run: |
           ./build/Debug/p5 --version
           ./build/Release/p5 --version
+
+      - name: Pack artifacts
+        run: |
+          mkdir -p out
+          zip -j "out/p5-linux-x64-Debug.zip" build/Debug/p5
+          zip -j "out/p5-linux-x64-Release.zip" build/Release/p5
+          ls -la out
+
+      - name: Upload dist (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: out
 
   build-windows:
     name: Build (Windows)
@@ -67,10 +79,31 @@ jobs:
           arch: x64
 
       - name: Build Debug and Release
-        run: cmake --workflow msvc2022
+        run: |
+          cmake --workflow msvc2022
 
       - name: Test binary
         run: |
           ./build/Debug/p5.exe --version
           ./build/Release/p5.exe --version
         shell: pwsh
+
+      - name: Pack artifacts
+        run: |
+          $out = "out"
+          New-Item -ItemType Directory -Force -Path $out
+          $rels = @(
+            @{ path = "build\Debug\p5.exe";  zip = "p5-windows-x64-Debug.zip" },
+            @{ path = "build\Release\p5.exe"; zip = "p5-windows-x64-Release.zip" }
+          )
+          foreach ($r in $rels) {
+            if (-not (Test-Path $r.path)) { throw "Missing: $($r.path)" }
+            Compress-Archive -Path $r.path -DestinationPath (Join-Path $out $r.zip) -Force
+          }
+        shell: pwsh
+
+      - name: Upload dist (Windows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: out
