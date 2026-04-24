@@ -8,7 +8,7 @@ include(Submodules)
 project(
     p5
     LANGUAGES CXX
-    VERSION 1.0
+    VERSION 0.1.0
     DESCRIPTION "p5: Complementary p4 command-line tools"
 )
 
