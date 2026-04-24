@@ -4,8 +4,8 @@
 
 | Platform | File |
 |----------|------|
-| Linux (x64) | `p5-linux-x64.zip` |
-| Windows (x64) | `p5-windows-x64.zip` |
+| Linux (x64) | `p5-$TAG_NAME-linux-x64.zip` |
+| Windows (x64) | `p5-$TAG_NAME-windows-x64.zip` |
 
 ### Checksums
 
