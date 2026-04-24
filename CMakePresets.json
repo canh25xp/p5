@@ -132,22 +132,18 @@
     {
       "name": "make-debug",
       "configurePreset": "make-debug",
-      "jobs": 8
     },
     {
       "name": "make-release",
       "configurePreset": "make-release",
-      "jobs": 8
     },
     {
       "name": "mingw-debug",
       "configurePreset": "mingw-debug",
-      "jobs": 8
     },
     {
       "name": "mingw-release",
       "configurePreset": "mingw-release",
-      "jobs": 8
     },
     {
       "name": "msvc2017-debug",
