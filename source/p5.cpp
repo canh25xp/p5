@@ -14,6 +14,7 @@
 #include "log.h"
 #include "options.h"
 #include "cli_helpers.h"
+#include "client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -45,7 +46,71 @@ bool P5::Initialize() {
         return false;
     }
 
+    // Auto-resolve client based on CWD if no explicit client was provided
+    // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
+    if (g_options.client().empty() && !g_options.noAutoClient() && !m_AutoResolving) {
+        AutoResolveClient();
+    }
+
     return true;
+}
+
+void P5::AutoResolveClient() {
+    m_AutoResolving = true;
+
+    std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
+    if (cwd.empty()) {
+        WARN("Auto-resolve: could not determine current working directory");
+        m_AutoResolving = false;
+        return;
+    }
+
+    std::string hostname = ClientResolver::GetCurrentHostname();
+
+    // Fetch clients owned by the current user using a transient API
+    // to avoid polluting the main m_ClientAPI with "tag" protocol.
+    ClientApi bootstrapApi;
+    bootstrapApi.SetPort(g_options.port().c_str());
+    bootstrapApi.SetUser(g_options.user().c_str());
+    bootstrapApi.SetProtocol("tag", "");
+
+    Error e;
+    bootstrapApi.Init(&e);
+    if (e.Test()) {
+        StrBuf msg;
+        e.Fmt(&msg);
+        WARN("Auto-resolve: could not initialize bootstrap connection: " << msg.Text());
+        m_AutoResolving = false;
+        return;
+    }
+
+    Clients clientsResult;
+    const char *args[] = {"-u", g_options.user().c_str()};
+    bootstrapApi.SetArgv(2, const_cast<char **>(args));
+    bootstrapApi.Run("clients", &clientsResult);
+
+    bootstrapApi.Final(&e);
+
+    // Filter to clients on the current host
+    Clients::ClientMap filtered = ClientResolver::FilterByHost(
+        clientsResult.GetClients(), hostname);
+
+    if (filtered.empty()) {
+        INFO("Auto-resolve: no clients found for user on host " << hostname);
+        m_AutoResolving = false;
+        return;
+    }
+
+    // Resolve the best-matching client based on CWD
+    std::string resolved = ClientResolver::Resolve(cwd, filtered);
+    if (!resolved.empty()) {
+        INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
+        m_ClientAPI.SetClient(resolved.c_str());
+    } else {
+        INFO("Auto-resolve: no client root matches CWD " << cwd);
+    }
+
+    m_AutoResolving = false;
 }
 
 bool P5::Deinitialize() {
@@ -124,6 +189,16 @@ Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
     args.push_back("-a"); // Include service accounts
     args.insert(args.end(), extraArgs.begin(), extraArgs.end());
     return Run<Users>("users", args);
+}
+
+Clients P5::ListClients(const std::vector<std::string> &extraArgs) {
+    // Use tag protocol by default so OutputStat is called with structured data
+    m_ClientAPI.SetProtocol("tag", "");
+
+    std::vector<std::string> args;
+    args.reserve(extraArgs.size());
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<Clients>("clients", args);
 }
 
 Result P5::Run(const char *command, int argumentCount, char **arguments) {

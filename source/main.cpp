@@ -2,6 +2,7 @@
 
 #include "commands.h"
 #include "options.h"
+#include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/set.h"
 
@@ -57,7 +58,7 @@ int main(int argc, char **argv) {
 
     // --- Client / workspace ---
     commands.add({"client", "workspace"}, "Create or edit a client specification and its view");
-    commands.add({"clients", "workspaces"}, "Display list of known clients");
+    commands.add(std::make_unique<Clients>());
 
     // --- Depot / file info ---
     commands.add("files", "List files in the depot");
