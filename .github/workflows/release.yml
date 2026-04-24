@@ -57,15 +57,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build libssl-dev libzstd-dev
 
-      - name: Build Debug and Release
+      - name: Build
         run: |
-          cmake --workflow ninja-debug
           cmake --workflow ninja-release
 
       - name: Pack artifacts
         run: |
           mkdir -p out
-          zip -j "out/p5-linux-x64-debug.zip" build/Debug/p5
           zip -j "out/p5-linux-x64-release.zip" build/Release/p5
           ls -la out
 
@@ -101,14 +99,15 @@ jobs:
         with:
           arch: x64
 
-      - name: Build Debug and Release
-        run: cmake --workflow msvc2022
+      - name: Build
+        run: |
+          cmake --preset msvc2022
+          cmake --build --preset msvc2022-release
 
       - name: Pack artifacts
         run: |
           $out = "out"
           New-Item -ItemType Directory -Force -Path $out
-          Compress-Archive -Path "build\Debug\p5.exe" -DestinationPath (Join-Path $out "p5-windows-x64-debug.zip") -Force
           Compress-Archive -Path "build\Release\p5.exe" -DestinationPath (Join-Path $out "p5-windows-x64-release.zip") -Force
         shell: pwsh
 
