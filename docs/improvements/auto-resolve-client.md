@@ -58,3 +58,4 @@ and then set P4CLIENT appropriately.
 
 - Client list caching (optional optimization to avoid `p4 clients --me` on every command)
 - Compile-time toggle to disable auto-resolve
+- Skip resolve clients for commands that does not access P4CLIENT, for example `p4 changes`, `p4 users`, ...
