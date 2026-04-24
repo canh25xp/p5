@@ -16,7 +16,7 @@ fi
 files=()
 while IFS= read -r -d '' f; do
     files+=("$f")
-done < <(git ls-files -z -- '*.cpp' '*.cc' '*.cxx' '*.h' '*.hpp' '*.hh' '*.hxx')
+done < <(git ls-files -z -- '*.cpp' '*.cc' '*.cxx' '*.h' '*.hpp' '*.hh' '*.hxx' ':(exclude)vendor/')
 
 if ((${#files[@]} == 0)); then
     echo "No tracked C++ files matched."
