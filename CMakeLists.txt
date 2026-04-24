@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(P4ApiVersion)
 include(downloadP4api)
+include(Submodules)
 
 project(
     p5
@@ -64,6 +65,9 @@ target_compile_definitions(
     "P5_APP_DESCRIPTION=\"${PROJECT_DESCRIPTION}\""
     "P5_VERSION_STRING=\"p5 version ${PROJECT_VERSION} (p4api version ${P4API_VERSION})\""
 )
+
+# Auto-initialize git submodules if needed (e.g., repo cloned without --recursive)
+init_git_submodules()
 
 add_subdirectory(vendor)
 
