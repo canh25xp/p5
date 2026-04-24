@@ -75,7 +75,7 @@ jobs:
         id: build
         run: |
           printf 'version<<END\n' >> $GITHUB_OUTPUT
-          ./build/Release/p5 --version 2>/dev/null || echo "p5 ${TAG_NAME}" >> $GITHUB_OUTPUT
+          ./build/Release/p5 --version >> $GITHUB_OUTPUT
           printf 'END\n' >> $GITHUB_OUTPUT
 
   build-windows:
