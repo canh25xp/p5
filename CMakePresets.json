@@ -35,8 +35,7 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "OPENSSL_ROOT_DIR": "/usr/local"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -44,8 +43,7 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/Release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "OPENSSL_ROOT_DIR": "/usr/local"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
@@ -53,8 +51,7 @@
       "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -62,8 +59,7 @@
       "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build/Release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "OPENSSL_ROOT_DIR": "C:/msys64/mingw64"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
@@ -73,9 +69,6 @@
       "architecture": {
         "value": "x64",
         "strategy": "set"
-      },
-      "cacheVariables": {
-        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3"
       }
     },
     {
@@ -85,9 +78,6 @@
       "architecture": {
         "value": "x64",
         "strategy": "set"
-      },
-      "cacheVariables": {
-        "OPENSSL_ROOT_DIR": "C:/Program Files/FireDaemon OpenSSL 3"
       }
     }
   ],
