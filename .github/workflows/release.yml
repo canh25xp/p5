@@ -61,7 +61,7 @@ jobs:
       - name: Pack artifacts
         run: |
           mkdir -p out
-          zip -j "out/p5-linux-x64-release.zip" build/Release/p5
+          zip -j "out/p5-linux-x64.zip" build/Release/p5
           ls -la out
 
       - name: Upload artifact
@@ -103,7 +103,7 @@ jobs:
         run: |
           $out = "out"
           New-Item -ItemType Directory -Force -Path $out
-          Compress-Archive -Path "build\Release\p5.exe" -DestinationPath (Join-Path $out "p5-windows-x64-release.zip") -Force
+          Compress-Archive -Path "build\Release\p5.exe" -DestinationPath (Join-Path $out "p5-windows-x64.zip") -Force
         shell: pwsh
 
       - name: Upload artifact
