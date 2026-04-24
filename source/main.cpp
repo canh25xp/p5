@@ -12,6 +12,8 @@
 int main(int argc, char **argv) {
     CLI::App app(P5_APP_DESCRIPTION);
 
+    app.get_formatter()->right_column_width(999999);
+
     argv = app.ensure_utf8(argv);
 
     app.require_subcommand(1);
