@@ -5,10 +5,15 @@ include(P4ApiVersion)
 include(downloadP4api)
 include(Submodules)
 
+set(P5_VERSION_MAJOR 0)
+set(P5_VERSION_MINOR 1)
+set(P5_VERSION_PATCH 0)
+set(P5_VERSION "${P5_VERSION_MAJOR}.${P5_VERSION_MINOR}.${P5_VERSION_PATCH}")
+
 project(
     p5
     LANGUAGES CXX
-    VERSION 1.0
+    VERSION ${P5_VERSION}
     DESCRIPTION "p5: Complementary p4 command-line tools"
 )
 
@@ -63,6 +68,10 @@ target_compile_definitions(
   ${PROJECT_NAME}
   PRIVATE
     "P5_APP_DESCRIPTION=\"${PROJECT_DESCRIPTION}\""
+    "P5_VERSION_MAJOR=\"${P5_VERSION_MAJOR}\""
+    "P5_VERSION_MINOR=\"${P5_VERSION_MINOR}\""
+    "P5_VERSION_PATCH=\"${P5_VERSION_PATCH}\""
+    "P5_VERSION=\"${P5_VERSION}\""
     "P5_VERSION_STRING=\"p5 version ${PROJECT_VERSION} (p4api version ${P4API_VERSION})\""
 )
 

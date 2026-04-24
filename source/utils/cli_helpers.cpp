@@ -1,4 +1,5 @@
 #include "cli_helpers.h"
+#include <cctype>
 #include <string>
 #include <vector>
 

@@ -82,183 +82,82 @@
     }
   ],
   "buildPresets": [
-    {
-      "name": "default",
-      "configurePreset": "ninja-debug"
-    },
-    {
-      "name": "ninja-debug",
-      "configurePreset": "ninja-debug"
-    },
-    {
-      "name": "ninja-release",
-      "configurePreset": "ninja-release"
-    },
-    {
-      "name": "make-debug",
-      "configurePreset": "make-debug",
-      "jobs": 8
-    },
-    {
-      "name": "make-release",
-      "configurePreset": "make-release",
-      "jobs": 8
-    },
-    {
-      "name": "mingw-make-debug",
-      "configurePreset": "mingw-make-debug",
-      "jobs": 8
-    },
-    {
-      "name": "mingw-make-release",
-      "configurePreset": "mingw-make-release",
-      "jobs": 8
-    },
-    {
-      "name": "msvc2017-debug",
-      "configurePreset": "msvc2017",
-      "configuration": "Debug"
-    },
-    {
-      "name": "msvc2017-release",
-      "configurePreset": "msvc2017",
-      "configuration": "Release"
-    },
-    {
-      "name": "msvc2022-debug",
-      "configurePreset": "msvc2022",
-      "configuration": "Debug"
-    },
-    {
-      "name": "msvc2022-release",
-      "configurePreset": "msvc2022",
-      "configuration": "Release"
-    }
+    { "name": "default", "configurePreset": "ninja-debug" },
+    { "name": "ninja-debug", "configurePreset": "ninja-debug" },
+    { "name": "ninja-release", "configurePreset": "ninja-release" },
+    { "name": "make-debug", "configurePreset": "make-debug" },
+    { "name": "make-release", "configurePreset": "make-release" },
+    { "name": "mingw-make-debug", "configurePreset": "mingw-make-debug" },
+    { "name": "mingw-make-release", "configurePreset": "mingw-make-release" },
+    { "name": "msvc2017-debug", "configurePreset": "msvc2017", "configuration": "Debug" },
+    { "name": "msvc2017-release", "configurePreset": "msvc2017", "configuration": "Release" },
+    { "name": "msvc2022-debug", "configurePreset": "msvc2022", "configuration": "Debug" },
+    { "name": "msvc2022-release", "configurePreset": "msvc2022", "configuration": "Release" }
   ],
   "workflowPresets": [
     {
       "name": "default",
       "steps": [
-        {
-          "type": "configure",
-          "name": "ninja-debug"
-        },
-        {
-          "type": "build",
-          "name": "ninja-debug"
-        }
+        { "type": "configure", "name": "ninja-debug" },
+        { "type": "build", "name": "ninja-debug" }
       ]
     },
     {
       "name": "ninja-debug",
       "steps": [
-        {
-          "type": "configure",
-          "name": "ninja-debug"
-        },
-        {
-          "type": "build",
-          "name": "ninja-debug"
-        }
+        { "type": "configure", "name": "ninja-debug" },
+        { "type": "build", "name": "ninja-debug" }
       ]
     },
     {
       "name": "ninja-release",
       "steps": [
-        {
-          "type": "configure",
-          "name": "ninja-release"
-        },
-        {
-          "type": "build",
-          "name": "ninja-release"
-        }
+        { "type": "configure", "name": "ninja-release" },
+        { "type": "build", "name": "ninja-release" }
       ]
     },
     {
       "name": "make-debug",
       "steps": [
-        {
-          "type": "configure",
-          "name": "make-debug"
-        },
-        {
-          "type": "build",
-          "name": "make-debug"
-        }
+        { "type": "configure", "name": "make-debug" },
+        { "type": "build", "name": "make-debug" }
       ]
     },
     {
       "name": "make-release",
       "steps": [
-        {
-          "type": "configure",
-          "name": "make-release"
-        },
-        {
-          "type": "build",
-          "name": "make-release"
-        }
+        { "type": "configure", "name": "make-release" },
+        { "type": "build", "name": "make-release" }
       ]
     },
     {
       "name": "mingw-make-debug",
       "steps": [
-        {
-          "type": "configure",
-          "name": "mingw-make-debug"
-        },
-        {
-          "type": "build",
-          "name": "mingw-make-debug"
-        }
+        { "type": "configure", "name": "mingw-make-debug" },
+        { "type": "build", "name": "mingw-make-debug" }
       ]
     },
     {
       "name": "mingw-make-release",
       "steps": [
-        {
-          "type": "configure",
-          "name": "mingw-make-release"
-        },
-        {
-          "type": "build",
-          "name": "mingw-make-release"
-        }
+        { "type": "configure", "name": "mingw-make-release" },
+        { "type": "build", "name": "mingw-make-release" }
       ]
     },
     {
       "name": "msvc2017",
       "steps": [
-        {
-          "type": "configure",
-          "name": "msvc2017"
-        },
-        {
-          "type": "build",
-          "name": "msvc2017-debug"
-        },
-        {
-          "type": "build",
-          "name": "msvc2017-release"
-        }
+        { "type": "configure", "name": "msvc2017" },
+        { "type": "build", "name": "msvc2017-debug" },
+        { "type": "build", "name": "msvc2017-release" }
       ]
     },
     {
       "name": "msvc2022",
       "steps": [
-        {
-          "type": "configure",
-          "name": "msvc2022"
-        },
-        {
-          "type": "build",
-          "name": "msvc2022-debug"
-        },
-        {
-          "type": "build",
-          "name": "msvc2022-release"
-        }
+        { "type": "configure", "name": "msvc2022" },
+        { "type": "build", "name": "msvc2022-debug" },
+        { "type": "build", "name": "msvc2022-release" }
       ]
     }
   ]
