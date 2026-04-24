@@ -15,10 +15,11 @@ The first string is the variable name; the second is its value. For flags that a
 
 ### Documented variables
 
-| Name         | Meaning |
-| ------------ | ------- |
-| `tag`        | Request **tagged** output when the server supports it for the command. Triggers `ClientUser::OutputStat()` instead of `OutputInfo()` for that data. |
-| `specstring` | Enable **specstring** / form-descriptor handling for form-related commands. Commonly used together with `tag`. |
+| Name         | Meaning                                                                                                                                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tag`        | Request **tagged** output when the server supports it for the command. Triggers `ClientUser::OutputStat()` instead of `OutputInfo()` for that data.                                                                          |
+| `track`      | Request **tagged** output when the server supports it for the command. Triggers `ClientUser::OutputStat()` instead of `OutputInfo()` for that data.                                                                          |
+| `specstring` | Enable **specstring** / form-descriptor handling for form-related commands. Commonly used together with `tag`.                                                                                                               |
 | `api`        | Set the **protocol level** (e.g. `"55"`, `"56"`, `"57"`, `"58"`, …) to pin older client/server response behavior. Normally matches the API you linked; override only if you need compatibility with a specific release line. |
 
 Example (tagged output, same idea as `p4 -z tag`):
