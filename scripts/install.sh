@@ -5,18 +5,26 @@ cd "$(git rev-parse --show-toplevel)"
 
 usage() {
     cat <<'USAGE'
-Usage: install.sh [-h|--help]
+Usage: install.sh [-h|--help] [-r|--release] [-d|--debug]
 
-Copies the release build (default: build/Release/p5) into ~/.local/bin (default). Set
-`P5_BINARY` or `DEST_DIR` to override either path.
+Copies the release build (default: build/Release/p5) into ~/.local/bin (default).
+Set `P5_BINARY` or `DEST_DIR` to override either path.
+Use `-d`/`--debug` to copy the Debug build instead.
 USAGE
 }
 
+build_type="Release"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help)
             usage
             exit 0
+            ;;
+        -r|--release)
+            build_type="Release"
+            ;;
+        -d|--debug)
+            build_type="Debug"
             ;;
         *)
             echo "Unsupported argument: $1" >&2
@@ -27,7 +35,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-P5_BINARY="${P5_BINARY:-build/Release/p5}"
+P5_BINARY="${P5_BINARY:-build/$build_type/p5}"
 DEST_DIR="${DEST_DIR:-$HOME/.local/bin}"
 
 if [[ ! -f "$P5_BINARY" ]]; then
