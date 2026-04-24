@@ -7,92 +7,127 @@
   },
   "configurePresets": [
     {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "ninja",
+      "hidden": true,
+      "inherits": ["base"],
+      "generator": "Ninja"
+    },
+    {
+      "name": "make",
+      "hidden": true,
+      "inherits": ["base"],
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "mingw",
+      "hidden": true,
+      "inherits": ["base"],
+      "generator": "MinGW Makefiles"
+    },
+    {
+      "name": "msvc-base",
+      "hidden": true,
+      "inherits": ["base"],
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      }
+    },
+    {
       "name": "default",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/Debug",
+      "displayName": "Debug (Ninja)",
+      "description": "Default debug build using Ninja",
+      "inherits": ["ninja"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "ninja-debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/Debug",
+      "name": "debug",
+      "displayName": "Debug (Ninja)",
+      "description": "Debug build using Ninja",
+      "inherits": ["ninja"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "ninja-release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/Release",
+      "name": "release",
+      "displayName": "Release (Ninja)",
+      "description": "Release build using Ninja",
+      "inherits": ["ninja"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
       "name": "make-debug",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/Debug",
+      "displayName": "Debug (Unix Makefiles)",
+      "description": "Debug build using Unix Makefiles",
+      "inherits": ["make"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "make-release",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/Release",
+      "displayName": "Release (Unix Makefiles)",
+      "description": "Release build using Unix Makefiles",
+      "inherits": ["make"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "mingw-make-debug",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${sourceDir}/build/Debug",
+      "name": "mingw-debug",
+      "displayName": "Debug (MinGW Makefiles)",
+      "description": "Debug build using MinGW Makefiles",
+      "inherits": ["mingw"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "mingw-make-release",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${sourceDir}/build/Release",
+      "name": "mingw-release",
+      "displayName": "Release (MinGW Makefiles)",
+      "description": "Release build using MinGW Makefiles",
+      "inherits": ["mingw"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
       "name": "msvc2017",
-      "generator": "Visual Studio 15 2017",
-      "binaryDir": "${sourceDir}/build",
-      "architecture": {
-        "value": "x64",
-        "strategy": "set"
-      }
+      "displayName": "Visual Studio 15 2017",
+      "description": "Multi-config build using Visual Studio 2017",
+      "inherits": ["msvc-base"],
+      "generator": "Visual Studio 15 2017"
     },
     {
       "name": "msvc2022",
-      "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build",
-      "architecture": {
-        "value": "x64",
-        "strategy": "set"
-      }
+      "displayName": "Visual Studio 17 2022",
+      "description": "Multi-config build using Visual Studio 2022",
+      "inherits": ["msvc-base"],
+      "generator": "Visual Studio 17 2022"
     }
   ],
   "buildPresets": [
     {
       "name": "default",
-      "configurePreset": "ninja-debug"
+      "configurePreset": "debug"
     },
     {
-      "name": "ninja-debug",
-      "configurePreset": "ninja-debug"
+      "name": "debug",
+      "configurePreset": "debug"
     },
     {
-      "name": "ninja-release",
-      "configurePreset": "ninja-release"
+      "name": "release",
+      "configurePreset": "release"
     },
     {
       "name": "make-debug",
@@ -105,13 +140,13 @@
       "jobs": 8
     },
     {
-      "name": "mingw-make-debug",
-      "configurePreset": "mingw-make-debug",
+      "name": "mingw-debug",
+      "configurePreset": "mingw-debug",
       "jobs": 8
     },
     {
-      "name": "mingw-make-release",
-      "configurePreset": "mingw-make-release",
+      "name": "mingw-release",
+      "configurePreset": "mingw-release",
       "jobs": 8
     },
     {
@@ -141,37 +176,37 @@
       "steps": [
         {
           "type": "configure",
-          "name": "ninja-debug"
+          "name": "debug"
         },
         {
           "type": "build",
-          "name": "ninja-debug"
+          "name": "debug"
         }
       ]
     },
     {
-      "name": "ninja-debug",
+      "name": "debug",
       "steps": [
         {
           "type": "configure",
-          "name": "ninja-debug"
+          "name": "debug"
         },
         {
           "type": "build",
-          "name": "ninja-debug"
+          "name": "debug"
         }
       ]
     },
     {
-      "name": "ninja-release",
+      "name": "release",
       "steps": [
         {
           "type": "configure",
-          "name": "ninja-release"
+          "name": "release"
         },
         {
           "type": "build",
-          "name": "ninja-release"
+          "name": "release"
         }
       ]
     },
@@ -202,28 +237,28 @@
       ]
     },
     {
-      "name": "mingw-make-debug",
+      "name": "mingw-debug",
       "steps": [
         {
           "type": "configure",
-          "name": "mingw-make-debug"
+          "name": "mingw-debug"
         },
         {
           "type": "build",
-          "name": "mingw-make-debug"
+          "name": "mingw-debug"
         }
       ]
     },
     {
-      "name": "mingw-make-release",
+      "name": "mingw-release",
       "steps": [
         {
           "type": "configure",
-          "name": "mingw-make-release"
+          "name": "mingw-release"
         },
         {
           "type": "build",
-          "name": "mingw-make-release"
+          "name": "mingw-release"
         }
       ]
     },
