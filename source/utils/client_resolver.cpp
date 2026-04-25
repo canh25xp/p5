@@ -5,7 +5,12 @@
 #include "p4/error.h"
 
 #include <cstdlib>
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd _getcwd
+#else
 #include <unistd.h>
+#endif
 
 std::string ClientResolver::Resolve(const std::string &cwd, const Clients::ClientMap &clients) {
     std::string bestClient;
@@ -16,7 +21,7 @@ std::string ClientResolver::Resolve(const std::string &cwd, const Clients::Clien
         if (!data.root.empty()) {
             const std::string &root = data.root;
             // CWD must start with root followed by '/' or be exactly equal to root
-            if (cwd == root || (cwd.size() > root.size() && cwd.compare(0, root.size(), root) == 0 && cwd[root.size()] == '/')) {
+            if (cwd == root || (cwd.size() > root.size() && cwd.compare(0, root.size(), root) == 0 && (cwd[root.size()] == '/' || cwd[root.size()] == '\\'))) {
                 if (root.size() > bestMatchLen) {
                     bestMatchLen = root.size();
                     bestClient = name;
@@ -29,7 +34,7 @@ std::string ClientResolver::Resolve(const std::string &cwd, const Clients::Clien
             if (altRoot.empty()) {
                 continue;
             }
-            if (cwd == altRoot || (cwd.size() > altRoot.size() && cwd.compare(0, altRoot.size(), altRoot) == 0 && cwd[altRoot.size()] == '/')) {
+            if (cwd == altRoot || (cwd.size() > altRoot.size() && cwd.compare(0, altRoot.size(), altRoot) == 0 && (cwd[altRoot.size()] == '/' || cwd[altRoot.size()] == '\\'))) {
                 if (altRoot.size() > bestMatchLen) {
                     bestMatchLen = altRoot.size();
                     bestClient = name;
