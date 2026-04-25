@@ -19,6 +19,8 @@ public:
     const std::string &user() const { return m_user; }
     const std::string &client() const { return m_client; }
     bool resolveClient() const { return m_resolve_client; }
+    bool noCache() const { return m_no_cache; }
+    bool clearCache() const { return m_clear_cache; }
     const std::vector<std::pair<std::string, std::string>> &p4Protocol() const { return m_p4_protocol; }
 
 private:
@@ -27,6 +29,8 @@ private:
     std::string m_port;
     std::string m_client;
     bool m_resolve_client{true};
+    bool m_no_cache{false};
+    bool m_clear_cache{false};
     /// Each `-z` argument: `name` or `name=value` (Helix protocol variable).
     std::vector<std::string> m_protocol_z;
     /// Parsed `-z` entries (empty `value` when no `=` was present).

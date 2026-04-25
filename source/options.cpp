@@ -32,6 +32,10 @@ void Options::add(CLI::App &app) {
     app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
         ->group("Global options")
         ->envname("P5RESOLVECLIENT");
+    app.add_flag("--no-cache", m_no_cache, "Force update cache for command")
+        ->group("Global options");
+    app.add_flag("--clear-cache", m_clear_cache, "Clear cache for command")
+        ->group("Global options");
     app.add_option("-z", m_protocol_z, "Set Helix protocol variable (name or name=value); repeat for multiple")
         ->group("Global options");
 

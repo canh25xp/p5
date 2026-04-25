@@ -15,6 +15,7 @@
 #include "options.h"
 #include "utils/cli_helpers.h"
 #include "utils/client_resolver.h"
+#include "cache.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -177,8 +178,30 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
         INFO("arguments: " << arg);
     }
 
+    std::chrono::seconds validPeriod;
+    bool shouldCache = CacheManager::ShouldCacheCommand(command, validPeriod);
+    std::string cacheFile;
+    if (shouldCache) {
+        cacheFile = CacheManager::GetCacheFilePath(command, stringArguments, g_options.port(), g_options.user());
+        INFO("cacheFile: " << cacheFile);
+        if (g_options.clearCache()) {
+            CacheManager::ClearCache(cacheFile);
+        } else {
+            if (CacheManager::ReplayCache(cacheFile, &clientUser, validPeriod, g_options.noCache())) {
+                INFO("Loaded cache for " << command);
+                return clientUser;
+            }
+        }
+    }
+
     m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-    m_ClientAPI.Run(command, &clientUser);
+
+    if (shouldCache && !cacheFile.empty()) {
+        CachingClientUser proxy(&clientUser, cacheFile);
+        m_ClientAPI.Run(command, &proxy);
+    } else {
+        m_ClientAPI.Run(command, &clientUser);
+    }
 
     int retries = commandRetries;
     while (m_ClientAPI.Dropped() || clientUser.GetError().IsError()) {
@@ -200,7 +223,12 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
         clientUser = T();
 
         m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-        m_ClientAPI.Run(command, &clientUser);
+        if (shouldCache && !cacheFile.empty()) {
+            CachingClientUser proxy(&clientUser, cacheFile);
+            m_ClientAPI.Run(command, &proxy);
+        } else {
+            m_ClientAPI.Run(command, &clientUser);
+        }
 
         retries--;
     }
