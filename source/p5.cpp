@@ -39,17 +39,17 @@ bool P5::Initialize() {
     for (const auto &proto : g_options.p4Protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
+    // Auto-resolve client based on CWD if no explicit client was provided
+    // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
+    if (g_options.client().empty() && g_options.resolveClient() && !m_AutoResolving) {
+        AutoResolveClient();
+    }
+
     m_ClientAPI.Init(&e);
 
     if (!CheckErrors(e, msg)) {
         ERROR("Could not initialize Helix Core C/C++ API");
         return false;
-    }
-
-    // Auto-resolve client based on CWD if no explicit client was provided
-    // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
-    if (g_options.client().empty() && !g_options.noAutoClient() && !m_AutoResolving) {
-        AutoResolveClient();
     }
 
     return true;
@@ -85,8 +85,8 @@ void P5::AutoResolveClient() {
     }
 
     Clients clientsResult;
-    const char *args[] = {"-u", g_options.user().c_str()};
-    bootstrapApi.SetArgv(2, const_cast<char **>(args));
+    const char *args[] = {"--me"};
+    bootstrapApi.SetArgv(1, const_cast<char **>(args));
     bootstrapApi.Run("clients", &clientsResult);
 
     bootstrapApi.Final(&e);

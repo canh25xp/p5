@@ -83,24 +83,7 @@ static const char *const kP4EnvVarCandidates[] = {
     "P4ZEROSYNC",
 };
 
-void load_enviro_for_set(Enviro &env, const Options &options) {
-    Error e;
-    StrBuf cwd;
-    HostEnv host;
-    host.GetCwd(cwd, &e, &env);
-    env.Config(cwd);
-    env.LoadEnviro(1);
-
-    if (!options.port().empty()) {
-        env.Update("P4PORT", options.port().c_str());
-    }
-    if (!options.user().empty()) {
-        env.Update("P4USER", options.user().c_str());
-    }
-    if (!options.client().empty()) {
-        env.Update("P4CLIENT", options.client().c_str());
-    }
-}
+// Refactored to use Options::load_enviro
 
 #if !defined(_WIN32)
 static bool line_assigns_name(const std::string &line, const std::string &name) {
@@ -273,10 +256,12 @@ static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const s
 /// `all == false`: same as `p4 set` with no arguments (local `Enviro` only).
 /// `all == true`: all supported P4* names known to the linked API.
 static void print_env(bool quiet, bool all, const Options &options) {
-    Enviro env;
-    load_enviro_for_set(env, options);
+    Enviro *env = options.env();
+    if (!env) {
+        return;
+    }
     if (!all) {
-        env.List(quiet ? 1 : 0);
+        env->List(quiet ? 1 : 0);
         return;
     }
     const int format_flags = quiet ? 1 : 0;
@@ -285,7 +270,7 @@ static void print_env(bool quiet, bool all, const Options &options) {
             continue;
         }
         StrBuf formatted;
-        env.Format(name, &formatted, format_flags);
+        env->Format(name, &formatted, format_flags);
         if (formatted.Length() > 0) {
             std::cout << formatted.Text() << '\n';
         } else {
@@ -318,15 +303,17 @@ void Set::run(const std::vector<std::string> &args) {
         }
     }
 
-    Enviro env;
-    load_enviro_for_set(env, m_options);
+    Enviro *env = m_options.env();
+    if (!env) {
+        return;
+    }
     Error e;
     const int print_quiet = m_quiet ? 1 : 0;
 
     for (const std::string &arg : args) {
         const std::string::size_type eq = arg.find('=');
         if (eq == std::string::npos) {
-            env.Print(arg.c_str(), print_quiet);
+            env->Print(arg.c_str(), print_quiet);
             continue;
         }
         if (eq == 0) {
@@ -339,7 +326,7 @@ void Set::run(const std::vector<std::string> &args) {
         ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
         throw CLI::RuntimeError(1);
 #else
-        if (!p4_set_persistent_unix(env, name, value)) {
+        if (!p4_set_persistent_unix(*env, name, value)) {
             throw CLI::RuntimeError(1);
         }
 #endif

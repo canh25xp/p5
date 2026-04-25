@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CLI/CLI.hpp"
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -11,18 +12,21 @@ class Options {
 public:
     void add(CLI::App &app);
     void apply();
+    class Enviro *env() const { return m_env.get(); }
+    void load_enviro(class Enviro &env) const;
 
     const std::string &port() const { return m_port; }
     const std::string &user() const { return m_user; }
     const std::string &client() const { return m_client; }
-    bool noAutoClient() const { return m_no_auto_client; }
+    bool resolveClient() const { return m_resolve_client; }
     const std::vector<std::pair<std::string, std::string>> &p4Protocol() const { return m_p4_protocol; }
 
 private:
+    std::unique_ptr<class Enviro> m_env;
     std::string m_user;
     std::string m_port;
     std::string m_client;
-    bool m_no_auto_client{false};
+    bool m_resolve_client{true};
     /// Each `-z` argument: `name` or `name=value` (Helix protocol variable).
     std::vector<std::string> m_protocol_z;
     /// Parsed `-z` entries (empty `value` when no `=` was present).
