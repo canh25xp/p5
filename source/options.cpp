@@ -22,8 +22,9 @@ void Options::add(CLI::App &app) {
     app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
         ->group("Global options")
         ->envname("P4CLIENT");
-    app.add_flag("--no-auto-client", m_no_auto_client, "Disable automatic client resolution based on CWD")
-        ->group("Global options");
+    app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
+        ->group("Global options")
+        ->envname("P5RESOLVECLIENT");
     app.add_option("-z", m_protocol_z, "Set Helix protocol variable (name or name=value); repeat for multiple")
         ->group("Global options");
 

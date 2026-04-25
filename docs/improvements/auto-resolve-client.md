@@ -50,8 +50,9 @@ and then set P4CLIENT appropriately.
    - Re-entry guard (`m_AutoResolving`) prevents infinite recursion if
      `ListClients` triggers a `Reinitialize`
 
-5. **`--no-auto-client` global flag** (`include/p5/options.h`, `source/options.cpp`)
-   - Disables automatic client resolution at runtime
+5. **`--resolve-client` global flag** (`include/p5/options.h`, `source/options.cpp`)
+   - Controls automatic client resolution at runtime (defaults to `true`)
+   - Use `--no-resolve-client` to disable
    - Priority: explicit `-c`/`--client`/`P4CLIENT` env > auto-resolve > default
 
 ### Not yet implemented

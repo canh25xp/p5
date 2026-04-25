@@ -48,7 +48,7 @@ bool P5::Initialize() {
 
     // Auto-resolve client based on CWD if no explicit client was provided
     // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
-    if (g_options.client().empty() && !g_options.noAutoClient() && !m_AutoResolving) {
+    if (g_options.client().empty() && g_options.resolveClient() && !m_AutoResolving) {
         AutoResolveClient();
     }
 
