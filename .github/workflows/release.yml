@@ -183,10 +183,10 @@ jobs:
           TAG_NAME="${{ needs.setup.outputs.tag_name }}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           if [ "$TAG_NAME" = "nightly" ]; then
-            echo 'SUBJECT=p5 development (prerelease) build' >> $GITHUB_ENV
+            echo "SUBJECT=p5 prerelease">> $GITHUB_ENV
             echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           else
-            echo 'SUBJECT=p5 release build' >> $GITHUB_ENV
+            echo "SUBJECT=p5 release $TAG_NAME" >> $GITHUB_ENV
             echo 'PRERELEASE=' >> $GITHUB_ENV
           fi
 
