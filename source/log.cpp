@@ -62,8 +62,8 @@ void Log::Output(LogLevel level, LogSource source, const char *func, int line, c
     case LogSource::App:
         sourceStr = "APP";
         break;
-    case LogSource::P4:
-        sourceStr = "P4";
+    case LogSource::API:
+        sourceStr = "API";
         break;
     }
 
