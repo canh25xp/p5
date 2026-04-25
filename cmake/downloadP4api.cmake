@@ -4,6 +4,12 @@ function(download_and_extract_p4api)
 
   set(P4API_VENDOR_DIR "${CMAKE_SOURCE_DIR}/vendor/p4api")
 
+  set(download_cache_dir "$ENV{P5_BINARY_CACHE}")
+  if(NOT download_cache_dir)
+    set(download_cache_dir "${P4API_VENDOR_DIR}")
+  endif()
+  file(MAKE_DIRECTORY "${download_cache_dir}")
+
   if(UNIX)
     set(P4API_ARCHIVE_URLS "https://filehost.perforce.com/perforce/r25.1/bin.linux26x86_64/p4api-glibc2.3-openssl3.tgz")
   elseif(MSVC)
@@ -32,10 +38,10 @@ function(download_and_extract_p4api)
 
   foreach(url IN LISTS P4API_ARCHIVE_URLS)
     get_filename_component(archive_name "${url}" NAME)
-    set(archive_path "${P4API_VENDOR_DIR}/${archive_name}")
+    set(archive_path "${download_cache_dir}/${archive_name}")
 
     if(NOT EXISTS "${archive_path}")
-      message(STATUS "Download url ${url}...")
+      message(STATUS "Download url ${url} to ${archive_path}...")
       file(DOWNLOAD "${url}" "${archive_path}" SHOW_PROGRESS)
     endif()
 

@@ -39,10 +39,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build libssl-dev libzstd-dev
 
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/download
+          key: ${{ runner.os }}-p5-deps-${{ hashFiles('cmake/downloadP4api.cmake', 'cmake/downloadOpensslWindows.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-p5-deps-
+
       - name: Build
         run: |
           cmake --workflow ninja-debug
           cmake --workflow ninja-release
+        env:
+          P5_BINARY_CACHE: ${{ github.workspace }}/.cache/download
 
       - name: Test binary
         run: |
@@ -78,9 +88,19 @@ jobs:
         with:
           arch: x64
 
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/download
+          key: ${{ runner.os }}-p5-deps-${{ hashFiles('cmake/downloadP4api.cmake', 'cmake/downloadOpensslWindows.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-p5-deps-
+
       - name: Build
         run: |
           cmake --workflow msvc2022
+        env:
+          P5_BINARY_CACHE: ${{ github.workspace }}/.cache/download
 
       - name: Test binary
         run: |

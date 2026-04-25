@@ -10,7 +10,14 @@ function(p5_download_openssl_msvc_if_needed)
   set(_P5_OSSL_BASE "${CMAKE_SOURCE_DIR}/vendor/openssl-firedaemon")
   set(_P5_OSSL_X64 "${_P5_OSSL_BASE}/x64")
   set(_P5_OSSL_ZIP_NAME "openssl-${_P5_OSSL_VERSION}.zip")
-  set(_P5_OSSL_ZIP "${_P5_OSSL_BASE}/${_P5_OSSL_ZIP_NAME}")
+
+  set(_P5_OSSL_CACHE_DIR "$ENV{P5_BINARY_CACHE}")
+  if(NOT _P5_OSSL_CACHE_DIR)
+    set(_P5_OSSL_CACHE_DIR "${_P5_OSSL_BASE}")
+  endif()
+  file(MAKE_DIRECTORY "${_P5_OSSL_CACHE_DIR}")
+
+  set(_P5_OSSL_ZIP "${_P5_OSSL_CACHE_DIR}/${_P5_OSSL_ZIP_NAME}")
   set(
     _P5_OSSL_URL
     "https://download.firedaemon.com/FireDaemon-OpenSSL/${_P5_OSSL_ZIP_NAME}"
@@ -28,7 +35,7 @@ function(p5_download_openssl_msvc_if_needed)
   if(NOT EXISTS "${_P5_OSSL_ZIP}")
     message(
       STATUS
-      "OpenSSL not found: downloading FireDaemon OpenSSL ${_P5_OSSL_VERSION} for MSVC..."
+      "OpenSSL not found: downloading FireDaemon OpenSSL ${_P5_OSSL_VERSION} to ${_P5_OSSL_ZIP}..."
     )
     file(
       DOWNLOAD "${_P5_OSSL_URL}" "${_P5_OSSL_ZIP}"
@@ -40,7 +47,7 @@ function(p5_download_openssl_msvc_if_needed)
   if(NOT EXISTS "${_P5_OSSL_X64}/include/openssl/opensslv.h")
     message(STATUS "Extracting OpenSSL to ${_P5_OSSL_BASE}...")
     execute_process(
-      COMMAND "${CMAKE_COMMAND}" -E tar xf "${_P5_OSSL_ZIP_NAME}"
+      COMMAND "${CMAKE_COMMAND}" -E tar xf "${_P5_OSSL_ZIP}"
       WORKING_DIRECTORY "${_P5_OSSL_BASE}"
       RESULT_VARIABLE _P5_OSSL_EXTRACT
     )

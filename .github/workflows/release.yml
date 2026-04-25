@@ -59,12 +59,10 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache
-            build
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt', '**/cmake/*.cmake') }}
+          path: .cache/download
+          key: ${{ runner.os }}-p5-deps-${{ hashFiles('cmake/downloadP4api.cmake', 'cmake/downloadOpensslWindows.cmake') }}
           restore-keys: |
-            ${{ runner.os }}-cmake-
+            ${{ runner.os }}-p5-deps-
 
       - name: Install dependencies
         run: |
@@ -76,6 +74,8 @@ jobs:
         run: |
           set -euo pipefail
           cmake --workflow ninja-release
+        env:
+          P5_BINARY_CACHE: ${{ github.workspace }}/.cache/download
 
       - name: Pack artifacts
         run: |
@@ -113,12 +113,10 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache
-            build
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt', '**/cmake/*.cmake') }}
+          path: .cache/download
+          key: ${{ runner.os }}-p5-deps-${{ hashFiles('cmake/downloadP4api.cmake', 'cmake/downloadOpensslWindows.cmake') }}
           restore-keys: |
-            ${{ runner.os }}-cmake-
+            ${{ runner.os }}-p5-deps-
 
       - name: Set up MSVC (x64)
         uses: ilammy/msvc-dev-cmd@v1
@@ -129,6 +127,8 @@ jobs:
         run: |
           cmake --preset msvc2022
           cmake --build --preset msvc2022-release
+        env:
+          P5_BINARY_CACHE: ${{ github.workspace }}/.cache/download
 
       - name: Pack artifacts
         run: |
