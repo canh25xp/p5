@@ -1,0 +1,48 @@
+---
+trigger: always_on
+---
+
+# P5 development context
+
+## What this project is
+
+`p5` is a command-line tool meant to replace the `p4` CLI. It adds features `p4` lacks and improves existing behavior, visually and functionally.
+
+## CLI compatibility
+
+The interface should match the existing `p4` tool as closely as possible so users can migrate to `p5` without relearning commands.
+
+## Build and test
+
+Prefer the workflow preset (generate + build in one step):
+
+```sh
+cmake --workflow default
+```
+
+Alternatives:
+
+```sh
+cmake --preset default && cmake --build --preset default
+```
+
+```sh
+cmake -B build && cmake --build build
+```
+
+Smoke-test the binary:
+
+```sh
+p5 --help
+```
+
+or, from the build tree:
+
+```sh
+./build/Debug/p5 --help
+```
+
+## Command-line implementation
+
+Parsing and subcommands use **CLI11**. Reference docs live under `vendor/CLI11/book/`.
+
