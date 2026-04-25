@@ -272,9 +272,9 @@ static void print_env(bool quiet, bool all, const Options &options) {
         StrBuf formatted;
         env->Format(name, &formatted, format_flags);
         if (formatted.Length() > 0) {
-            std::cout << formatted.Text() << '\n';
+            PRINT(formatted.Text());
         } else {
-            std::cout << name << "=\n";
+            PRINT(name << "=");
         }
     }
 }
@@ -286,7 +286,7 @@ void Set::run(const std::vector<std::string> &args) {
     }
 
     if (m_all) {
-        std::cerr << "p5 set: -a/--all cannot be used with variable arguments\n";
+        CLI_ERROR("p5 set: -a/--all cannot be used with variable arguments");
         throw CLI::RuntimeError(1);
     }
 
@@ -294,11 +294,11 @@ void Set::run(const std::vector<std::string> &args) {
         const std::string::size_type eq = arg.find('=');
         if (eq == std::string::npos) {
             if (!arg.empty() && arg[0] == '-') {
-                std::cerr << "p5 set: unknown option: " << arg << '\n';
+                CLI_ERROR("p5 set: unknown option: " << arg);
                 throw CLI::RuntimeError(1);
             }
         } else if (eq > 0 && arg[0] == '-') {
-            std::cerr << "p5 set: invalid variable name: " << arg.substr(0, eq) << '\n';
+            CLI_ERROR("p5 set: invalid variable name: " << arg.substr(0, eq));
             throw CLI::RuntimeError(1);
         }
     }
@@ -317,13 +317,13 @@ void Set::run(const std::vector<std::string> &args) {
             continue;
         }
         if (eq == 0) {
-            ERROR("p5 set: empty variable name");
+            CLI_ERROR("p5 set: empty variable name");
             throw CLI::RuntimeError(1);
         }
         const std::string name = arg.substr(0, eq);
         const std::string value = arg.substr(eq + 1);
 #if defined(_WIN32)
-        ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
+        CLI_ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
         throw CLI::RuntimeError(1);
 #else
         if (!p4_set_persistent_unix(*env, name, value)) {

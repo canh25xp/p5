@@ -31,6 +31,7 @@ private:
     std::vector<std::string> m_protocol_z;
     /// Parsed `-z` entries (empty `value` when no `=` was present).
     std::vector<std::pair<std::string, std::string>> m_p4_protocol;
+    std::string m_verbosity;
 };
 
 extern Options g_options;

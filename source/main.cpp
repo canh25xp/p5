@@ -1,5 +1,5 @@
-#include <iostream>
 #include "CLI/CLI.hpp"
+#include "log.h"
 
 #include "commands.h"
 #include "options.h"
@@ -12,6 +12,9 @@
 #endif
 
 int main(int argc, char **argv) {
+    // TODO: configuable at build time or run time.
+    Log::ConciseLevel = 1;
+
     CLI::App app(P5_APP_DESCRIPTION);
 
     app.get_formatter()->right_column_width(999999);
@@ -156,8 +159,8 @@ int main(int argc, char **argv) {
         if (e.get_exit_code() == static_cast<int>(CLI::ExitCodes::ExtrasError)) {
             auto remaining = app.remaining(true);
             if (!remaining.empty()) {
-                std::cerr << "Error: Unknown command \"" << remaining[0] << "\"" << std::endl;
-                std::cerr << "Run with --help for more information." << std::endl;
+                CLI_ERROR("Unknown command \"" << remaining[0] << "\"");
+                CLI_ERROR("Run with --help for more information.");
                 return 1;
             }
         }
@@ -165,8 +168,8 @@ int main(int argc, char **argv) {
     }
 
     if (app.get_subcommands().empty()) {
-        std::cerr << "A subcommand is required" << std::endl;
-        std::cerr << "Run with --help for more information." << std::endl;
+        CLI_ERROR("A subcommand is required");
+        CLI_ERROR("Run with --help for more information.");
         return 1;
     }
 

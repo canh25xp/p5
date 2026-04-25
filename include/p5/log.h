@@ -1,6 +1,21 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
+#include <string>
+
+enum class LogLevel {
+    Info = 0,
+    Warn = 1,
+    Error = 2,
+    Fatal = 3
+};
+
+enum class LogSource {
+    CLI,
+    App,
+    API
+};
 
 class Log {
 public:
@@ -9,25 +24,54 @@ public:
     static const char *ColorGreen;
     static const char *ColorNormal;
 
+    static LogLevel CurrentLevel;
+    static int ConciseLevel;
+
     static void DisableColoredOutput();
+
+    static void Output(LogLevel level, LogSource source, const char *func, int line, const std::string &msg);
+    static void Print(const std::string &msg);
 };
 
-#define ERROR(x) std::cerr << Log::ColorRed                                        \
-                           << "[ ERROR @ " << __func__ << ":" << __LINE__ << " ] " \
-                           << x << Log::ColorNormal << std::endl
+#define LOG_INTERNAL(level, source, x)                                  \
+    do {                                                                \
+        if (level >= Log::CurrentLevel) {                               \
+            std::ostringstream _oss;                                    \
+            _oss << x;                                                  \
+            Log::Output(level, source, __func__, __LINE__, _oss.str()); \
+        }                                                               \
+    } while (0)
 
-#ifdef P5_VERBOSE_LOGGING
-#define PRINT(x) std::cout << "[ PRINT @ " << __func__ << ":" << __LINE__ << " ] " << x << std::endl
+#define INFO(x) LOG_INTERNAL(LogLevel::Info, LogSource::App, x)
+#define WARN(x) LOG_INTERNAL(LogLevel::Warn, LogSource::App, x)
+#define ERROR(x) LOG_INTERNAL(LogLevel::Error, LogSource::App, x)
+#define FATAL(x)                                          \
+    do {                                                  \
+        LOG_INTERNAL(LogLevel::Fatal, LogSource::App, x); \
+        exit(1);                                          \
+    } while (0)
 
-#define WARN(x) std::cerr << Log::ColorYellow                                    \
-                          << "[ WARN @ " << __func__ << ":" << __LINE__ << " ] " \
-                          << x << Log::ColorNormal << std::endl
+#define CLI_INFO(x) LOG_INTERNAL(LogLevel::Info, LogSource::CLI, x)
+#define CLI_WARN(x) LOG_INTERNAL(LogLevel::Warn, LogSource::CLI, x)
+#define CLI_ERROR(x) LOG_INTERNAL(LogLevel::Error, LogSource::CLI, x)
+#define CLI_FATAL(x)                                      \
+    do {                                                  \
+        LOG_INTERNAL(LogLevel::Fatal, LogSource::CLI, x); \
+        exit(1);                                          \
+    } while (0)
 
-#define INFO(x) std::cerr << Log::ColorGreen                                     \
-                          << "[ INFO @ " << __func__ << ":" << __LINE__ << " ] " \
-                          << x << Log::ColorNormal << std::endl
-#else
-#define PRINT(x) ((void)0)
-#define WARN(x) ((void)0)
-#define INFO(x) ((void)0)
-#endif
+#define API_INFO(x) LOG_INTERNAL(LogLevel::Info, LogSource::API, x)
+#define API_WARN(x) LOG_INTERNAL(LogLevel::Warn, LogSource::API, x)
+#define API_ERROR(x) LOG_INTERNAL(LogLevel::Error, LogSource::API, x)
+#define API_FATAL(x)                                      \
+    do {                                                  \
+        LOG_INTERNAL(LogLevel::Fatal, LogSource::API, x); \
+        exit(1);                                          \
+    } while (0)
+
+#define PRINT(x)                 \
+    do {                         \
+        std::ostringstream _oss; \
+        _oss << x;               \
+        Log::Print(_oss.str());  \
+    } while (0)
