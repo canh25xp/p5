@@ -102,18 +102,18 @@ void Clients::run(const std::vector<std::string> &args) {
 
             for (const ClientName &name : names) {
                 const ClientData &data = toPrint.at(name);
-                std::cout << name << '\n';
-                std::cout << "  root " << data.root << '\n';
+                PRINT(name);
+                PRINT("  root " << data.root);
                 if (!data.host.empty()) {
-                    std::cout << "  host " << data.host << '\n';
+                    PRINT("  host " << data.host);
                 }
                 if (!data.description.empty()) {
-                    std::cout << "  " << data.description << '\n';
+                    PRINT("  " << data.description);
                 }
                 for (const auto &alt : data.altRoots) {
-                    std::cout << "  altRoot " << alt << '\n';
+                    PRINT("  altRoot " << alt);
                 }
-                std::cout << '\n';
+                PRINT("");
             }
             printDone = true;
         }
