@@ -1,3 +1,4 @@
+#include <iostream>
 #include "CLI/CLI.hpp"
 
 #include "commands.h"
@@ -17,7 +18,7 @@ int main(int argc, char **argv) {
 
     argv = app.ensure_utf8(argv);
 
-    app.require_subcommand(1);
+    app.require_subcommand(0, 1);
 
     g_options.add(app);
 
@@ -149,7 +150,25 @@ int main(int argc, char **argv) {
 
     commands.install(app);
 
-    CLI11_PARSE(app, argc, argv);
+    try {
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError &e) {
+        if (e.get_name() == "ExtrasError") {
+            auto remaining = app.remaining();
+            if (!remaining.empty()) {
+                std::cerr << "Error: Unknown command \"" << remaining[0] << "\"" << std::endl;
+                std::cerr << "Run with --help for more information." << std::endl;
+                return 1;
+            }
+        }
+        return app.exit(e);
+    }
+
+    if (app.get_subcommands().empty()) {
+        std::cerr << "A subcommand is required" << std::endl;
+        std::cerr << "Run with --help for more information." << std::endl;
+        return 1;
+    }
 
     return 0;
 }
