@@ -250,6 +250,11 @@ inline T P5::Run(const char *command, const std::vector<std::string> &stringArgu
 
     T clientUser;
 
+    INFO("p4 command: " << command);
+    for (const auto &arg : stringArguments) {
+        INFO("arguments: " << arg);
+    }
+
     m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
     m_ClientAPI.Run(command, &clientUser);
 

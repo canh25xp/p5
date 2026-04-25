@@ -1,6 +1,6 @@
 #include "commands.h"
 #include "p5.h"
-#include "dbg.h"
+#include "log.h"
 
 void Commands::add(const char *name, const char *description, void (*run)(const std::vector<std::string> &), std::vector<const char *> aliases) {
     std::vector<std::string> aliases_str;
@@ -44,9 +44,9 @@ void Commands::install(CLI::App &app) const {
 void Commands::run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
     P5 p5;
 
-    dbg(command);
+    INFO("p4 command passthrough: " << command);
     for (const auto &arg : args) {
-        dbg(arg);
+        INFO("arguments: " << arg);
     }
 
     std::vector<char *> argv_array;
