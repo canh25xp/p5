@@ -36,6 +36,9 @@ void Options::add(CLI::App &app) {
         ->group("Global options");
     app.add_flag("--clear-cache", m_clear_cache, "Clear cache for command")
         ->group("Global options");
+    app.add_option("--cache-dir", m_cache_dir, "Directory to store cache (default: ~/.cache/p5/)")
+        ->group("Global options")
+        ->envname("P5CACHEDIR");
     app.add_option("-z", m_protocol_z, "Set Helix protocol variable (name or name=value); repeat for multiple")
         ->group("Global options");
 
@@ -83,6 +86,18 @@ void Options::apply() {
         m_port = var;
     if (char *var = m_env->Get("P4CLIENT"))
         m_client = var;
+
+    if (m_cache_dir.empty()) {
+        const char *home = std::getenv("HOME");
+        if (!home) {
+            home = std::getenv("USERPROFILE");
+        }
+        if (home) {
+            m_cache_dir = std::string(home) + "/.cache/p5";
+        } else {
+            m_cache_dir = "p5_cache"; // fallback
+        }
+    }
 }
 
 void Options::load_enviro(Enviro &env) const {

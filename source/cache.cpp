@@ -41,7 +41,7 @@ bool CacheManager::ShouldCacheCommand(const std::string &command, std::chrono::s
     return false;
 }
 
-std::string CacheManager::GetCacheFilePath(const std::string &command, const std::vector<std::string> &args, const std::string &port, const std::string &user) {
+std::string CacheManager::GetCacheFilePath(const std::string &cacheDirStr, const std::string &command, const std::vector<std::string> &args, const std::string &port, const std::string &user) {
     std::string keyStr = port + "|" + user + "|" + command;
     for (const auto &a : args) {
         keyStr += "|" + a;
@@ -50,7 +50,7 @@ std::string CacheManager::GetCacheFilePath(const std::string &command, const std
     std::hash<std::string> hasher;
     size_t hash = hasher(keyStr);
 
-    fs::path cacheDir = fs::temp_directory_path() / "p5_cache";
+    fs::path cacheDir = cacheDirStr;
     std::error_code ec;
     if (!fs::exists(cacheDir, ec)) {
         fs::create_directories(cacheDir, ec);

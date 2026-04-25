@@ -9,7 +9,7 @@ class CacheManager {
 public:
     static bool ShouldCacheCommand(const std::string &command, std::chrono::seconds &outValidPeriod);
 
-    static std::string GetCacheFilePath(const std::string &command, const std::vector<std::string> &args, const std::string &port, const std::string &user);
+    static std::string GetCacheFilePath(const std::string &cacheDir, const std::string &command, const std::vector<std::string> &args, const std::string &port, const std::string &user);
 
     static bool ReplayCache(const std::string &cacheFilePath, ClientUser *targetUser, std::chrono::seconds validPeriod, bool forceUpdate);
 

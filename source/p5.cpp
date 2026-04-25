@@ -182,7 +182,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
     bool shouldCache = CacheManager::ShouldCacheCommand(command, validPeriod);
     std::string cacheFile;
     if (shouldCache) {
-        cacheFile = CacheManager::GetCacheFilePath(command, stringArguments, g_options.port(), g_options.user());
+        cacheFile = CacheManager::GetCacheFilePath(g_options.cacheDir(), command, stringArguments, g_options.port(), g_options.user());
         INFO("cacheFile: " << cacheFile);
         if (g_options.clearCache()) {
             CacheManager::ClearCache(cacheFile);
