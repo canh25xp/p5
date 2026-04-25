@@ -50,13 +50,12 @@ void Options::apply() {
         load_enviro(*m_env);
     }
 
-    char *v;
-    if ((v = m_env->Get("P4USER")))
-        m_user = v;
-    if ((v = m_env->Get("P4PORT")))
-        m_port = v;
-    if ((v = m_env->Get("P4CLIENT")))
-        m_client = v;
+    if (char *var = m_env->Get("P4USER"))
+        m_user = var;
+    if (char *var = m_env->Get("P4PORT"))
+        m_port = var;
+    if (char *var = m_env->Get("P4CLIENT"))
+        m_client = var;
 }
 
 void Options::load_enviro(Enviro &env) const {
