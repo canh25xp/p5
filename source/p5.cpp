@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <fstream>
 #include <thread>
 
 #include "p4/clientapi.h"
@@ -106,6 +107,49 @@ void P5::AutoResolveClient() {
     if (!resolved.empty()) {
         INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
         m_ClientAPI.SetClient(resolved.c_str());
+
+        // Write to P4CONFIG if it exists
+        const char* configPathCstr = bootstrapApi.GetConfig().Text();
+        std::string configPath = (configPathCstr) ? configPathCstr : "";
+        if (!configPath.empty() && configPath != "noconfig") {
+            std::ifstream in(configPath);
+            if (in.is_open()) {
+                std::vector<std::string> lines;
+                std::string line;
+                bool found = false;
+                while (std::getline(in, line)) {
+                    if (!line.empty() && line.back() == '\r') {
+                        line.pop_back();
+                    }
+                    if (!line.empty() && line[0] != '#') {
+                        size_t eq = line.find('=');
+                        if (eq != std::string::npos && line.compare(0, eq, "P4CLIENT") == 0) {
+                            if (!found) {
+                                lines.push_back("P4CLIENT=" + resolved);
+                                found = true;
+                            }
+                            continue;
+                        }
+                    }
+                    lines.push_back(line);
+                }
+                in.close();
+
+                if (!found) {
+                    lines.push_back("P4CLIENT=" + resolved);
+                }
+
+                std::ofstream out(configPath, std::ios::binary);
+                if (out.is_open()) {
+                    for (const std::string &l : lines) {
+                        out << l << "\n";
+                    }
+                    INFO("Auto-resolve: updated " << configPath << " with P4CLIENT=" << resolved);
+                } else {
+                    WARN("Auto-resolve: could not write to " << configPath);
+                }
+            }
+        }
     } else {
         INFO("Auto-resolve: no client root matches CWD " << cwd);
     }
