@@ -7,9 +7,9 @@ usage() {
     cat <<'USAGE'
 Usage: install.sh [-h|--help] [-r|--release] [-d|--debug]
 
-Copies the release build (default: build/Release/p5) into ~/.local/bin (default).
+Builds and copies the p5 binary into ~/.local/bin (default).
 Set `P5_BINARY` or `DEST_DIR` to override either path.
-Use `-d`/`--debug` to copy the Debug build instead.
+Use `-d`/`--debug` to build/install the Debug version.
 USAGE
 }
 
@@ -37,6 +37,9 @@ done
 
 P5_BINARY="${P5_BINARY:-build/$build_type/p5}"
 DEST_DIR="${DEST_DIR:-$HOME/.local/bin}"
+
+echo "Building p5 ($build_type)..."
+cmake --workflow --preset "ninja-${build_type,,}"
 
 if [[ ! -f "$P5_BINARY" ]]; then
     echo "error: source binary not found at '$P5_BINARY'" >&2
