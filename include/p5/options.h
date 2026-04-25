@@ -31,10 +31,6 @@ private:
     std::vector<std::string> m_protocol_z;
     /// Parsed `-z` entries (empty `value` when no `=` was present).
     std::vector<std::pair<std::string, std::string>> m_p4_protocol;
-
-    CLI::Option *m_user_opt{nullptr};
-    CLI::Option *m_port_opt{nullptr};
-    CLI::Option *m_client_opt{nullptr};
 };
 
 extern Options g_options;

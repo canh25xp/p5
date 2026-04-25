@@ -17,12 +17,12 @@ void Options::add(CLI::App &app) {
 
     app.set_version_flag("-v,-V,--version", P5_VERSION_STRING)->group("Global options");
 
-    m_user_opt = app.add_option("-u,--user", m_user, "Override P4USER (default: $P4USER)")
-                     ->group("Global options");
-    m_port_opt = app.add_option("-p,--port", m_port, "Override P4PORT (default: $P4PORT)")
-                     ->group("Global options");
-    m_client_opt = app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
-                       ->group("Global options");
+    app.add_option("-u,--user", m_user, "Override P4USER (default: $P4USER)")
+        ->group("Global options");
+    app.add_option("-p,--port", m_port, "Override P4PORT (default: $P4PORT)")
+        ->group("Global options");
+    app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
+        ->group("Global options");
     app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
         ->group("Global options")
         ->envname("P5RESOLVECLIENT");
@@ -66,13 +66,13 @@ void Options::load_enviro(Enviro &env) const {
     env.Config(cwd);
     env.LoadEnviro(1);
 
-    if (m_user_opt && m_user_opt->count() > 0) {
+    if (!m_user.empty()) {
         env.Update("P4USER", m_user.c_str());
     }
-    if (m_port_opt && m_port_opt->count() > 0) {
+    if (!m_port.empty()) {
         env.Update("P4PORT", m_port.c_str());
     }
-    if (m_client_opt && m_client_opt->count() > 0) {
+    if (!m_client.empty()) {
         env.Update("P4CLIENT", m_client.c_str());
     }
 }
