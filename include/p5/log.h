@@ -25,7 +25,7 @@ public:
     static const char *ColorNormal;
 
     static LogLevel CurrentLevel;
-    static bool ConciseFormat;
+    static int ConciseLevel;
 
     static void DisableColoredOutput();
 

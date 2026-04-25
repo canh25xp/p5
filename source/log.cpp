@@ -18,7 +18,17 @@ LogLevel Log::CurrentLevel = LogLevel::Info;
 LogLevel Log::CurrentLevel = LogLevel::Error;
 #endif
 
-bool Log::ConciseFormat = std::getenv("P5_LOG_CONCISE") != nullptr;
+int Log::ConciseLevel = []() {
+    const char *env = std::getenv("P5_LOG_CONCISE");
+    if (env == nullptr) {
+        return 0;
+    }
+    try {
+        return std::stoi(env);
+    } catch (...) {
+        return 1;
+    }
+}();
 
 void Log::DisableColoredOutput() {
     ColorRed = COLOR_NORMAL;
@@ -67,9 +77,14 @@ void Log::Output(LogLevel level, LogSource source, const char *func, int line, c
         break;
     }
 
-    if (ConciseFormat) {
+    if (ConciseLevel == 1) {
         std::cerr << color << "[" << conciseLevelStr << "][" << sourceStr << "] "
                   << msg << ColorNormal << std::endl;
+    } else if (ConciseLevel == 2) {
+        std::cerr << color << "[" << conciseLevelStr << "]"
+                  << msg << ColorNormal << std::endl;
+    } else if (ConciseLevel >= 3) {
+        std::cerr << color << msg << ColorNormal << std::endl;
     } else {
         std::string funcLine = std::string(func) + ":" + std::to_string(line);
         std::cerr << color << "[ " << std::left << std::setw(5) << levelStr << " ][ "
