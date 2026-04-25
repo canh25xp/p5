@@ -85,8 +85,8 @@ void P5::AutoResolveClient() {
     }
 
     Clients clientsResult;
-    const char *args[] = {"-u", g_options.user().c_str()};
-    bootstrapApi.SetArgv(2, const_cast<char **>(args));
+    const char *args[] = {"--me"};
+    bootstrapApi.SetArgv(1, const_cast<char **>(args));
     bootstrapApi.Run("clients", &clientsResult);
 
     bootstrapApi.Final(&e);
