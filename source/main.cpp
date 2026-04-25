@@ -153,8 +153,8 @@ int main(int argc, char **argv) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
-        if (e.get_name() == "ExtrasError") {
-            auto remaining = app.remaining();
+        if (e.get_exit_code() == static_cast<int>(CLI::ExitCodes::ExtrasError)) {
+            auto remaining = app.remaining(true);
             if (!remaining.empty()) {
                 std::cerr << "Error: Unknown command \"" << remaining[0] << "\"" << std::endl;
                 std::cerr << "Run with --help for more information." << std::endl;
