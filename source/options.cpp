@@ -3,6 +3,10 @@
 Options g_options;
 
 #include <utility>
+#include "p4/clientapi.h"
+#include "p4/enviro.h"
+#include "p4/hostenv.h"
+#include "p4/error.h"
 
 #ifndef P5_VERSION_STRING
 #define P5_VERSION_STRING "p5 (unknown version) (p4api unknown)"
@@ -13,15 +17,12 @@ void Options::add(CLI::App &app) {
 
     app.set_version_flag("-v,-V,--version", P5_VERSION_STRING)->group("Global options");
 
-    app.add_option("-u,--user", m_user, "Override P4USER (default: $P4USER)")
-        ->group("Global options")
-        ->envname("P4USER");
-    app.add_option("-p,--port", m_port, "Override P4PORT (default: $P4PORT)")
-        ->group("Global options")
-        ->envname("P4PORT");
-    app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
-        ->group("Global options")
-        ->envname("P4CLIENT");
+    m_user_opt = app.add_option("-u,--user", m_user, "Override P4USER (default: $P4USER)")
+                     ->group("Global options");
+    m_port_opt = app.add_option("-p,--port", m_port, "Override P4PORT (default: $P4PORT)")
+                     ->group("Global options");
+    m_client_opt = app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
+                       ->group("Global options");
     app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
         ->group("Global options")
         ->envname("P5RESOLVECLIENT");
@@ -42,5 +43,35 @@ void Options::apply() {
         if (!key.empty()) {
             m_p4_protocol.emplace_back(std::move(key), std::move(value));
         }
+    }
+
+    Enviro env;
+    load_enviro(env);
+
+    char *v;
+    if ((v = env.Get("P4USER")))
+        m_user = v;
+    if ((v = env.Get("P4PORT")))
+        m_port = v;
+    if ((v = env.Get("P4CLIENT")))
+        m_client = v;
+}
+
+void Options::load_enviro(Enviro &env) const {
+    Error e;
+    StrBuf cwd;
+    HostEnv host;
+    host.GetCwd(cwd, &e, &env);
+    env.Config(cwd);
+    env.LoadEnviro(1);
+
+    if (m_user_opt && m_user_opt->count() > 0) {
+        env.Update("P4USER", m_user.c_str());
+    }
+    if (m_port_opt && m_port_opt->count() > 0) {
+        env.Update("P4PORT", m_port.c_str());
+    }
+    if (m_client_opt && m_client_opt->count() > 0) {
+        env.Update("P4CLIENT", m_client.c_str());
     }
 }

@@ -83,24 +83,7 @@ static const char *const kP4EnvVarCandidates[] = {
     "P4ZEROSYNC",
 };
 
-void load_enviro_for_set(Enviro &env, const Options &options) {
-    Error e;
-    StrBuf cwd;
-    HostEnv host;
-    host.GetCwd(cwd, &e, &env);
-    env.Config(cwd);
-    env.LoadEnviro(1);
-
-    if (!options.port().empty()) {
-        env.Update("P4PORT", options.port().c_str());
-    }
-    if (!options.user().empty()) {
-        env.Update("P4USER", options.user().c_str());
-    }
-    if (!options.client().empty()) {
-        env.Update("P4CLIENT", options.client().c_str());
-    }
-}
+// Refactored to use Options::load_enviro
 
 #if !defined(_WIN32)
 static bool line_assigns_name(const std::string &line, const std::string &name) {
@@ -274,7 +257,7 @@ static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const s
 /// `all == true`: all supported P4* names known to the linked API.
 static void print_env(bool quiet, bool all, const Options &options) {
     Enviro env;
-    load_enviro_for_set(env, options);
+    options.load_enviro(env);
     if (!all) {
         env.List(quiet ? 1 : 0);
         return;
@@ -319,7 +302,7 @@ void Set::run(const std::vector<std::string> &args) {
     }
 
     Enviro env;
-    load_enviro_for_set(env, m_options);
+    m_options.load_enviro(env);
     Error e;
     const int print_quiet = m_quiet ? 1 : 0;
 
