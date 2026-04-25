@@ -45,15 +45,17 @@ void Options::apply() {
         }
     }
 
-    Enviro env;
-    load_enviro(env);
+    if (!m_env) {
+        m_env = std::make_unique<Enviro>();
+        load_enviro(*m_env);
+    }
 
     char *v;
-    if ((v = env.Get("P4USER")))
+    if ((v = m_env->Get("P4USER")))
         m_user = v;
-    if ((v = env.Get("P4PORT")))
+    if ((v = m_env->Get("P4PORT")))
         m_port = v;
-    if ((v = env.Get("P4CLIENT")))
+    if ((v = m_env->Get("P4CLIENT")))
         m_client = v;
 }
 

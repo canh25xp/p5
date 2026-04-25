@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CLI/CLI.hpp"
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -11,6 +12,7 @@ class Options {
 public:
     void add(CLI::App &app);
     void apply();
+    class Enviro *env() const { return m_env.get(); }
     void load_enviro(class Enviro &env) const;
 
     const std::string &port() const { return m_port; }
@@ -20,9 +22,7 @@ public:
     const std::vector<std::pair<std::string, std::string>> &p4Protocol() const { return m_p4_protocol; }
 
 private:
-    // TODO: these options should align with p4's Enviro (When run `set`)
-    // Maybe also refactor `source/commands/set.cpp` to ensure a single source of truth for environtment.
-    // See home/michael/projects/p5-dev/vendor/p4api/p4api-2025.1.2907437/include/p4/enviro.h
+    std::unique_ptr<class Enviro> m_env;
     std::string m_user;
     std::string m_port;
     std::string m_client;
