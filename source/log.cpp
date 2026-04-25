@@ -74,7 +74,7 @@ void Log::Output(LogLevel level, LogSource source, const char *func, int line, c
         std::string funcLine = std::string(func) + ":" + std::to_string(line);
         std::cerr << color << "[ " << std::left << std::setw(5) << levelStr << " ][ "
                   << std::left << std::setw(3) << sourceStr << " @ "
-                  << std::left << std::setw(15) << funcLine << " ] "
+                  << std::left << std::setw(8) << funcLine << " ] " // this assuming no line of code exceed 999 lines (which is insane)
                   << msg << ColorNormal << std::endl;
     }
 }
