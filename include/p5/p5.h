@@ -13,13 +13,11 @@ class P5 {
     ClientApi m_ClientAPI;
     int m_Usage;
     bool m_LibrariesInitialized;
-    bool m_AutoResolving{false};
 
     bool Initialize();
     bool Deinitialize();
     bool Reinitialize();
     bool CheckErrors(Error &e, StrBuf &msg);
-    void AutoResolveClient();
 
     static const int COMMAND_RETRIES = 3;             // Specify how many times a command should be retried before the process exits in a failure.
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.

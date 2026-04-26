@@ -14,6 +14,7 @@
 #include "log.h"
 #include "options.h"
 #include "cli_helpers.h"
+#include "client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -38,10 +39,11 @@ bool P5::Initialize() {
     for (const auto &proto : g_options.p4Protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
-    // Auto-resolve client based on CWD if no explicit client was provided
-    // Guard against re-entry: AutoResolveClient -> ListClients -> Reinitialize -> Initialize
-    if (g_options.client().empty() && g_options.resolveClient() && !m_AutoResolving) {
-        AutoResolveClient();
+    if (g_options.client().empty() && g_options.resolveClient()) {
+        std::string resolved = ClientResolver::AutoResolve(g_options.port(), g_options.user());
+        if (!resolved.empty()) {
+            m_ClientAPI.SetClient(resolved.c_str());
+        }
     }
 
     m_ClientAPI.Init(&e);
