@@ -9,49 +9,10 @@
 #include <string>
 #include <vector>
 
-namespace {
-
-class LoginResult : public Result {
-public:
-    const std::string &Password() const { return m_password; }
-
-    void Prompt(Error *err, StrBuf &rsp, int noEcho, Error *e) override {
-        ClientUser::Prompt(err, rsp, noEcho, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(Error *err, StrBuf &rsp, int noEcho, int noOutput, Error *e) override {
-        ClientUser::Prompt(err, rsp, noEcho, noOutput, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, Error *e) override {
-        ClientUser::Prompt(msg, rsp, noEcho, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, int noOutput, Error *e) override {
-        ClientUser::Prompt(msg, rsp, noEcho, noOutput, e);
-        Capture(rsp, noEcho);
-    }
-
-private:
-    void Capture(const StrBuf &rsp, int noEcho) {
-        if (noEcho && rsp.Length() > 0) {
-            m_password = rsp.Text();
-        }
-    }
-
-    std::string m_password;
-};
-
-} // namespace
-
 void Login::run(const std::vector<std::string> &args) {
     P5 p5;
-    LoginResult result;
-    p5.Run("login", args, result);
-    if (!result.IsError()) {
+    p5.Run("login", args, *this);
+    if (!IsError()) {
         throw CLI::RuntimeError(1);
     }
 
@@ -59,12 +20,12 @@ void Login::run(const std::vector<std::string> &args) {
         return;
     }
 
-    if (result.Password().empty()) {
+    if (Password().empty()) {
         CLI_ERROR("p5 login: --save requires an interactive password prompt");
         throw CLI::RuntimeError(1);
     }
 
-    if (!AuthStore::SavePassword(p5.Port(), p5.User(), result.Password())) {
+    if (!AuthStore::SavePassword(p5.Port(), p5.User(), Password())) {
         throw CLI::RuntimeError(1);
     }
     PRINT("Password saved for " << p5.User() << "@" << p5.Port());
