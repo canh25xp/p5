@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include <fstream>
 #include <thread>
 
 #include "p4/clientapi.h"
@@ -15,7 +14,6 @@
 #include "log.h"
 #include "options.h"
 #include "cli_helpers.h"
-#include "client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -158,3 +156,83 @@ Result P5::Run(const std::string &commandLine) {
     return Run(command.c_str(), static_cast<int>(argv.size()), const_cast<char **>(argv.data()));
 }
 
+template <class T>
+T P5::Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries) {
+    std::string argsString;
+    for (const std::string &stringArg : stringArguments) {
+        argsString = argsString + " " + stringArg;
+    }
+
+    std::vector<char *> argsCharArray;
+    for (const std::string &arg : stringArguments) {
+        argsCharArray.push_back((char *)arg.c_str());
+    }
+
+    T clientUser;
+
+    INFO("p4 command: " << command);
+    for (const auto &arg : stringArguments) {
+        INFO("arguments: " << arg);
+    }
+
+    m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
+    m_ClientAPI.Run(command, &clientUser);
+
+    int retries = commandRetries;
+    while (m_ClientAPI.Dropped() || clientUser.GetError().IsError()) {
+        if (retries == 0) {
+            break;
+        }
+
+        ERROR("Connection dropped or command errored, retrying in 5 seconds.");
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        if (Reinitialize()) {
+            INFO("Reinitialized P4API");
+        } else {
+            ERROR("Could not reinitialize P4API");
+        }
+
+        WARN("Retrying: p4 " << command << argsString);
+
+        clientUser = T();
+
+        m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
+        m_ClientAPI.Run(command, &clientUser);
+
+        retries--;
+    }
+
+    if (m_ClientAPI.Dropped() || clientUser.GetError().IsFatal()) {
+        ERROR("Exiting due to receiving errors even after retrying " << COMMAND_RETRIES << " times");
+        Deinitialize();
+        std::exit(1);
+    }
+
+    m_Usage++;
+    if (m_Usage > COMMAND_REFRESH_THRESHOLD) {
+        int refreshRetries = COMMAND_RETRIES;
+        while (refreshRetries > 0) {
+            WARN("Trying to refresh the connection due to age (" << m_Usage << " > " << COMMAND_REFRESH_THRESHOLD << ").");
+            if (Reinitialize()) {
+                INFO("Connection was refreshed");
+                break;
+            }
+            ERROR("Could not refresh connection due to old age. Retrying in 5 seconds");
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+
+            refreshRetries--;
+        }
+
+        if (refreshRetries == 0) {
+            ERROR("Could not refresh the connection after " << COMMAND_RETRIES << " retries. Exiting.");
+            std::exit(1);
+        }
+    }
+
+    return clientUser;
+}
+
+// Explicit instantiations
+template Users P5::Run<Users>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Clients P5::Run<Clients>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
