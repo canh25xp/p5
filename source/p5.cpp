@@ -2,6 +2,7 @@
 
 #include <csignal>
 #include <cstdlib>
+#include <openssl/crypto.h>
 #include <string>
 #include <vector>
 #include <chrono>
@@ -15,6 +16,7 @@
 #include "options.h"
 #include "utils/cli_helpers.h"
 #include "utils/client_resolver.h"
+#include "utils/auth_store.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
@@ -130,6 +132,76 @@ Result P5::Run(const char *command, int argumentCount, char **arguments) {
     m_ClientAPI.Run(command, &clientUser);
 
     return clientUser;
+}
+
+void P5::Run(const char *command, const std::vector<std::string> &args, ClientUser &clientUser) {
+    std::vector<char *> argv;
+    argv.reserve(args.size());
+    for (const std::string &arg : args) {
+        argv.push_back(const_cast<char *>(arg.c_str()));
+    }
+
+    m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
+    m_ClientAPI.Run(command, &clientUser);
+}
+
+namespace {
+
+class SilentResult : public ClientUser {
+public:
+    bool HasError() const { return m_error.Test() != 0; }
+    bool IsFatal() const { return m_error.IsFatal() != 0; }
+
+    void HandleError(Error *e) override { m_error = *e; }
+    void Message(Error *e) override {
+        if (e && e->Test()) {
+            m_error = *e;
+        }
+    }
+    void OutputError(const char *) override {}
+    void OutputInfo(char, const char *) override {}
+    void OutputText(const char *, int) override {}
+
+private:
+    Error m_error;
+};
+
+} // namespace
+
+bool P5::AutoLogin() {
+    char statusArg[] = "-s";
+    char *statusArgs[] = {statusArg};
+    SilentResult status;
+    m_ClientAPI.SetArgv(1, statusArgs);
+    m_ClientAPI.Run("login", &status);
+    if (!status.HasError()) {
+        return true;
+    }
+
+    std::string password;
+    if (!AuthStore::LoadPassword(Port(), User(), password)) {
+        return false;
+    }
+    if (password.empty()) {
+        return false;
+    }
+
+    m_ClientAPI.SetPassword(password.c_str());
+
+    SilentResult login;
+    m_ClientAPI.SetArgv(0, nullptr);
+    m_ClientAPI.Run("login", &login);
+    OPENSSL_cleanse(&password[0], password.size());
+    password.clear();
+    return !login.HasError() && !login.IsFatal();
+}
+
+std::string P5::Port() {
+    return m_ClientAPI.GetPort().Text();
+}
+
+std::string P5::User() {
+    return m_ClientAPI.GetUser().Text();
 }
 
 Result P5::Run(const std::string &commandLine) {

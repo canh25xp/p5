@@ -2,6 +2,8 @@
 #include "p5.h"
 #include "log.h"
 
+#include <string>
+
 void Commands::add(const char *name, const char *description, void (*run)(const std::vector<std::string> &), std::vector<const char *> aliases) {
     std::vector<std::string> aliases_str;
     for (const char *alias : aliases) {
@@ -47,6 +49,11 @@ void Commands::run_p4_passthrough(const char *command, const std::vector<std::st
     INFO("p4 command passthrough: " << command);
     for (const auto &arg : args) {
         INFO("arguments: " << arg);
+    }
+
+    const std::string commandName(command);
+    if (commandName != "login" && commandName != "login2" && commandName != "logout" && commandName != "tickets" && commandName != "trust" && commandName != "help") {
+        p5.AutoLogin();
     }
 
     std::vector<char *> argv_array;

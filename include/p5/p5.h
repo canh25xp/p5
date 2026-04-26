@@ -34,6 +34,10 @@ public:
 
     Result Run(const char *command, int argc, char **argv);
     Result Run(const std::string &commandLine);
+    void Run(const char *command, const std::vector<std::string> &args, ClientUser &clientUser);
+    bool AutoLogin();
+    std::string Port();
+    std::string User();
     Users ListUsers(const std::vector<std::string> &extraArgs = {});
     Clients ListClients(const std::vector<std::string> &extraArgs = {});
 };

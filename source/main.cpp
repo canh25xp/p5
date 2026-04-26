@@ -6,6 +6,7 @@
 #include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/set.h"
+#include "commands/login.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -137,7 +138,7 @@ int main(int argc, char **argv) {
     commands.add("attribute", "Set per-revision attributes on revisions");
 
     // --- Auth ---
-    commands.add("login", "Login to Perforce by obtaining a session ticket");
+    commands.add(std::make_unique<Login>());
     commands.add("login2", "Perform a multi factor authentication");
     commands.add("logout", "Logout of Perforce by removing or invalidating a ticket");
     commands.add("tickets", "Display list of session tickets for this user");
