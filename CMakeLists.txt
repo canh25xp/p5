@@ -92,6 +92,7 @@ target_compile_definitions(
 init_git_submodules()
 
 add_subdirectory(vendor)
+add_subdirectory(tests)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/p5
