@@ -13,25 +13,10 @@ public:
 
     const std::string &Password() const { return m_password; }
 
-    void Prompt(Error *err, StrBuf &rsp, int noEcho, Error *e) override {
-        ClientUser::Prompt(err, rsp, noEcho, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(Error *err, StrBuf &rsp, int noEcho, int noOutput, Error *e) override {
-        ClientUser::Prompt(err, rsp, noEcho, noOutput, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, Error *e) override {
-        ClientUser::Prompt(msg, rsp, noEcho, e);
-        Capture(rsp, noEcho);
-    }
-
-    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, int noOutput, Error *e) override {
-        ClientUser::Prompt(msg, rsp, noEcho, noOutput, e);
-        Capture(rsp, noEcho);
-    }
+    void Prompt(Error *err, StrBuf &rsp, int noEcho, Error *e) override;
+    void Prompt(Error *err, StrBuf &rsp, int noEcho, int noOutput, Error *e) override;
+    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, Error *e) override;
+    void Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, int noOutput, Error *e) override;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

@@ -9,6 +9,26 @@
 #include <string>
 #include <vector>
 
+void Login::Prompt(Error *err, StrBuf &rsp, int noEcho, Error *e) {
+    ClientUser::Prompt(err, rsp, noEcho, e);
+    Capture(rsp, noEcho);
+}
+
+void Login::Prompt(Error *err, StrBuf &rsp, int noEcho, int noOutput, Error *e) {
+    ClientUser::Prompt(err, rsp, noEcho, noOutput, e);
+    Capture(rsp, noEcho);
+}
+
+void Login::Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, Error *e) {
+    ClientUser::Prompt(msg, rsp, noEcho, e);
+    Capture(rsp, noEcho);
+}
+
+void Login::Prompt(const StrPtr &msg, StrBuf &rsp, int noEcho, int noOutput, Error *e) {
+    ClientUser::Prompt(msg, rsp, noEcho, noOutput, e);
+    Capture(rsp, noEcho);
+}
+
 void Login::run(const std::vector<std::string> &args) {
     P5 p5;
     p5.Run("login", args, *this);
