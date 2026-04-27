@@ -1,10 +1,10 @@
-#include "client_resolver.h"
+#include "utils/client_resolver.h"
 
 #include "log.h"
 
-#include "p4/hostenv.h"
-#include "p4/enviro.h"
-#include "p4/error.h"
+#include <p4/hostenv.h>
+#include <p4/enviro.h>
+#include <p4/error.h>
 
 #include <cstdlib>
 #include <fstream>

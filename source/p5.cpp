@@ -6,13 +6,13 @@
 #include <chrono>
 #include <thread>
 
-#include "p4/clientapi.h"
-#include "p4/p4libs.h"
+#include <p4/clientapi.h>
+#include <p4/p4libs.h>
 
 #include "log.h"
 #include "options.h"
-#include "cli_helpers.h"
-#include "client_resolver.h"
+#include "utils/cli_helpers.h"
+#include "utils/client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {

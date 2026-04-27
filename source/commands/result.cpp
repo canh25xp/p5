@@ -1,6 +1,6 @@
-#include "result.h"
+#include "commands/result.h"
 
-#include "p4/clientapi.h"
+#include <p4/clientapi.h>
 
 #include "log.h"
 
