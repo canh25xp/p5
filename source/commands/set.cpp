@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <cctype>
 #include <cerrno>
 #include <cstring>
 #include <iostream>
@@ -83,6 +84,21 @@ static const char *const P4ENV[] = {
     "P4ZEROSYNC",
 };
 
+static const char *const P5ENV[] = {
+    "P5AUTOLOGIN",
+    "P5RESOLVECLIENT",
+    "P5SAVEPASSWORD",
+};
+
+static bool is_p5_name(const std::string &name) {
+    for (const char *entry : P5ENV) {
+        if (name == entry) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Refactored to use Options::load_enviro
 
 #if !defined(_WIN32)
@@ -95,6 +111,75 @@ static bool line_assigns_name(const std::string &line, const std::string &name) 
         return false;
     }
     return line.compare(0, eq, name) == 0;
+}
+
+static bool is_absolute_path(const std::string &path) {
+    if (path.empty()) {
+        return false;
+    }
+    if (path[0] == '/') {
+        return true;
+    }
+    return path.size() > 2 && std::isalpha(static_cast<unsigned char>(path[0])) && path[1] == ':' && (path[2] == '/' || path[2] == '\\');
+}
+
+static bool path_exists(const std::string &path) {
+    struct stat st;
+    return stat(path.c_str(), &st) == 0;
+}
+
+static std::string parent_dir(const std::string &path) {
+    const size_t p = path.find_last_of('/');
+    if (p == std::string::npos) {
+        return std::string();
+    }
+    if (p == 0) {
+        return "/";
+    }
+    return path.substr(0, p);
+}
+
+static std::string join_path(const std::string &left, const std::string &right) {
+    if (left.empty()) {
+        return right;
+    }
+    if (left.back() == '/') {
+        return left + right;
+    }
+    return left + "/" + right;
+}
+
+static std::string detect_p4config_path(Enviro &env) {
+    const char *configName = env.Get("P4CONFIG");
+    if (!configName || configName[0] == '\0') {
+        return std::string();
+    }
+
+    const std::string config(configName);
+    if (is_absolute_path(config)) {
+        return config;
+    }
+
+    Error e;
+    StrBuf cwd;
+    HostEnv host;
+    if (!host.GetCwd(cwd, &e, &env) || e.Test() || cwd.Length() == 0) {
+        return std::string();
+    }
+
+    std::string current(cwd.Text());
+    while (!current.empty()) {
+        const std::string candidate = join_path(current, config);
+        if (path_exists(candidate)) {
+            return candidate;
+        }
+        if (current == "/") {
+            break;
+        }
+        current = parent_dir(current);
+    }
+
+    return join_path(std::string(cwd.Text()), config);
 }
 
 // Perforce: persist to $P4ENVIRO if set, else $HOME/.p4enviro (Helix P4ENVIRO doc).
@@ -155,10 +240,9 @@ static int mkdirs_posix(const std::string &dir) {
     return -1;
 }
 
-static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const std::string &value) {
-    const std::string path = p4enviro_path_for_write(env);
+static bool set_persistent_file_unix(const std::string &path, const std::string &name, const std::string &value) {
     if (path.empty()) {
-        ERROR("p5 set: could not determine P4ENVIRO file path (HOME or P4ENVIRO not set?)");
+        ERROR("p5 set: could not determine settings file path");
         return false;
     }
 
@@ -251,6 +335,27 @@ static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const s
     (void)chmod(path.c_str(), 0600);
     return true;
 }
+
+static bool p4_set_persistent_unix(Enviro &env, const std::string &name, const std::string &value) {
+    const std::string path = p4enviro_path_for_write(env);
+    if (path.empty()) {
+        ERROR("p5 set: could not determine P4ENVIRO file path (HOME or P4ENVIRO not set?)");
+        return false;
+    }
+    return set_persistent_file_unix(path, name, value);
+}
+
+static bool p5_set_persistent_unix(Enviro &env, const std::string &name, const std::string &value) {
+    std::string path = detect_p4config_path(env);
+    if (path.empty()) {
+        path = p4enviro_path_for_write(env);
+    }
+    if (path.empty()) {
+        ERROR("p5 set: could not determine P4CONFIG or P4ENVIRO file path");
+        return false;
+    }
+    return set_persistent_file_unix(path, name, value);
+}
 #endif // !defined(_WIN32)
 
 /// `all == false`: same as `p4 set` with no arguments (local `Enviro` only).
@@ -262,6 +367,11 @@ static void print_env(bool quiet, bool all, const Options &options) {
     }
     if (!all) {
         env->List(quiet ? 1 : 0);
+        for (const char *name : P5ENV) {
+            if (env->Get(name) != nullptr) {
+                env->Print(name, quiet ? 1 : 0);
+            }
+        }
         return;
     }
     const int format_flags = quiet ? 1 : 0;
@@ -273,6 +383,13 @@ static void print_env(bool quiet, bool all, const Options &options) {
         env->Format(name, &formatted, format_flags);
         if (formatted.Length() > 0) {
             PRINT(formatted.Text());
+        } else {
+            PRINT(name << "=");
+        }
+    }
+    for (const char *name : P5ENV) {
+        if (char *value = env->Get(name)) {
+            PRINT(name << "=" << value);
         } else {
             PRINT(name << "=");
         }
@@ -307,7 +424,6 @@ void Set::run(const std::vector<std::string> &args) {
     if (!env) {
         return;
     }
-    Error e;
     const int print_quiet = m_quiet ? 1 : 0;
 
     for (const std::string &arg : args) {
@@ -323,10 +439,13 @@ void Set::run(const std::vector<std::string> &args) {
         const std::string name = arg.substr(0, eq);
         const std::string value = arg.substr(eq + 1);
 #if defined(_WIN32)
-        CLI_ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
+        CLI_ERROR("p5 set: updating settings (NAME=value) is currently not supported on Windows");
         throw CLI::RuntimeError(1);
 #else
-        if (!p4_set_persistent_unix(*env, name, value)) {
+        const bool ok = is_p5_name(name)
+                            ? p5_set_persistent_unix(*env, name, value)
+                            : p4_set_persistent_unix(*env, name, value);
+        if (!ok) {
             throw CLI::RuntimeError(1);
         }
 #endif

@@ -9,6 +9,36 @@ Options g_options;
 #include "p4/error.h"
 #include "log.h"
 #include <cstdlib>
+#include <algorithm>
+#include <cctype>
+
+static bool parse_bool_setting(const char *value, bool &out) {
+    if (!value) {
+        return false;
+    }
+
+    std::string normalized(value);
+    std::transform(normalized.begin(), normalized.end(), normalized.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+
+    if (normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "on") {
+        out = true;
+        return true;
+    }
+    if (normalized == "0" || normalized == "false" || normalized == "no" || normalized == "off") {
+        out = false;
+        return true;
+    }
+    return false;
+}
+
+static const char *get_setting(Enviro &env, const char *name) {
+    if (char *value = env.Get(name)) {
+        return value;
+    }
+    return std::getenv(name);
+}
 
 #ifndef P5_VERSION_STRING
 #define P5_VERSION_STRING "p5 (unknown version) (p4api unknown)"
@@ -29,9 +59,8 @@ void Options::add(CLI::App &app) {
         ->group("Global options");
     app.add_option("-c,--client", m_client, "Override P4CLIENT (default: $P4CLIENT)")
         ->group("Global options");
-    app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
-        ->group("Global options")
-        ->envname("P5RESOLVECLIENT");
+    m_resolve_client_option = app.add_flag("--resolve-client,!--no-resolve-client", m_resolve_client, "Resolve client based on CWD")
+                                  ->group("Global options");
     app.add_option("-z", m_protocol_z, "Set Helix protocol variable (name or name=value); repeat for multiple")
         ->group("Global options");
 
@@ -54,6 +83,34 @@ void Options::apply() {
     if (!m_env) {
         m_env = std::make_unique<Enviro>();
         load_enviro(*m_env);
+    }
+
+    const char *resolveClientSetting = get_setting(*m_env, "P5RESOLVECLIENT");
+    if (m_resolve_client_option && m_resolve_client_option->count() == 0 && resolveClientSetting) {
+        bool parsed = false;
+        if (parse_bool_setting(resolveClientSetting, parsed)) {
+            m_resolve_client = parsed;
+        } else {
+            WARN("Ignoring invalid P5RESOLVECLIENT value: " << resolveClientSetting);
+        }
+    }
+
+    if (const char *autoLoginSetting = get_setting(*m_env, "P5AUTOLOGIN")) {
+        bool parsed = false;
+        if (parse_bool_setting(autoLoginSetting, parsed)) {
+            m_auto_login = parsed;
+        } else {
+            WARN("Ignoring invalid P5AUTOLOGIN value: " << autoLoginSetting);
+        }
+    }
+
+    if (const char *savePasswordSetting = get_setting(*m_env, "P5SAVEPASSWORD")) {
+        bool parsed = false;
+        if (parse_bool_setting(savePasswordSetting, parsed)) {
+            m_save_password = parsed;
+        } else {
+            WARN("Ignoring invalid P5SAVEPASSWORD value: " << savePasswordSetting);
+        }
     }
 
     if (m_verbosity.empty()) {
