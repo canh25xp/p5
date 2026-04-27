@@ -1,14 +1,14 @@
-#include "CLI/CLI.hpp"
+#include <CLI/CLI.hpp>
 
 #include "set.h"
 
 #include "options.h"
 #include "log.h"
 
-#include "p4/clientapi.h"
-#include "p4/enviro.h"
-#include "p4/error.h"
-#include "p4/hostenv.h"
+#include <p4/clientapi.h>
+#include <p4/enviro.h>
+#include <p4/error.h>
+#include <p4/hostenv.h>
 
 #include <cstdlib>
 #include <cstdio>

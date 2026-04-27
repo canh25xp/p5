@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CLI/CLI.hpp"
+#include <CLI/CLI.hpp>
 #include <memory>
 #include <string>
 #include <utility>

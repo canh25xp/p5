@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "CLI/CLI.hpp"
+#include <CLI/CLI.hpp>
 #include "commands/command.h"
 
 /// Batches CLI11 subcommand definitions; call install to attach them to a root `CLI::App`.

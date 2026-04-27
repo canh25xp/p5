@@ -7,9 +7,9 @@
 #include <chrono>
 #include <thread>
 
-#include "p4/clientapi.h"
-#include "p4/p4libs.h"
-#include "p4/signaler.h"
+#include <p4/clientapi.h>
+#include <p4/p4libs.h>
+#include <p4/signaler.h>
 
 #include "log.h"
 #include "options.h"

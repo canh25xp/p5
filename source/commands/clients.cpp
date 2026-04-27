@@ -1,11 +1,11 @@
-#include "CLI/CLI.hpp"
+#include <CLI/CLI.hpp>
 
 #include "clients.h"
 #include "client_resolver.h"
 #include "p5.h"
 
-#include "p4/clientapi.h"
-#include "p4/hostenv.h"
+#include <p4/clientapi.h>
+#include <p4/hostenv.h>
 
 #include "log.h"
 
