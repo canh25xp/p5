@@ -1,6 +1,5 @@
 #include "p5.h"
 
-#include <csignal>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -9,7 +8,6 @@
 
 #include "p4/clientapi.h"
 #include "p4/p4libs.h"
-#include "p4/signaler.h"
 
 #include "log.h"
 #include "options.h"
@@ -99,11 +97,6 @@ bool P5::InitializeLibraries() {
         ERROR("Failed to initialize P4Libraries");
         return false;
     }
-
-    // We disable the default signaler to stop it from deleting memory from the wrong heap
-    // https://www.perforce.com/manuals/p4api/Content/P4API/chapter.clientprogramming.signaler.html
-    std::signal(SIGINT, SIG_DFL);
-    signaler.Disable();
 
     INFO("Initialized P4Libraries successfully");
     return true;
