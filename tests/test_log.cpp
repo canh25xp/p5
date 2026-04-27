@@ -1,6 +1,8 @@
 #include "log.h"
 
-// g++ -std=c++17 -Iinclude/p5 source/test_log.cpp source/log.cpp -o test_log && ./test_log
+/*
+g++ -std=c++17 -Iinclude/p5 tests/test_log.cpp source/log.cpp -o test_log && ./test_log
+*/
 int main() {
     Log::CurrentLevel = LogLevel::Info;
     std::cout << "\nCurrent Log Level: " << static_cast<int>(Log::CurrentLevel) << "\n";
@@ -57,10 +59,8 @@ int main() {
     // API_FATAL("This is a API FATAL message.");
 
     Log::CurrentLevel = LogLevel::Info;
-
-
-
-
+    std::cout << "\nCurrent Log Level: " << static_cast<int>(Log::CurrentLevel) << "\n";
+    // clang-format off
 
 
 
