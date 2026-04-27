@@ -26,7 +26,7 @@
 
 // Candidate names covering client and related tooling; `Enviro::IsKnown` decides what the linked API supports.
 // Extracted from `strings vendor/p4api/p4api-2025.1.2907437/lib/libsupp.a 2>/dev/null | rg '^P4[A-Z0-9]+$' | sort -u`
-static const char *const kP4EnvVarCandidates[] = {
+static const char *const P4ENV[] = {
     "P4ALIASES",
     "P4ALTSYNC",
     "P4AUDIT",
@@ -265,7 +265,7 @@ static void print_env(bool quiet, bool all, const Options &options) {
         return;
     }
     const int format_flags = quiet ? 1 : 0;
-    for (const char *name : kP4EnvVarCandidates) {
+    for (const char *name : P4ENV) {
         if (!Enviro::IsKnown(name)) {
             continue;
         }
