@@ -1,4 +1,4 @@
-add_executable(p4 p4.cpp)
+add_executable(p4 p4.cpp clientuser.cc)
 
 set_target_properties(
   p4
