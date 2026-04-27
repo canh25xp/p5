@@ -5,9 +5,9 @@
 
 #include <p4/clientapi.h>
 
-#include "result.h"
-#include "clients.h"
-#include "users.h"
+#include "commands/result.h"
+#include "commands/clients.h"
+#include "commands/users.h"
 
 class P5 {
     ClientApi m_ClientAPI;

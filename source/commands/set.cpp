@@ -1,6 +1,6 @@
 #include <CLI/CLI.hpp>
 
-#include "set.h"
+#include "commands/set.h"
 
 #include "options.h"
 #include "log.h"

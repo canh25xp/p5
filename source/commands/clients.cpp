@@ -1,7 +1,7 @@
 #include <CLI/CLI.hpp>
 
-#include "clients.h"
-#include "client_resolver.h"
+#include "commands/clients.h"
+#include "utils/client_resolver.h"
 #include "p5.h"
 
 #include <p4/clientapi.h>
