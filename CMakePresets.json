@@ -83,6 +83,12 @@
   ],
   "buildPresets": [
     { "name": "default", "configurePreset": "ninja-debug" },
+    { "name": "p4", "configurePreset": "ninja-debug", "targets": "p4" },
+    { "name": "p5", "configurePreset": "ninja-debug", "targets": "p5" },
+    { "name": "p4-release", "configurePreset": "ninja-release", "targets": "p4" },
+    { "name": "p5-release", "configurePreset": "ninja-release", "targets": "p5" },
+    { "name": "p4-debug", "configurePreset": "ninja-debug", "targets": "p4" },
+    { "name": "p5-debug", "configurePreset": "ninja-debug", "targets": "p5" },
     { "name": "ninja-debug", "configurePreset": "ninja-debug" },
     { "name": "ninja-release", "configurePreset": "ninja-release" },
     { "name": "make-debug", "configurePreset": "make-debug" },
