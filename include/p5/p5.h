@@ -19,6 +19,7 @@ class P5 {
     bool Reinitialize();
     bool CheckErrors(Error &e, StrBuf &msg);
     ClientUser &Execute(const char *command, std::vector<char *> &argv, ClientUser &user);
+    void RefreshIfNeeded();
 
     static const int COMMAND_RETRIES = 3;             // Specify how many times a command should be retried before the process exits in a failure.
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.

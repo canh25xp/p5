@@ -122,6 +122,29 @@ ClientUser &P5::Execute(const char *command, std::vector<char *> &argv, ClientUs
     return user;
 }
 
+void P5::RefreshIfNeeded() {
+    m_Usage++;
+    if (m_Usage <= COMMAND_REFRESH_THRESHOLD) {
+        return;
+    }
+
+    int refreshRetries = COMMAND_RETRIES;
+    while (refreshRetries-- > 0) {
+        WARN("Trying to refresh the connection due to age (" << m_Usage << " > " << COMMAND_REFRESH_THRESHOLD << ").");
+        if (Reinitialize()) {
+            INFO("Connection was refreshed");
+            m_Usage = 0;
+            return;
+        }
+
+        ERROR("Could not refresh connection due to old age. Retrying in 5 seconds");
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+
+    ERROR("Could not refresh the connection after " << COMMAND_RETRIES << " retries. Exiting.");
+    std::exit(1);
+}
+
 Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
     std::vector<char *> argv;
     argv.reserve(args.size());
@@ -203,26 +226,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
         std::exit(1);
     }
 
-    m_Usage++;
-    if (m_Usage > COMMAND_REFRESH_THRESHOLD) {
-        int refreshRetries = COMMAND_RETRIES;
-        while (refreshRetries > 0) {
-            WARN("Trying to refresh the connection due to age (" << m_Usage << " > " << COMMAND_REFRESH_THRESHOLD << ").");
-            if (Reinitialize()) {
-                INFO("Connection was refreshed");
-                break;
-            }
-            ERROR("Could not refresh connection due to old age. Retrying in 5 seconds");
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-
-            refreshRetries--;
-        }
-
-        if (refreshRetries == 0) {
-            ERROR("Could not refresh the connection after " << COMMAND_RETRIES << " retries. Exiting.");
-            std::exit(1);
-        }
-    }
+    RefreshIfNeeded();
 
     return clientUser;
 }
