@@ -49,14 +49,7 @@ void Commands::run_p4_passthrough(const char *command, const std::vector<std::st
         INFO("arguments: " << arg);
     }
 
-    std::vector<char *> argv_array;
-    argv_array.reserve(args.size());
-    for (const auto &arg : args) {
-        argv_array.push_back(const_cast<char *>(arg.c_str()));
-    }
-
-    char **argv_ptr = argv_array.empty() ? nullptr : argv_array.data();
-    p5.Run(command, static_cast<int>(args.size()), argv_ptr);
+    p5.Run(std::string(command), args);
 }
 
 void Command::run(const std::vector<std::string> &args) {

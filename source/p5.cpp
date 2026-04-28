@@ -116,11 +116,16 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-Result P5::Run(const char *command, int argumentCount, char **arguments) {
-    Result clientUser;
+Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
+    std::vector<char *> argv;
+    argv.reserve(args.size());
+    for (const auto &arg : args) {
+        argv.push_back(const_cast<char *>(arg.c_str()));
+    }
 
-    m_ClientAPI.SetArgv(argumentCount, arguments);
-    m_ClientAPI.Run(command, &clientUser);
+    Result clientUser;
+    m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
+    m_ClientAPI.Run(command.c_str(), &clientUser);
 
     return clientUser;
 }
@@ -139,16 +144,7 @@ Result P5::Run(const std::string &commandLine) {
     // Remaining tokens are arguments
     std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
-    // Build argv (must stay alive during Run)
-    std::vector<const char *> argv;
-
-    argv.reserve(args.size());
-
-    for (std::string &arg : args) {
-        argv.push_back(arg.c_str()); // safe: std::string owns memory
-    }
-
-    return Run(command.c_str(), static_cast<int>(argv.size()), const_cast<char **>(argv.data()));
+    return Run(command, args);
 }
 
 template <class T>

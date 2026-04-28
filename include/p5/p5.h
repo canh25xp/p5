@@ -32,7 +32,7 @@ public:
     P5();
     ~P5();
 
-    Result Run(const char *command, int argc, char **argv);
+    Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
     Users ListUsers(const std::vector<std::string> &extraArgs = {});
     Clients ListClients(const std::vector<std::string> &extraArgs = {});
