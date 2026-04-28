@@ -16,18 +16,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif()
 
-# Find openssl on the system
-if(NOT OPENSSL_ROOT_DIR)
-  if(UNIX)
-    set(OPENSSL_ROOT_DIR "/usr/local")
-  elseif(MSVC)
-    set(OPENSSL_ROOT_DIR "C:/Program Files/FireDaemon OpenSSL 3")
-  elseif(WIN32)
-    set(OPENSSL_ROOT_DIR "C:/msys64/mingw64")
-  endif()
-  message(STATUS "OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
-endif()
-
 find_package(OpenSSL QUIET)
 if(NOT OPENSSL_FOUND)
   p5_download_openssl_msvc_if_needed()
