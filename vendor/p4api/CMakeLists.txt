@@ -9,9 +9,10 @@ set(OPENSSL_USE_STATIC_LIBS TRUE)
 # -lzstd, which only resolves if libzstd-dev is installed (unversioned libzstd.so).
 # Without it, fall back to shared OpenSSL so the app links without a separate zstd dev symlink.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_library(_P5_ZLIB_DEV NAMES z)
   find_library(_P5_ZSTD_DEV NAMES zstd)
-  if(NOT _P5_ZSTD_DEV)
-    message(STATUS "libzstd not found for static OpenSSL (install libzstd-dev for static libs); using shared OpenSSL")
+  if(NOT _P5_ZLIB_DEV OR NOT _P5_ZSTD_DEV)
+    message(STATUS "zlib/zstd dev linker libs not found for static OpenSSL (install zlib1g-dev and libzstd-dev for static libs); using shared OpenSSL")
     set(OPENSSL_USE_STATIC_LIBS FALSE)
   endif()
 endif()
@@ -91,6 +92,15 @@ endif()
 target_include_directories(p4api_client INTERFACE "${P4API_INCLUDE_DIR}")
 
 target_link_libraries(p4api_client INTERFACE OpenSSL::SSL OpenSSL::Crypto)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND OPENSSL_USE_STATIC_LIBS)
+  find_package(ZLIB REQUIRED)
+  find_library(_P5_ZSTD_LIB NAMES zstd)
+  if(NOT _P5_ZSTD_LIB)
+    message(FATAL_ERROR "libzstd not found while linking static OpenSSL")
+  endif()
+  target_link_libraries(p4api_client INTERFACE ZLIB::ZLIB ${_P5_ZSTD_LIB})
+endif()
 
 if(UNIX)
   target_compile_definitions(p4api_client INTERFACE OS_LINUX)
