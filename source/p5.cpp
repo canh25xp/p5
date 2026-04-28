@@ -116,6 +116,12 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
+ClientUser &P5::Execute(const char *command, std::vector<char *> &argv, ClientUser &user) {
+    m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
+    m_ClientAPI.Run(command, &user);
+    return user;
+}
+
 Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
     std::vector<char *> argv;
     argv.reserve(args.size());
@@ -124,8 +130,7 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     }
 
     Result clientUser;
-    m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
-    m_ClientAPI.Run(command.c_str(), &clientUser);
+    Execute(command.c_str(), argv, clientUser);
 
     return clientUser;
 }
@@ -166,8 +171,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
         INFO("arguments: " << arg);
     }
 
-    m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-    m_ClientAPI.Run(command, &clientUser);
+    Execute(command, argsCharArray, clientUser);
 
     int retries = commandRetries;
     while (m_ClientAPI.Dropped() || clientUser.GetError().IsError()) {
@@ -188,8 +192,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
 
         clientUser = T();
 
-        m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-        m_ClientAPI.Run(command, &clientUser);
+        Execute(command, argsCharArray, clientUser);
 
         retries--;
     }
