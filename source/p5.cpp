@@ -194,7 +194,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
     Execute(command, argsCharArray, clientUser);
 
     int retries = commandRetries;
-    while (m_ClientAPI.Dropped() || clientUser.GetError().IsError()) {
+    while (m_ClientAPI.Dropped() || clientUser.IsError()) {
         if (retries == 0) {
             break;
         }

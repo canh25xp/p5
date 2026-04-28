@@ -82,7 +82,7 @@ void Clients::PrintFormatted(std::ostream &out) const {
 void Clients::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Clients r = p5.ListClients(args);
-    if (r.IsError()) {
+    if (!r.IsError()) {
         ClientMap toPrint = r.GetClients();
 
         // When --here is set, filter results to only clients on the current host

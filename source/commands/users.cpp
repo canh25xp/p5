@@ -66,8 +66,7 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 void Users::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Users r = p5.ListUsers(args);
-    // Result::IsError() returns true when there is no client-side error.
-    if (r.IsError()) {
+    if (!r.IsError()) {
         r.PrintSortedTsv(std::cout);
     } else {
         throw CLI::RuntimeError(1);
