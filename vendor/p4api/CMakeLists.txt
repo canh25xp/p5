@@ -16,10 +16,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif()
 
-find_package(OpenSSL QUIET)
-if(NOT OPENSSL_FOUND)
-  p5_download_openssl_msvc_if_needed()
+# Find openssl on the system
+if(NOT OPENSSL_ROOT_DIR)
+  if(MSVC)
+    p5_download_openssl_msvc_if_needed()
+    message(STATUS "OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
+  endif()
 endif()
+
+find_package(OpenSSL QUIET)
 find_package(OpenSSL REQUIRED)
 
 message(STATUS "OPENSSL_FOUND: ${OPENSSL_FOUND}")
