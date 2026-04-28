@@ -66,11 +66,10 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 void Users::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Users r = p5.ListUsers(args);
-    if (!r.IsError()) {
-        r.PrintSortedTsv(std::cout);
-    } else {
+    if (r.IsError())
         throw CLI::RuntimeError(1);
-    }
+
+    r.PrintSortedTsv(std::cout);
 }
 
 Users P5::ListUsers(const std::vector<std::string> &extraArgs) {

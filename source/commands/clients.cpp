@@ -82,40 +82,39 @@ void Clients::PrintFormatted(std::ostream &out) const {
 void Clients::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Clients r = p5.ListClients(args);
-    if (!r.IsError()) {
-        ClientMap toPrint = r.GetClients();
-
-        // When --here is set, filter results to only clients on the current host
-        if (m_here) {
-            std::string hostname = ClientResolver::GetCurrentHostname();
-            toPrint = ClientResolver::FilterByHost(toPrint, hostname);
-        }
-
-        // Sort and print
-        std::vector<ClientName> names;
-        names.reserve(toPrint.size());
-        for (const auto &entry : toPrint) {
-            names.push_back(entry.first);
-        }
-        std::sort(names.begin(), names.end());
-
-        for (const ClientName &name : names) {
-            const ClientData &data = toPrint.at(name);
-            PRINT(name);
-            PRINT("  root " << data.root);
-            if (!data.host.empty()) {
-                PRINT("  host " << data.host);
-            }
-            if (!data.description.empty()) {
-                PRINT("  " << data.description);
-            }
-            for (const auto &alt : data.altRoots) {
-                PRINT("  altRoot " << alt);
-            }
-            PRINT("");
-        }
-    } else {
+    if (r.IsError())
         throw CLI::RuntimeError(1);
+
+    ClientMap toPrint = r.GetClients();
+
+    // When --here is set, filter results to only clients on the current host
+    if (m_here) {
+        std::string hostname = ClientResolver::GetCurrentHostname();
+        toPrint = ClientResolver::FilterByHost(toPrint, hostname);
+    }
+
+    // Sort and print
+    std::vector<ClientName> names;
+    names.reserve(toPrint.size());
+    for (const auto &entry : toPrint) {
+        names.push_back(entry.first);
+    }
+    std::sort(names.begin(), names.end());
+
+    for (const ClientName &name : names) {
+        const ClientData &data = toPrint.at(name);
+        PRINT(name);
+        PRINT("  root " << data.root);
+        if (!data.host.empty()) {
+            PRINT("  host " << data.host);
+        }
+        if (!data.description.empty()) {
+            PRINT("  " << data.description);
+        }
+        for (const auto &alt : data.altRoots) {
+            PRINT("  altRoot " << alt);
+        }
+        PRINT("");
     }
 }
 
