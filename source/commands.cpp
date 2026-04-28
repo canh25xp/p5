@@ -57,10 +57,10 @@ P5 &Commands::p5() {
 void Commands::run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
     P5 &p5 = this->p5();
 
-    INFO("p4 command passthrough: " << command);
-    for (const auto &arg : args) {
-        INFO("arguments: " << arg);
-    }
+    std::string argsString;
+    for (const std::string &stringArg : args)
+        argsString = argsString + " " + stringArg;
+    INFO("Run passthrough: p4 " << command << argsString);
 
     p5.Run(std::string(command), args);
 }

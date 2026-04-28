@@ -189,10 +189,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
 
     T clientUser;
 
-    INFO("p4 command: " << command);
-    for (const auto &arg : stringArguments) {
-        INFO("arguments: " << arg);
-    }
+    INFO("Run: p4 " << command << argsString);
 
     Execute(command, argsCharArray, clientUser);
 
