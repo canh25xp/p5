@@ -11,4 +11,5 @@ public:
     const Error &GetError() const { return m_Error; }
 
     bool IsError() { return m_Error.IsError() == 1; }
+    bool IsFatal() { return m_Error.IsFatal() == 1; }
 };

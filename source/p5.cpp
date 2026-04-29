@@ -239,7 +239,7 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
         retries--;
     }
 
-    if (m_ClientAPI.Dropped() || clientUser.GetError().IsFatal()) {
+    if (m_ClientAPI.Dropped() || clientUser.IsFatal()) {
         ERROR("Exiting due to receiving errors even after retrying " << COMMAND_RETRIES << " times");
         Deinitialize();
         std::exit(1);
