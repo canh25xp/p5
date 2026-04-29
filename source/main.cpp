@@ -156,22 +156,8 @@ int main(int argc, char **argv) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
-        if (e.get_exit_code() == static_cast<int>(CLI::ExitCodes::ExtrasError)) {
-            auto remaining = app.remaining(true);
-            if (!remaining.empty()) {
-                CLI_ERROR("Unknown command \"" << remaining[0] << "\"");
-                CLI_ERROR("Run with --help for more information.");
-                return 1;
-            }
-        }
+        // TODO: Use CLI_ERROR for logging
         return app.exit(e);
     }
-
-    if (app.get_subcommands().empty()) {
-        CLI_ERROR("A subcommand is required");
-        CLI_ERROR("Run with --help for more information.");
-        return 1;
-    }
-
     return 0;
 }
