@@ -44,7 +44,7 @@ private:
     bool m_userCaseInsensitive{false};
     std::string m_name;
     std::string m_Name;
-    int m_limits{0};
+    int m_max{0};
     std::string m_stream;
     bool m_unloaded{false};
     bool m_all{false};

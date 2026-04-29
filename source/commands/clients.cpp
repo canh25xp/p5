@@ -128,16 +128,16 @@ void Clients::register_cli(CLI::App &app) {
 
     sub->add_flag("--me", m_me, "List clients owned by the current user");
     sub->add_flag("--here", m_here, "List clients on the current host (implies --me)");
-    sub->add_flag("-t", m_time, "Display the time as well as the date");
-    sub->add_option("-u", m_user, "List clients owned by the specified user (supports wildcards)");
+    sub->add_flag("-t,--time", m_time, "Display the time as well as the date");
+    sub->add_option("-u,--user", m_user, "List clients owned by the specified user (supports wildcards)");
     sub->add_flag("--user-case-insensitive", m_userCaseInsensitive, "Treat the -u user value as a case-insensitive search pattern");
-    sub->add_option("-e", m_name, "List workspaces with names matching the pattern (case-sensitive)");
-    sub->add_option("-E", m_Name, "List workspaces with names matching the pattern (case-insensitive)");
-    sub->add_option("-m", m_limits, "Limit output to the specified number of workspaces");
-    sub->add_option("-S", m_stream, "Limit output to workspaces dedicated to the stream");
-    sub->add_flag("-U", m_unloaded, "List unloaded clients");
-    sub->add_flag("-a", m_all, "Display all clients, not just those bound to this server");
-    sub->add_option("-s", m_server, "Display only clients bound to the specified server ID");
+    sub->add_option("-e,--name", m_name, "List workspaces with names matching the pattern (case-sensitive)");
+    sub->add_option("-E,--name-ignore-case", m_Name, "List workspaces with names matching the pattern (case-insensitive)");
+    sub->add_option("-m,--max", m_max, "Limit output to the specified number of workspaces");
+    sub->add_option("-S,--stream", m_stream, "Limit output to workspaces dedicated to the stream");
+    sub->add_flag("-U,--unloaded", m_unloaded, "List unloaded clients");
+    sub->add_flag("-a,--all", m_all, "Display all clients, not just those bound to this server");
+    sub->add_option("-s,--server", m_server, "Display only clients bound to the specified server ID");
     sub->callback([this, sub]() {
         std::vector<std::string> args;
         if (m_here) {
@@ -164,9 +164,9 @@ void Clients::register_cli(CLI::App &app) {
             args.push_back("-E");
             args.push_back(m_Name);
         }
-        if (m_limits > 0) {
+        if (m_max > 0) {
             args.push_back("-m");
-            args.push_back(std::to_string(m_limits));
+            args.push_back(std::to_string(m_max));
         }
         if (!m_stream.empty()) {
             args.push_back("-S");
