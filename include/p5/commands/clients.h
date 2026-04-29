@@ -20,7 +20,7 @@ public:
 
     using ClientMap = std::unordered_map<ClientName, ClientData>;
 
-    Clients() : Command("clients", "Display list of known clients (p5 formatted output)", {"workspaces"}) {}
+    Clients() : Command("clients", "Display list of clients", {"workspaces"}) {}
 
 private:
     ClientMap m_Clients;
