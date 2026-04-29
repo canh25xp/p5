@@ -14,6 +14,7 @@ public:
     struct ClientData {
         std::string root;
         std::string host;
+        std::string owner;
         std::string description;
         std::vector<std::string> altRoots;
     };
@@ -32,6 +33,9 @@ public:
 
     /// One block per client, sorted by client name.
     void PrintFormatted(std::ostream &out) const;
+
+    /// Single-line per client with column alignment, sorted by client name.
+    void PrintSortedTsv(std::ostream &out) const;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

@@ -36,6 +36,11 @@ void Clients::OutputStat(StrDict *varList) {
         clientData.host = hostPtr->Text();
     }
 
+    StrPtr *ownerPtr = varList->GetVar("Owner");
+    if (ownerPtr) {
+        clientData.owner = ownerPtr->Text();
+    }
+
     StrPtr *descPtr = varList->GetVar("Description");
     if (descPtr) {
         clientData.description = descPtr->Text();
@@ -79,6 +84,31 @@ void Clients::PrintFormatted(std::ostream &out) const {
     }
 }
 
+void Clients::PrintSortedTsv(std::ostream &out) const {
+    std::vector<ClientName> names;
+    names.reserve(m_Clients.size());
+    for (const auto &entry : m_Clients) {
+        names.push_back(entry.first);
+    }
+    std::sort(names.begin(), names.end());
+
+    // Compute column widths
+    size_t maxNameWidth = 0;
+    size_t maxRootWidth = 0;
+    for (const ClientName &name : names) {
+        const ClientData &data = m_Clients.at(name);
+        maxNameWidth = std::max(maxNameWidth, name.size());
+        maxRootWidth = std::max(maxRootWidth, data.root.size());
+    }
+
+    for (const ClientName &name : names) {
+        const ClientData &data = m_Clients.at(name);
+        out << "Client " << name << std::string(maxNameWidth - name.size() + 2, ' ')
+            << data.root << std::string(maxRootWidth - data.root.size() + 2, ' ')
+            << data.owner << '\n';
+    }
+}
+
 void Clients::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Clients r = p5.ListClients(args);
@@ -94,28 +124,12 @@ void Clients::run(const std::vector<std::string> &args) {
     }
 
     // Sort and print
-    std::vector<ClientName> names;
-    names.reserve(toPrint.size());
-    for (const auto &entry : toPrint) {
-        names.push_back(entry.first);
+    if (m_here) {
+        // For filtered results, we need to print the filtered map
+        // Rebuild m_Clients with filtered data and print
+        r.m_Clients = std::move(toPrint);
     }
-    std::sort(names.begin(), names.end());
-
-    for (const ClientName &name : names) {
-        const ClientData &data = toPrint.at(name);
-        PRINT(name);
-        PRINT("  root " << data.root);
-        if (!data.host.empty()) {
-            PRINT("  host " << data.host);
-        }
-        if (!data.description.empty()) {
-            PRINT("  " << data.description);
-        }
-        for (const auto &alt : data.altRoots) {
-            PRINT("  altRoot " << alt);
-        }
-        PRINT("");
-    }
+    r.PrintSortedTsv(std::cout);
 }
 
 void Clients::register_cli(CLI::App &app) {
