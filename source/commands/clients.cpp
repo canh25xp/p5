@@ -4,6 +4,7 @@
 #include "commands.h"
 #include "utils/client_resolver.h"
 #include "p5.h"
+#include "error.h"
 
 #include <p4/clientapi.h>
 #include <p4/hostenv.h>
@@ -82,8 +83,10 @@ void Clients::PrintFormatted(std::ostream &out) const {
 void Clients::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
     Clients r = p5.ListClients(args);
-    if (r.IsError())
-        throw CLI::RuntimeError(1);
+    if (r.IsError()) {
+        CLI_ERROR("Failed to list clients");
+        throw CLI::RuntimeError(static_cast<int>(ErrorCode::CommandFailed));
+    }
 
     ClientMap toPrint = r.GetClients();
 

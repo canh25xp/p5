@@ -9,6 +9,7 @@
 #include <p4/clientapi.h>
 #include <p4/p4libs.h>
 
+#include "error.h"
 #include "log.h"
 #include "options.h"
 #include "utils/cli_helpers.h"
@@ -16,13 +17,11 @@
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
-        ERROR("Could not initialize P4 libraries");
-        return;
+        throw P5Error(ErrorCode::ApiError, "Could not initialize P4 libraries");
     }
     m_LibrariesInitialized = true;
     if (!Initialize()) {
-        ERROR("Could not initialize P4");
-        return;
+        throw P5Error(ErrorCode::ConnectionFailed, "Could not initialize P4 connection");
     }
 }
 
@@ -48,7 +47,7 @@ bool P5::Initialize() {
     }
 
     if (!CheckErrors(e, msg)) {
-        ERROR("Could not initialize Helix Core C/C++ API");
+        ERROR("Could not initialize Helix Core C/C++ API: " << msg.Text());
         return false;
     }
 
