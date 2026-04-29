@@ -37,14 +37,15 @@ bool P5::Initialize() {
     for (const auto &proto : g_options.p4Protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
+
+    m_ClientAPI.Init(&e);
+
     if (g_options.client().empty() && g_options.resolveClient()) {
-        std::string resolved = ClientResolver::AutoResolve(g_options.port(), g_options.user());
+        std::string resolved = AutoResolve();
         if (!resolved.empty()) {
             m_ClientAPI.SetClient(resolved.c_str());
         }
     }
-
-    m_ClientAPI.Init(&e);
 
     if (!CheckErrors(e, msg)) {
         ERROR("Could not initialize Helix Core C/C++ API");
@@ -52,6 +53,34 @@ bool P5::Initialize() {
     }
 
     return true;
+}
+
+std::string P5::AutoResolve() {
+    std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
+    if (cwd.empty()) {
+        WARN("Auto-resolve: could not determine current working directory");
+    }
+
+    std::string hostname = ClientResolver::GetCurrentHostname();
+
+    // Fetch clients owned by the current user
+    Clients clientsResult = ListClients({"--me"});
+
+    // Filter to clients on the current host
+    Clients::ClientMap filtered = ClientResolver::FilterByHost(clientsResult.GetClients(), hostname);
+
+    if (filtered.empty()) {
+        INFO("Auto-resolve: no clients found for user " << g_options.user() << " on host " << hostname);
+        return {};
+    }
+
+    // Resolve the best-matching client based on CWD
+    std::string resolved = ClientResolver::Resolve(cwd, filtered);
+    if (resolved.empty())
+        INFO("Auto-resolve: no client root matches CWD " << cwd);
+
+    INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
+    return resolved;
 }
 
 bool P5::Deinitialize() {
