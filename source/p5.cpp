@@ -253,3 +253,24 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 // Explicit instantiations
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+
+Clients P5::ListClients(const std::vector<std::string> &extraArgs) {
+    // Use tag protocol by default so OutputStat is called with structured data
+    m_ClientAPI.SetProtocol("tag", "");
+
+    std::vector<std::string> args;
+    args.reserve(extraArgs.size());
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<Clients>("clients", args);
+}
+
+Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
+    // Use tag protocol by default so OutputStat is called with structured data
+    m_ClientAPI.SetProtocol("tag", "");
+
+    std::vector<std::string> args;
+    args.reserve(1 + extraArgs.size());
+    args.push_back("-a"); // Include service accounts
+    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
+    return Run<Users>("users", args);
+}

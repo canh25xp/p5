@@ -71,14 +71,3 @@ void Users::run(const std::vector<std::string> &args) {
 
     r.PrintSortedTsv(std::cout);
 }
-
-Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
-    // Use tag protocol by default so OutputStat is called with structured data
-    m_ClientAPI.SetProtocol("tag", "");
-
-    std::vector<std::string> args;
-    args.reserve(1 + extraArgs.size());
-    args.push_back("-a"); // Include service accounts
-    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<Users>("users", args);
-}

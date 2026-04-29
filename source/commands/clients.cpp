@@ -118,16 +118,6 @@ void Clients::run(const std::vector<std::string> &args) {
     }
 }
 
-Clients P5::ListClients(const std::vector<std::string> &extraArgs) {
-    // Use tag protocol by default so OutputStat is called with structured data
-    m_ClientAPI.SetProtocol("tag", "");
-
-    std::vector<std::string> args;
-    args.reserve(extraArgs.size());
-    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<Clients>("clients", args);
-}
-
 void Clients::register_cli(CLI::App &app) {
     auto *sub = app.add_subcommand(name, description);
 
