@@ -37,6 +37,6 @@ public:
 
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
-    Users ListUsers(const std::vector<std::string> &extraArgs = {});
-    Clients ListClients(const std::vector<std::string> &extraArgs = {});
+    Users ListUsers(const std::vector<std::string> &args = {});
+    Clients ListClients(const std::vector<std::string> &args = {});
 };
