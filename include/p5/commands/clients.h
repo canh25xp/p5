@@ -39,14 +39,14 @@ public:
 private:
     bool m_me{false};
     bool m_here{false};
-    bool m_t{false};
-    std::string m_u;
+    bool m_time{false};
+    std::string m_user;
     bool m_userCaseInsensitive{false};
-    std::string m_e;
-    std::string m_E;
-    int m_m{0};
-    std::string m_S;
-    bool m_U{false};
-    bool m_a{false};
-    std::string m_s;
+    std::string m_name;
+    std::string m_Name;
+    int m_limits{0};
+    std::string m_stream;
+    bool m_unloaded{false};
+    bool m_all{false};
+    std::string m_server;
 };
