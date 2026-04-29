@@ -145,9 +145,14 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-ClientUser &P5::Execute(const char *command, std::vector<char *> &argv, ClientUser &user) {
+ClientUser &P5::Execute(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    std::vector<char *> argv;
+    argv.reserve(args.size());
+    for (const auto &arg : args) {
+        argv.push_back(const_cast<char *>(arg.c_str()));
+    }
     m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
-    m_ClientAPI.Run(command, &user);
+    m_ClientAPI.Run(command.c_str(), &user);
     return user;
 }
 
@@ -175,15 +180,8 @@ void P5::RefreshIfNeeded() {
 }
 
 Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
-    std::vector<char *> argv;
-    argv.reserve(args.size());
-    for (const auto &arg : args) {
-        argv.push_back(const_cast<char *>(arg.c_str()));
-    }
-
     Result clientUser;
-    Execute(command.c_str(), argv, clientUser);
-
+    Execute(command.c_str(), args, clientUser);
     return clientUser;
 }
 
@@ -205,22 +203,17 @@ Result P5::Run(const std::string &commandLine) {
 }
 
 template <class T>
-T P5::Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries) {
+T P5::Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries) {
     std::string argsString;
-    for (const std::string &stringArg : stringArguments) {
+    for (const std::string &stringArg : args) {
         argsString = argsString + " " + stringArg;
-    }
-
-    std::vector<char *> argsCharArray;
-    for (const std::string &arg : stringArguments) {
-        argsCharArray.push_back((char *)arg.c_str());
     }
 
     T clientUser;
 
     INFO("Run: p4 " << command << argsString);
 
-    Execute(command, argsCharArray, clientUser);
+    Execute(command, args, clientUser);
 
     int retries = commandRetries;
     while (m_ClientAPI.Dropped() || clientUser.IsError()) {
@@ -241,7 +234,7 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
 
         clientUser = T();
 
-        Execute(command, argsCharArray, clientUser);
+        Execute(command, args, clientUser);
 
         retries--;
     }
@@ -258,5 +251,5 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
 }
 
 // Explicit instantiations
-template Users P5::Run<Users>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Clients P5::Run<Clients>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);

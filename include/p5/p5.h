@@ -18,7 +18,7 @@ class P5 {
     bool Deinitialize();
     bool Reinitialize();
     bool CheckErrors(Error &e, StrBuf &msg);
-    ClientUser &Execute(const char *command, std::vector<char *> &argv, ClientUser &user);
+    ClientUser &Execute(const std::string &command, const std::vector<std::string> &argv, ClientUser &user);
     void RefreshIfNeeded();
     std::string AutoResolve();
 
@@ -26,7 +26,7 @@ class P5 {
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.
 
     template <class T>
-    T Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries = COMMAND_RETRIES);
+    T Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries = COMMAND_RETRIES);
 
 public:
     static bool InitializeLibraries();
