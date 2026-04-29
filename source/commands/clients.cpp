@@ -128,15 +128,60 @@ void Clients::register_cli(CLI::App &app) {
 
     sub->add_flag("--me", m_me, "List clients owned by the current user");
     sub->add_flag("--here", m_here, "List clients on the current host (implies --me)");
-    sub->allow_extras();
+    sub->add_flag("-t", m_t, "Display the time as well as the date");
+    sub->add_option("-u", m_u, "List clients owned by the specified user (supports wildcards)");
+    sub->add_flag("--user-case-insensitive", m_userCaseInsensitive, "Treat the -u user value as a case-insensitive search pattern");
+    sub->add_option("-e", m_e, "List workspaces with names matching the pattern (case-sensitive)");
+    sub->add_option("-E", m_E, "List workspaces with names matching the pattern (case-insensitive)");
+    sub->add_option("-m", m_m, "Limit output to the specified number of workspaces");
+    sub->add_option("-S", m_S, "Limit output to workspaces dedicated to the stream");
+    sub->add_flag("-U", m_U, "List unloaded clients");
+    sub->add_flag("-a", m_a, "Display all clients, not just those bound to this server");
+    sub->add_option("-s", m_s, "Display only clients bound to the specified server ID");
     sub->callback([this, sub]() {
-        std::vector<std::string> extraArgs = sub->remaining();
+        std::vector<std::string> args;
         if (m_here) {
             m_me = true;
         }
         if (m_me) {
-            extraArgs.push_back("--me");
+            args.push_back("--me");
         }
-        this->run(extraArgs);
+        if (m_t) {
+            args.push_back("-t");
+        }
+        if (!m_u.empty()) {
+            args.push_back("-u");
+            args.push_back(m_u);
+        }
+        if (m_userCaseInsensitive) {
+            args.push_back("--user-case-insensitive");
+        }
+        if (!m_e.empty()) {
+            args.push_back("-e");
+            args.push_back(m_e);
+        }
+        if (!m_E.empty()) {
+            args.push_back("-E");
+            args.push_back(m_E);
+        }
+        if (m_m > 0) {
+            args.push_back("-m");
+            args.push_back(std::to_string(m_m));
+        }
+        if (!m_S.empty()) {
+            args.push_back("-S");
+            args.push_back(m_S);
+        }
+        if (m_U) {
+            args.push_back("-U");
+        }
+        if (m_a) {
+            args.push_back("-a");
+        }
+        if (!m_s.empty()) {
+            args.push_back("-s");
+            args.push_back(m_s);
+        }
+        this->run(args);
     });
 }
