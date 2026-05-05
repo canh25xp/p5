@@ -43,6 +43,7 @@ bool P5::Initialize() {
     if (g_options.client().empty() && g_options.resolveClient()) {
         std::string resolved = AutoResolve();
         if (!resolved.empty()) {
+            g_options.client() = resolved;
             m_ClientAPI.SetClient(resolved.c_str());
         }
     }
