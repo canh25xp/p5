@@ -111,7 +111,7 @@ void Clients::PrintSortedTsv(std::ostream &out) const {
 
 void Clients::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
-    Clients r = p5.ListClients(args);
+    Clients r = p5.RunClients(args);
     if (r.IsError())
         throw CLI::RuntimeError(1);
 

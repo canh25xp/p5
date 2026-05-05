@@ -64,7 +64,7 @@ std::string P5::AutoResolve() {
     std::string hostname = ClientResolver::GetCurrentHostname();
 
     // Fetch clients owned by the current user
-    Clients clientsResult = ListClients({"--me"});
+    Clients clientsResult = RunClients({"--me"});
 
     // Filter to clients on the current host
     Clients::ClientMap filtered = ClientResolver::FilterByHost(clientsResult.GetClients(), hostname);
@@ -254,13 +254,13 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 
-Clients P5::ListClients(const std::vector<std::string> &args) {
+Clients P5::RunClients(const std::vector<std::string> &args) {
     // Use tag protocol by default so OutputStat is called with structured data
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Clients>("clients", args);
 }
 
-Users P5::ListUsers(const std::vector<std::string> &args) {
+Users P5::RunUsers(const std::vector<std::string> &args) {
     // Use tag protocol by default so OutputStat is called with structured data
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Users>("users", args);

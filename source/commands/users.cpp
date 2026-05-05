@@ -65,7 +65,7 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 
 void Users::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
-    Users r = p5.ListUsers(args);
+    Users r = p5.RunUsers(args);
     if (r.IsError())
         throw CLI::RuntimeError(1);
 
