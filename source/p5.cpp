@@ -34,13 +34,13 @@ bool P5::Initialize() {
     m_ClientAPI.SetPort(g_options.port().c_str());
     m_ClientAPI.SetUser(g_options.user().c_str());
     m_ClientAPI.SetClient(g_options.client().c_str());
-    for (const auto &proto : g_options.p4Protocol()) {
+    for (const auto &proto : g_options.protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
     }
 
     m_ClientAPI.Init(&e);
 
-    if (g_options.client().empty() && g_options.resolveClient()) {
+    if (g_options.client().empty() && g_options.resolve()) {
         std::string resolved = AutoResolve();
         if (!resolved.empty()) {
             g_options.client() = resolved;
