@@ -15,6 +15,9 @@ public:
     class Enviro *env() const { return m_env.get(); }
     void load_enviro(class Enviro &env) const;
 
+    std::string &port() { return m_port; }
+    std::string &user() { return m_user; }
+    std::string &client() { return m_client; }
     const std::string &port() const { return m_port; }
     const std::string &user() const { return m_user; }
     const std::string &client() const { return m_client; }
