@@ -9,7 +9,7 @@
 
 class P5;
 
-class HaveCollector : public Result {
+class Have : public Result {
 public:
     void OutputStat(StrDict *varList) override;
 

@@ -8,7 +8,7 @@
 
 class P5;
 
-class FstatCollector : public Result {
+class Fstat : public Result {
 public:
     void OutputStat(StrDict *varList) override;
 

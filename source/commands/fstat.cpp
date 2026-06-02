@@ -1,4 +1,4 @@
-#include "commands/fstat_collector.h"
+#include "commands/fstat.h"
 
 #include "p5.h"
 
@@ -41,7 +41,7 @@ bool ParseDigestHex(const char *hex, std::array<uint8_t, 16> &out) {
 
 } // namespace
 
-void FstatCollector::OutputStat(StrDict *varList) {
+void Fstat::OutputStat(StrDict *varList) {
     if (!varList) {
         return;
     }
@@ -91,7 +91,7 @@ void FstatCollector::OutputStat(StrDict *varList) {
     }
 }
 
-DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
+DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
     std::vector<std::string> fstatArgs = {
         "-Rc",
         "-Ol",
@@ -100,11 +100,11 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
     };
     fstatArgs.insert(fstatArgs.end(), paths.begin(), paths.end());
 
-    FstatCollector collector = p5.RunFstat(fstatArgs);
-    collector.state().buildMapping();
+    Fstat fstat = p5.RunFstat(fstatArgs);
+    fstat.state().buildMapping();
 
     std::vector<std::string> staleRefs;
-    for (const auto &record : collector.state().fileRecords) {
+    for (const auto &record : fstat.state().fileRecords) {
         if (record.haveRev && record.headRev && *record.haveRev != *record.headRev) {
             staleRefs.push_back(record.depotFile + "#" + std::to_string(*record.haveRev));
         }
@@ -118,10 +118,10 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
             "depotFile,headType,headAction,fileSize,digest",
         };
         refreshArgs.insert(refreshArgs.end(), staleRefs.begin(), staleRefs.end());
-        FstatCollector refresh = p5.RunFstat(refreshArgs);
+        Fstat refresh = p5.RunFstat(refreshArgs);
 
         for (const auto &refreshed : refresh.state().fileRecords) {
-            if (auto *original = collector.state().getByDepotLower(refreshed.depotFileLower)) {
+            if (auto *original = fstat.state().getByDepotLower(refreshed.depotFileLower)) {
                 if (refreshed.headType) {
                     original->headType = refreshed.headType;
                 }
@@ -138,5 +138,5 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
         }
     }
 
-    return collector.state();
+    return fstat.state();
 }

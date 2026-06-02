@@ -9,8 +9,8 @@
 #include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
-#include "commands/fstat_collector.h"
-#include "commands/have_collector.h"
+#include "commands/fstat.h"
+#include "commands/have.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -49,6 +49,6 @@ public:
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
-    FstatCollector RunFstat(const std::vector<std::string> &args = {});
-    HaveCollector RunHave(const std::vector<std::string> &args = {});
+    Fstat RunFstat(const std::vector<std::string> &args = {});
+    Have RunHave(const std::vector<std::string> &args = {});
 };

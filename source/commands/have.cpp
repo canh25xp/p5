@@ -1,4 +1,4 @@
-#include "commands/have_collector.h"
+#include "commands/have.h"
 
 #include "p5.h"
 
@@ -22,7 +22,7 @@ std::string ToLower(std::string s) {
 
 } // namespace
 
-void HaveCollector::OutputStat(StrDict *varList) {
+void Have::OutputStat(StrDict *varList) {
     if (!varList) {
         return;
     }
@@ -45,7 +45,7 @@ void HaveCollector::OutputStat(StrDict *varList) {
     m_records[ToLower(path->Text())] = rec;
 }
 
-std::unordered_map<std::string, HaveRecord> HaveCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
+std::unordered_map<std::string, HaveRecord> Have::Load(P5 &p5, const std::vector<std::string> &paths) {
     std::vector<std::string> args = paths;
     if (args.empty()) {
         args.push_back("...");

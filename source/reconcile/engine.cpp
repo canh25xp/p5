@@ -4,8 +4,8 @@
 #include "options.h"
 #include "reconcile/batch_p4.h"
 #include "reconcile/digest.h"
-#include "commands/fstat_collector.h"
-#include "commands/have_collector.h"
+#include "commands/fstat.h"
+#include "commands/have.h"
 #include "reconcile/workspace_scan.h"
 
 #include <cstdio>
@@ -50,13 +50,13 @@ AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std:
         fstatPaths.push_back("./...");
     }
 
-    result.depot = FstatCollector::Load(p5, fstatPaths);
+    result.depot = Fstat::Load(p5, fstatPaths);
     DepotState &depot = result.depot;
     WorkspaceState workspace = ScanWorkspace(p5, workDir, opts.skipIgnore);
 
     std::unordered_map<std::string, HaveRecord> haveRecords;
     if (opts.mtimeOptimize) {
-        haveRecords = HaveCollector::Load(p5, fstatPaths);
+        haveRecords = Have::Load(p5, fstatPaths);
     }
 
     std::vector<std::string> doAdd;
