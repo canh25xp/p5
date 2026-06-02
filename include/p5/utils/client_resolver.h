@@ -13,16 +13,6 @@ class ClientResolver {
 public:
     /// Attempt to resolve a client name for the given working directory.
     /// Returns empty string if no match is found.
-    // WARN: this call p4 clients with "tag" protocol before any other commands.
-    // Result in every commands afterward force running with protocol tag (Ugly output if the commands not yet defined Output for Result)
-    // TODO: Solutions:
-    // - Reset protocol after done. Not possible since SetProtocol() must happen _before_ the Init() hence cannot be changed afterward.
-    // - Set protocol tags by default and accept breaking compatibility with p4
-    // - Set protocol by default and define output for all p4 commands. Costly but doable.
-    // - Run AutoResolveClient in a separate p5 instance.
-    // - Use a transient ClientApi instance within AutoResolveClient to avoid polluting the main instance.
-    // - Move auto-resolution to a pre-initialization step before m_ClientAPI.Init() is called.
-    // - Implement a smart Result handler that can format tagged output back to plain text for generic commands.
     static std::string Resolve(const std::string &cwd, const Clients::ClientMap &clients);
 
     /// Get the current working directory using p4api's HostEnv.
