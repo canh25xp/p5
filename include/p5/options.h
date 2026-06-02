@@ -15,11 +15,16 @@ public:
     class Enviro *env() const { return m_env.get(); }
     void load_enviro(class Enviro &env) const;
 
+    std::string &port() { return m_port; }
+    std::string &user() { return m_user; }
+    std::string &client() { return m_client; }
+    bool &resolve() { return m_resolve_client; }
+    std::vector<std::pair<std::string, std::string>> &protocol() { return m_p4_protocol; }
     const std::string &port() const { return m_port; }
     const std::string &user() const { return m_user; }
     const std::string &client() const { return m_client; }
-    bool resolveClient() const { return m_resolve_client; }
-    const std::vector<std::pair<std::string, std::string>> &p4Protocol() const { return m_p4_protocol; }
+    bool resolve() const { return m_resolve_client; }
+    const std::vector<std::pair<std::string, std::string>> &protocol() const { return m_p4_protocol; }
 
 private:
     std::unique_ptr<class Enviro> m_env;

@@ -34,17 +34,19 @@ bool P5::Initialize() {
     m_ClientAPI.SetPort(g_options.port().c_str());
     m_ClientAPI.SetUser(g_options.user().c_str());
     m_ClientAPI.SetClient(g_options.client().c_str());
-    for (const auto &proto : g_options.p4Protocol()) {
+    for (const auto &proto : g_options.protocol()) {
         m_ClientAPI.SetProtocol(proto.first.c_str(), proto.second.c_str());
-    }
-    if (g_options.client().empty() && g_options.resolveClient()) {
-        std::string resolved = ClientResolver::AutoResolve(g_options.port(), g_options.user());
-        if (!resolved.empty()) {
-            m_ClientAPI.SetClient(resolved.c_str());
-        }
     }
 
     m_ClientAPI.Init(&e);
+
+    if (g_options.client().empty() && g_options.resolve()) {
+        std::string resolved = AutoResolve();
+        if (!resolved.empty()) {
+            g_options.client() = resolved;
+            m_ClientAPI.SetClient(resolved.c_str());
+        }
+    }
 
     if (!CheckErrors(e, msg)) {
         ERROR("Could not initialize Helix Core C/C++ API");
@@ -52,6 +54,41 @@ bool P5::Initialize() {
     }
 
     return true;
+}
+
+std::string P5::AutoResolve() {
+    std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
+    if (cwd.empty()) {
+        WARN("Auto-resolve: could not determine current working directory");
+    }
+
+    std::string hostname = ClientResolver::GetCurrentHostname();
+
+    // Fetch clients owned by the current user
+    Clients clientsResult = RunClients({"--me"});
+
+    // Filter to clients on the current host
+    Clients::ClientMap filtered = ClientResolver::FilterByHost(clientsResult.GetClients(), hostname);
+
+    if (filtered.empty()) {
+        INFO("Auto-resolve: no clients found for user " << g_options.user() << " on host " << hostname);
+        return {};
+    }
+
+    // Resolve the best-matching client based on CWD
+    std::string resolved = ClientResolver::Resolve(cwd, filtered);
+    if (resolved.empty()) {
+        INFO("Auto-resolve: no client root matches CWD " << cwd);
+        return {};
+    }
+
+    INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
+
+    const char *configPathCstr = m_ClientAPI.GetConfig().Text();
+    std::string configPath = configPathCstr ? configPathCstr : "";
+    ClientResolver::WriteClientToConfig(configPath, resolved);
+
+    return resolved;
 }
 
 bool P5::Deinitialize() {
@@ -116,12 +153,43 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-Result P5::Run(const char *command, int argumentCount, char **arguments) {
+ClientUser &P5::Execute(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    std::vector<char *> argv;
+    argv.reserve(args.size());
+    for (const auto &arg : args) {
+        argv.push_back(const_cast<char *>(arg.c_str()));
+    }
+    m_ClientAPI.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
+    m_ClientAPI.Run(command.c_str(), &user);
+    return user;
+}
+
+void P5::RefreshIfNeeded() {
+    m_Usage++;
+    if (m_Usage <= COMMAND_REFRESH_THRESHOLD) {
+        return;
+    }
+
+    int refreshRetries = COMMAND_RETRIES;
+    while (refreshRetries-- > 0) {
+        WARN("Trying to refresh the connection due to age (" << m_Usage << " > " << COMMAND_REFRESH_THRESHOLD << ").");
+        if (Reinitialize()) {
+            INFO("Connection was refreshed");
+            m_Usage = 0;
+            return;
+        }
+
+        ERROR("Could not refresh connection due to old age. Retrying in 5 seconds");
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+
+    ERROR("Could not refresh the connection after " << COMMAND_RETRIES << " retries. Exiting.");
+    std::exit(1);
+}
+
+Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
     Result clientUser;
-
-    m_ClientAPI.SetArgv(argumentCount, arguments);
-    m_ClientAPI.Run(command, &clientUser);
-
+    Execute(command.c_str(), args, clientUser);
     return clientUser;
 }
 
@@ -139,42 +207,24 @@ Result P5::Run(const std::string &commandLine) {
     // Remaining tokens are arguments
     std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
-    // Build argv (must stay alive during Run)
-    std::vector<const char *> argv;
-
-    argv.reserve(args.size());
-
-    for (std::string &arg : args) {
-        argv.push_back(arg.c_str()); // safe: std::string owns memory
-    }
-
-    return Run(command.c_str(), static_cast<int>(argv.size()), const_cast<char **>(argv.data()));
+    return Run(command, args);
 }
 
 template <class T>
-T P5::Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries) {
+T P5::Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries) {
     std::string argsString;
-    for (const std::string &stringArg : stringArguments) {
+    for (const std::string &stringArg : args) {
         argsString = argsString + " " + stringArg;
-    }
-
-    std::vector<char *> argsCharArray;
-    for (const std::string &arg : stringArguments) {
-        argsCharArray.push_back((char *)arg.c_str());
     }
 
     T clientUser;
 
-    INFO("p4 command: " << command);
-    for (const auto &arg : stringArguments) {
-        INFO("arguments: " << arg);
-    }
+    INFO("Run: p4 " << command << argsString);
 
-    m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-    m_ClientAPI.Run(command, &clientUser);
+    Execute(command, args, clientUser);
 
     int retries = commandRetries;
-    while (m_ClientAPI.Dropped() || clientUser.GetError().IsError()) {
+    while (m_ClientAPI.Dropped() || clientUser.IsError()) {
         if (retries == 0) {
             break;
         }
@@ -192,42 +242,32 @@ T P5::Run(const char *command, const std::vector<std::string> &stringArguments, 
 
         clientUser = T();
 
-        m_ClientAPI.SetArgv(argsCharArray.size(), argsCharArray.data());
-        m_ClientAPI.Run(command, &clientUser);
+        Execute(command, args, clientUser);
 
         retries--;
     }
 
-    if (m_ClientAPI.Dropped() || clientUser.GetError().IsFatal()) {
+    if (m_ClientAPI.Dropped() || clientUser.IsFatal()) {
         ERROR("Exiting due to receiving errors even after retrying " << COMMAND_RETRIES << " times");
         Deinitialize();
         std::exit(1);
     }
 
-    m_Usage++;
-    if (m_Usage > COMMAND_REFRESH_THRESHOLD) {
-        int refreshRetries = COMMAND_RETRIES;
-        while (refreshRetries > 0) {
-            WARN("Trying to refresh the connection due to age (" << m_Usage << " > " << COMMAND_REFRESH_THRESHOLD << ").");
-            if (Reinitialize()) {
-                INFO("Connection was refreshed");
-                break;
-            }
-            ERROR("Could not refresh connection due to old age. Retrying in 5 seconds");
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-
-            refreshRetries--;
-        }
-
-        if (refreshRetries == 0) {
-            ERROR("Could not refresh the connection after " << COMMAND_RETRIES << " retries. Exiting.");
-            std::exit(1);
-        }
-    }
+    RefreshIfNeeded();
 
     return clientUser;
 }
 
 // Explicit instantiations
-template Users P5::Run<Users>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Clients P5::Run<Clients>(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+
+Clients P5::RunClients(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Clients>("clients", args);
+}
+
+Users P5::RunUsers(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Users>("users", args);
+}

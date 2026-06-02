@@ -1,5 +1,6 @@
 #include <CLI/CLI.hpp>
 
+#include "commands.h"
 #include "p5.h"
 
 #include <p4/clientapi.h>
@@ -63,29 +64,10 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 }
 
 void Users::run(const std::vector<std::string> &args) {
-    bool printDone = false;
-    {
-        P5 p5;
-        Users r = p5.ListUsers(args);
-        // Result::IsError() returns true when there is no client-side error.
-        if (r.IsError()) {
-            r.PrintSortedTsv(std::cout);
-            printDone = true;
-        }
-    }
-
-    if (!printDone) {
+    P5 &p5 = m_commands->p5();
+    Users r = p5.RunUsers(args);
+    if (r.IsError())
         throw CLI::RuntimeError(1);
-    }
-}
 
-Users P5::ListUsers(const std::vector<std::string> &extraArgs) {
-    // Use tag protocol by default so OutputStat is called with structured data
-    m_ClientAPI.SetProtocol("tag", "");
-
-    std::vector<std::string> args;
-    args.reserve(1 + extraArgs.size());
-    args.push_back("-a"); // Include service accounts
-    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<Users>("users", args);
+    r.PrintSortedTsv(std::cout);
 }

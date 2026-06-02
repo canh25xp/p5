@@ -1,6 +1,7 @@
 #include <CLI/CLI.hpp>
 
 #include "commands/clients.h"
+#include "commands.h"
 #include "utils/client_resolver.h"
 #include "p5.h"
 
@@ -33,6 +34,11 @@ void Clients::OutputStat(StrDict *varList) {
     StrPtr *hostPtr = varList->GetVar("Host");
     if (hostPtr) {
         clientData.host = hostPtr->Text();
+    }
+
+    StrPtr *ownerPtr = varList->GetVar("Owner");
+    if (ownerPtr) {
+        clientData.owner = ownerPtr->Text();
     }
 
     StrPtr *descPtr = varList->GetVar("Description");
@@ -78,60 +84,52 @@ void Clients::PrintFormatted(std::ostream &out) const {
     }
 }
 
-void Clients::run(const std::vector<std::string> &args) {
-    bool printDone = false;
-    {
-        P5 p5;
-        Clients r = p5.ListClients(args);
-        if (r.IsError()) {
-            ClientMap toPrint = r.GetClients();
+void Clients::PrintSortedTsv(std::ostream &out) const {
+    std::vector<ClientName> names;
+    names.reserve(m_Clients.size());
+    for (const auto &entry : m_Clients) {
+        names.push_back(entry.first);
+    }
+    std::sort(names.begin(), names.end());
 
-            // When --here is set, filter results to only clients on the current host
-            if (m_here) {
-                std::string hostname = ClientResolver::GetCurrentHostname();
-                toPrint = ClientResolver::FilterByHost(toPrint, hostname);
-            }
-
-            // Sort and print
-            std::vector<ClientName> names;
-            names.reserve(toPrint.size());
-            for (const auto &entry : toPrint) {
-                names.push_back(entry.first);
-            }
-            std::sort(names.begin(), names.end());
-
-            for (const ClientName &name : names) {
-                const ClientData &data = toPrint.at(name);
-                PRINT(name);
-                PRINT("  root " << data.root);
-                if (!data.host.empty()) {
-                    PRINT("  host " << data.host);
-                }
-                if (!data.description.empty()) {
-                    PRINT("  " << data.description);
-                }
-                for (const auto &alt : data.altRoots) {
-                    PRINT("  altRoot " << alt);
-                }
-                PRINT("");
-            }
-            printDone = true;
-        }
+    // Compute column widths
+    size_t maxNameWidth = 0;
+    size_t maxRootWidth = 0;
+    for (const ClientName &name : names) {
+        const ClientData &data = m_Clients.at(name);
+        maxNameWidth = std::max(maxNameWidth, name.size());
+        maxRootWidth = std::max(maxRootWidth, data.root.size());
     }
 
-    if (!printDone) {
-        throw CLI::RuntimeError(1);
+    for (const ClientName &name : names) {
+        const ClientData &data = m_Clients.at(name);
+        out << "Client " << name << std::string(maxNameWidth - name.size() + 2, ' ')
+            << data.root << std::string(maxRootWidth - data.root.size() + 2, ' ')
+            << data.owner << '\n';
     }
 }
 
-Clients P5::ListClients(const std::vector<std::string> &extraArgs) {
-    // Use tag protocol by default so OutputStat is called with structured data
-    m_ClientAPI.SetProtocol("tag", "");
+void Clients::run(const std::vector<std::string> &args) {
+    P5 &p5 = m_commands->p5();
+    Clients r = p5.RunClients(args);
+    if (r.IsError())
+        throw CLI::RuntimeError(1);
 
-    std::vector<std::string> args;
-    args.reserve(extraArgs.size());
-    args.insert(args.end(), extraArgs.begin(), extraArgs.end());
-    return Run<Clients>("clients", args);
+    ClientMap toPrint = r.GetClients();
+
+    // When --here is set, filter results to only clients on the current host
+    if (m_here) {
+        std::string hostname = ClientResolver::GetCurrentHostname();
+        toPrint = ClientResolver::FilterByHost(toPrint, hostname);
+    }
+
+    // Sort and print
+    if (m_here) {
+        // For filtered results, we need to print the filtered map
+        // Rebuild m_Clients with filtered data and print
+        r.m_Clients = std::move(toPrint);
+    }
+    r.PrintSortedTsv(std::cout);
 }
 
 void Clients::register_cli(CLI::App &app) {
@@ -144,15 +142,60 @@ void Clients::register_cli(CLI::App &app) {
 
     sub->add_flag("--me", m_me, "List clients owned by the current user");
     sub->add_flag("--here", m_here, "List clients on the current host (implies --me)");
-    sub->allow_extras();
+    sub->add_flag("-t,--time", m_time, "Display the time as well as the date");
+    sub->add_option("-u,--user", m_user, "List clients owned by the specified user (supports wildcards)");
+    sub->add_flag("--user-case-insensitive", m_userCaseInsensitive, "Treat the -u user value as a case-insensitive search pattern");
+    sub->add_option("-e,--name", m_name, "List workspaces with names matching the pattern (case-sensitive)");
+    sub->add_option("-E,--name-ignore-case", m_Name, "List workspaces with names matching the pattern (case-insensitive)");
+    sub->add_option("-m,--max", m_max, "Limit output to the specified number of workspaces");
+    sub->add_option("-S,--stream", m_stream, "Limit output to workspaces dedicated to the stream");
+    sub->add_flag("-U,--unloaded", m_unloaded, "List unloaded clients");
+    sub->add_flag("-a,--all", m_all, "Display all clients, not just those bound to this server");
+    sub->add_option("-s,--server", m_server, "Display only clients bound to the specified server ID");
     sub->callback([this, sub]() {
-        std::vector<std::string> extraArgs = sub->remaining();
+        std::vector<std::string> args;
         if (m_here) {
             m_me = true;
         }
         if (m_me) {
-            extraArgs.push_back("--me");
+            args.push_back("--me");
         }
-        this->run(extraArgs);
+        if (m_time) {
+            args.push_back("-t");
+        }
+        if (!m_user.empty()) {
+            args.push_back("-u");
+            args.push_back(m_user);
+        }
+        if (m_userCaseInsensitive) {
+            args.push_back("--user-case-insensitive");
+        }
+        if (!m_name.empty()) {
+            args.push_back("-e");
+            args.push_back(m_name);
+        }
+        if (!m_Name.empty()) {
+            args.push_back("-E");
+            args.push_back(m_Name);
+        }
+        if (m_max > 0) {
+            args.push_back("-m");
+            args.push_back(std::to_string(m_max));
+        }
+        if (!m_stream.empty()) {
+            args.push_back("-S");
+            args.push_back(m_stream);
+        }
+        if (m_unloaded) {
+            args.push_back("-U");
+        }
+        if (m_all) {
+            args.push_back("-a");
+        }
+        if (!m_server.empty()) {
+            args.push_back("-s");
+            args.push_back(m_server);
+        }
+        this->run(args);
     });
 }

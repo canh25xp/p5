@@ -2,6 +2,10 @@
 #include "p5.h"
 #include "log.h"
 
+Commands::Commands() = default;
+
+Commands::~Commands() = default;
+
 void Commands::add(const char *name, const char *description, void (*run)(const std::vector<std::string> &), std::vector<const char *> aliases) {
     std::vector<std::string> aliases_str;
     for (const char *alias : aliases) {
@@ -33,35 +37,37 @@ void Commands::add(std::vector<const char *> commands, const char *description) 
 
 void Commands::clear() {
     m_entries.clear();
+    m_p5.reset();
 }
 
 void Commands::install(CLI::App &app) const {
     for (const auto &e : m_entries) {
+        e->set_commands(const_cast<Commands *>(this));
         e->register_cli(app);
     }
 }
 
+P5 &Commands::p5() {
+    if (!m_p5) {
+        m_p5 = std::make_unique<P5>();
+    }
+    return *m_p5;
+}
+
 void Commands::run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
-    P5 p5;
+    P5 &p5 = this->p5();
 
-    INFO("p4 command passthrough: " << command);
-    for (const auto &arg : args) {
-        INFO("arguments: " << arg);
-    }
+    std::string argsString;
+    for (const std::string &stringArg : args)
+        argsString = argsString + " " + stringArg;
+    INFO("Run passthrough: p4 " << command << argsString);
 
-    std::vector<char *> argv_array;
-    argv_array.reserve(args.size());
-    for (const auto &arg : args) {
-        argv_array.push_back(const_cast<char *>(arg.c_str()));
-    }
-
-    char **argv_ptr = argv_array.empty() ? nullptr : argv_array.data();
-    p5.Run(command, static_cast<int>(args.size()), argv_ptr);
+    p5.Run(std::string(command), args);
 }
 
 void Command::run(const std::vector<std::string> &args) {
     if (passthrough) {
-        Commands::run_p4_passthrough(name.c_str(), args);
+        m_commands->run_p4_passthrough(name.c_str(), args);
     } else if (fn) {
         fn(args);
     }

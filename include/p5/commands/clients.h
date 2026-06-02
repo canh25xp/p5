@@ -14,13 +14,14 @@ public:
     struct ClientData {
         std::string root;
         std::string host;
+        std::string owner;
         std::string description;
         std::vector<std::string> altRoots;
     };
 
     using ClientMap = std::unordered_map<ClientName, ClientData>;
 
-    Clients() : Command("clients", "Display list of known clients (p5 formatted output)", {"workspaces"}) {}
+    Clients() : Command("clients", "Display list of clients", {"workspaces"}) {}
 
 private:
     ClientMap m_Clients;
@@ -33,10 +34,23 @@ public:
     /// One block per client, sorted by client name.
     void PrintFormatted(std::ostream &out) const;
 
+    /// Single-line per client with column alignment, sorted by client name.
+    void PrintSortedTsv(std::ostream &out) const;
+
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
 
 private:
     bool m_me{false};
     bool m_here{false};
+    bool m_time{false};
+    std::string m_user;
+    bool m_userCaseInsensitive{false};
+    std::string m_name;
+    std::string m_Name;
+    int m_max{0};
+    std::string m_stream;
+    bool m_unloaded{false};
+    bool m_all{false};
+    std::string m_server;
 };
