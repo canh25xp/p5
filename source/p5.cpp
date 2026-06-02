@@ -266,6 +266,7 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 // Explicit instantiations
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 
 Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
     ClientApi api;
@@ -313,4 +314,9 @@ Clients P5::RunClients(const std::vector<std::string> &args) {
 Users P5::RunUsers(const std::vector<std::string> &args) {
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Users>("users", args);
+}
+
+Changes P5::RunChanges(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Changes>("changes", args);
 }

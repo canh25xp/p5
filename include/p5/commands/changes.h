@@ -2,12 +2,36 @@
 
 #include "command.h"
 
+#include <iosfwd>
 #include <string>
 #include <vector>
 
 class Changes : public Command {
 public:
+    using ChangeNumber = int;
+
+    struct ChangeData {
+        std::string time;
+        std::string user;
+        std::string client;
+        std::string status;
+        std::string description;
+    };
+
     Changes() : Command("changes", "Display list of pending and submitted changelists", {"changelists"}) {}
+
+private:
+    std::vector<ChangeNumber> m_order;
+    std::vector<ChangeData> m_changes;
+
+public:
+    void OutputStat(StrDict *varList) override;
+
+    /// One row per changelist with aligned columns (default p5 output).
+    void PrintSortedTable(std::ostream &out, bool includeTime, bool truncateDescription, bool reverse) const;
+
+    /// Block format with full description (used when -l is set).
+    void PrintFormatted(std::ostream &out, bool includeTime, bool reverse) const;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
