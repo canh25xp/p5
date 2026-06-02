@@ -2,6 +2,7 @@
 
 #include "commands.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 
@@ -64,6 +65,7 @@ void Users::PrintSortedTsv(std::ostream &out) const {
 }
 
 void Users::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     P5 &p5 = m_commands->p5();
     Users r = p5.RunUsers(args);
     if (r.IsError())

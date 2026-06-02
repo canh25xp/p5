@@ -20,10 +20,12 @@ public:
     std::string &client() { return m_client; }
     bool &resolve() { return m_resolve_client; }
     std::vector<std::pair<std::string, std::string>> &protocol() { return m_p4_protocol; }
+    void set_command(const std::string &command) { m_command = command; }
     const std::string &port() const { return m_port; }
     const std::string &user() const { return m_user; }
     const std::string &client() const { return m_client; }
     bool resolve() const { return m_resolve_client; }
+    const std::string &command() const { return m_command; }
     const std::vector<std::pair<std::string, std::string>> &protocol() const { return m_p4_protocol; }
 
 private:
@@ -31,6 +33,7 @@ private:
     std::string m_user;
     std::string m_port;
     std::string m_client;
+    std::string m_command;
     bool m_resolve_client{true};
     /// Each `-z` argument: `name` or `name=value` (Helix protocol variable).
     std::vector<std::string> m_protocol_z;
