@@ -45,6 +45,7 @@ private:
     bool m_longTrunc{false};
     bool m_force{false};
     bool m_reverse{false};
+    bool m_me{false};
     std::vector<std::string> m_client;
     bool m_clientCaseInsensitive{false};
     int m_afterChange{0};
