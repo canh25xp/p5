@@ -96,7 +96,7 @@ Clients::ClientMap ClientResolver::FilterByHost(const Clients::ClientMap &client
     return result;
 }
 
-static void WriteClientToConfig(const std::string &configPath, const std::string &resolved) {
+void ClientResolver::WriteClientToConfig(const std::string &configPath, const std::string &resolved) {
     if (configPath.empty() || configPath == "noconfig") {
         return;
     }

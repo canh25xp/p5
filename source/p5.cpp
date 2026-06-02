@@ -83,6 +83,11 @@ std::string P5::AutoResolve() {
     }
 
     INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
+
+    const char *configPathCstr = m_ClientAPI.GetConfig().Text();
+    std::string configPath = configPathCstr ? configPathCstr : "";
+    ClientResolver::WriteClientToConfig(configPath, resolved);
+
     return resolved;
 }
 

@@ -25,4 +25,7 @@ public:
     /// A client with an empty host field is considered to match any host
     /// (some clients like Swarm clients have no host set).
     static Clients::ClientMap FilterByHost(const Clients::ClientMap &clients, const std::string &host);
+
+    /// Update P4CLIENT in the P4CONFIG file at configPath, if the file exists.
+    static void WriteClientToConfig(const std::string &configPath, const std::string &resolved);
 };
