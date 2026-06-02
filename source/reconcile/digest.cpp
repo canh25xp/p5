@@ -1,6 +1,6 @@
 #include "reconcile/digest.h"
 
-#include <openssl/md5.h>
+#include <openssl/evp.h>
 
 #include <algorithm>
 #include <atomic>
@@ -25,15 +25,53 @@ std::string CachePath(const std::string &clientName) {
     return base + "/.cache/p5/digests_" + clientName + ".bin";
 }
 
-void UpdateTextDigest(std::istream &input, MD5_CTX &ctx) {
+class Md5Context {
+public:
+    Md5Context() {
+        ctx_ = EVP_MD_CTX_new();
+        if (ctx_) {
+            EVP_DigestInit_ex(ctx_, EVP_md5(), nullptr);
+        }
+    }
+
+    ~Md5Context() {
+        if (ctx_) {
+            EVP_MD_CTX_free(ctx_);
+        }
+    }
+
+    Md5Context(const Md5Context &) = delete;
+    Md5Context &operator=(const Md5Context &) = delete;
+
+    bool ok() const { return ctx_ != nullptr; }
+
+    void update(const void *data, size_t len) {
+        if (ctx_) {
+            EVP_DigestUpdate(ctx_, data, len);
+        }
+    }
+
+    bool final(std::array<uint8_t, 16> &out) {
+        if (!ctx_) {
+            return false;
+        }
+        unsigned int len = 0;
+        return EVP_DigestFinal_ex(ctx_, out.data(), &len) == 1 && len == out.size();
+    }
+
+private:
+    EVP_MD_CTX *ctx_ = nullptr;
+};
+
+void UpdateTextDigest(std::istream &input, Md5Context &ctx) {
     std::string line;
     while (std::getline(input, line)) {
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        MD5_Update(&ctx, line.data(), line.size());
+        ctx.update(line.data(), line.size());
         const char nl = '\n';
-        MD5_Update(&ctx, &nl, 1);
+        ctx.update(&nl, 1);
     }
 }
 
@@ -65,8 +103,10 @@ bool IsUnchangedSinceSync(const WorkspaceFile &file, const std::unordered_map<st
 }
 
 std::array<uint8_t, 16> ComputeDigest(const WorkspaceFile &file, DigestType type) {
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
+    Md5Context ctx;
+    if (!ctx.ok()) {
+        return {};
+    }
 
     std::ifstream in(file.path, std::ios::binary);
     if (!in) {
@@ -79,7 +119,7 @@ std::array<uint8_t, 16> ComputeDigest(const WorkspaceFile &file, DigestType type
             in.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
             const auto got = in.gcount();
             if (got > 0) {
-                MD5_Update(&ctx, buffer.data(), static_cast<size_t>(got));
+                ctx.update(buffer.data(), static_cast<size_t>(got));
             }
         }
     } else {
@@ -87,7 +127,9 @@ std::array<uint8_t, 16> ComputeDigest(const WorkspaceFile &file, DigestType type
     }
 
     std::array<uint8_t, 16> out{};
-    MD5_Final(out.data(), &ctx);
+    if (!ctx.final(out)) {
+        return {};
+    }
     return out;
 }
 
