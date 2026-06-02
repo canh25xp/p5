@@ -8,7 +8,7 @@
 #include <p4/clientapi.h>
 
 #include "log.h"
-#include "utils/text_width.h"
+#include "utils/tabular_renderer.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -108,54 +108,20 @@ void Changes::PrintSortedTable(std::ostream &out, bool includeTime, bool truncat
         });
     }
 
-    size_t maxChangeWidth = 6;
-    size_t maxDateWidth = 4;
-    size_t maxUserWidth = 4;
-    size_t maxClientWidth = 6;
-    size_t maxStatusWidth = 6;
-    size_t maxDescWidth = 11;
-
-    std::vector<std::string> dates;
-    dates.reserve(indices.size());
+    std::vector<std::vector<std::string>> rows;
+    rows.reserve(indices.size());
     for (size_t idx : indices) {
         const ChangeData &data = m_changes[idx];
         std::string date = FormatChangeTime(data.time, includeTime);
-        dates.push_back(date);
-
-        std::string changeStr = std::to_string(m_order[idx]);
-        maxChangeWidth = std::max(maxChangeWidth, p5::DisplayWidth(changeStr));
-        maxDateWidth = std::max(maxDateWidth, p5::DisplayWidth(date));
-        maxUserWidth = std::max(maxUserWidth, p5::DisplayWidth(data.user));
-        maxClientWidth = std::max(maxClientWidth, p5::DisplayWidth(data.client));
-        maxStatusWidth = std::max(maxStatusWidth, p5::DisplayWidth(data.status));
-
         std::string desc = data.description;
         if (truncateDescription) {
             TruncateDescription(desc, 250);
         }
-        maxDescWidth = std::max(maxDescWidth, p5::DisplayWidth(desc));
+        rows.push_back({std::to_string(m_order[idx]), date, data.user, data.client, data.status, desc});
     }
 
-    auto pad = [](size_t width, const std::string &text) {
-        return std::string(width - p5::DisplayWidth(text) + 2, ' ');
-    };
-
-    out << "Change" << pad(maxChangeWidth, "Change") << "Date" << pad(maxDateWidth, "Date") << "User" << pad(maxUserWidth, "User")
-        << "Client" << pad(maxClientWidth, "Client") << "Status" << pad(maxStatusWidth, "Status") << "Description" << '\n';
-
-    for (size_t i = 0; i < indices.size(); ++i) {
-        const size_t idx = indices[i];
-        const ChangeData &data = m_changes[idx];
-        std::string changeStr = std::to_string(m_order[idx]);
-        std::string desc = data.description;
-        if (truncateDescription) {
-            TruncateDescription(desc, 250);
-        }
-
-        out << changeStr << pad(maxChangeWidth, changeStr) << dates[i] << pad(maxDateWidth, dates[i]) << data.user
-            << pad(maxUserWidth, data.user) << data.client << pad(maxClientWidth, data.client) << data.status
-            << pad(maxStatusWidth, data.status) << desc << '\n';
-    }
+    const std::vector<std::string> headers = {"Change", "Date", "User", "Client", "Status", "Description"};
+    p5::PrintTable(out, headers, rows);
 }
 
 void Changes::PrintFormatted(std::ostream &out, bool includeTime, bool reverse) const {

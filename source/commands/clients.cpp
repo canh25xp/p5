@@ -10,7 +10,7 @@
 #include <p4/hostenv.h>
 
 #include "log.h"
-#include "utils/text_width.h"
+#include "utils/tabular_renderer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -87,6 +87,10 @@ void Clients::PrintFormatted(std::ostream &out) const {
 }
 
 void Clients::PrintSortedTsv(std::ostream &out) const {
+    if (m_Clients.empty()) {
+        return;
+    }
+
     std::vector<ClientName> names;
     names.reserve(m_Clients.size());
     for (const auto &entry : m_Clients) {
@@ -94,21 +98,15 @@ void Clients::PrintSortedTsv(std::ostream &out) const {
     }
     std::sort(names.begin(), names.end());
 
-    // Compute column widths
-    size_t maxNameWidth = 0;
-    size_t maxRootWidth = 0;
+    std::vector<std::vector<std::string>> rows;
+    rows.reserve(names.size());
     for (const ClientName &name : names) {
         const ClientData &data = m_Clients.at(name);
-        maxNameWidth = std::max(maxNameWidth, p5::DisplayWidth(name));
-        maxRootWidth = std::max(maxRootWidth, p5::DisplayWidth(data.root));
+        rows.push_back({name, data.root, data.owner});
     }
 
-    for (const ClientName &name : names) {
-        const ClientData &data = m_Clients.at(name);
-        out << "Client " << name << std::string(maxNameWidth - p5::DisplayWidth(name) + 2, ' ')
-            << data.root << std::string(maxRootWidth - p5::DisplayWidth(data.root) + 2, ' ')
-            << data.owner << '\n';
-    }
+    const std::vector<std::string> headers = {"Client", "Root", "Owner"};
+    p5::PrintTable(out, headers, rows);
 }
 
 void Clients::run(const std::vector<std::string> &args) {
