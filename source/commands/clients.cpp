@@ -10,6 +10,7 @@
 #include <p4/hostenv.h>
 
 #include "log.h"
+#include "utils/text_width.h"
 
 #include <algorithm>
 #include <iostream>
@@ -98,14 +99,14 @@ void Clients::PrintSortedTsv(std::ostream &out) const {
     size_t maxRootWidth = 0;
     for (const ClientName &name : names) {
         const ClientData &data = m_Clients.at(name);
-        maxNameWidth = std::max(maxNameWidth, name.size());
-        maxRootWidth = std::max(maxRootWidth, data.root.size());
+        maxNameWidth = std::max(maxNameWidth, p5::DisplayWidth(name));
+        maxRootWidth = std::max(maxRootWidth, p5::DisplayWidth(data.root));
     }
 
     for (const ClientName &name : names) {
         const ClientData &data = m_Clients.at(name);
-        out << "Client " << name << std::string(maxNameWidth - name.size() + 2, ' ')
-            << data.root << std::string(maxRootWidth - data.root.size() + 2, ' ')
+        out << "Client " << name << std::string(maxNameWidth - p5::DisplayWidth(name) + 2, ' ')
+            << data.root << std::string(maxRootWidth - p5::DisplayWidth(data.root) + 2, ' ')
             << data.owner << '\n';
     }
 }
