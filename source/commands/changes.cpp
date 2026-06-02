@@ -226,8 +226,7 @@ std::vector<std::string> Changes::buildP4Args(const std::vector<std::string> &fi
         args.push_back(m_status);
     }
     if (m_me) {
-        args.push_back("-u");
-        args.push_back(g_options.user());
+        args.push_back("--me");
     }
     for (const std::string &user : m_user) {
         args.push_back("-u");
