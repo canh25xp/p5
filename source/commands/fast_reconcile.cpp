@@ -58,7 +58,6 @@ void FastReconcile::run(const std::vector<std::string> &args) {
     }
 
     P5 &p5 = m_commands->p5();
-    p5.SetTagProtocol();
 
     const bool anyRestrict = m_flagEdit || m_flagAdd || m_flagDelete;
     reconcile::ReconcileOptions opts;

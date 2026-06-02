@@ -51,9 +51,7 @@ std::unordered_map<std::string, HaveRecord> HaveCollector::Load(P5 &p5, const st
         args.push_back("...");
     }
 
-    HaveCollector collector;
-    p5.RunWithUser("have", args, collector);
-    return collector.m_records;
+    return p5.RunHave(args).records();
 }
 
 } // namespace reconcile

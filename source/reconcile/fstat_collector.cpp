@@ -97,19 +97,17 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
     };
     fstatArgs.insert(fstatArgs.end(), paths.begin(), paths.end());
 
-    FstatCollector collector;
-    p5.RunWithUser("fstat", fstatArgs, collector);
-    collector.m_state.buildMapping();
+    FstatCollector collector = p5.RunFstat(fstatArgs);
+    collector.state().buildMapping();
 
     std::vector<std::string> staleRefs;
-    for (const auto &record : collector.m_state.fileRecords) {
+    for (const auto &record : collector.state().fileRecords) {
         if (record.haveRev && record.headRev && *record.haveRev != *record.headRev) {
             staleRefs.push_back(record.depotFile + "#" + std::to_string(*record.haveRev));
         }
     }
 
     if (!staleRefs.empty()) {
-        FstatCollector refresh;
         std::vector<std::string> refreshArgs = {
             "-Rc",
             "-Ol",
@@ -117,10 +115,10 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
             "depotFile,headType,headAction,fileSize,digest",
         };
         refreshArgs.insert(refreshArgs.end(), staleRefs.begin(), staleRefs.end());
-        p5.RunWithUser("fstat", refreshArgs, refresh);
+        FstatCollector refresh = p5.RunFstat(refreshArgs);
 
-        for (const auto &refreshed : refresh.m_state.fileRecords) {
-            if (auto *original = collector.m_state.getByDepotLower(refreshed.depotFileLower)) {
+        for (const auto &refreshed : refresh.state().fileRecords) {
+            if (auto *original = collector.state().getByDepotLower(refreshed.depotFileLower)) {
                 if (refreshed.headType) {
                     original->headType = refreshed.headType;
                 }
@@ -137,7 +135,7 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
         }
     }
 
-    return collector.m_state;
+    return collector.state();
 }
 
 } // namespace reconcile

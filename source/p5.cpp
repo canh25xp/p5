@@ -198,11 +198,6 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
-void P5::RunWithUser(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
-    Execute(command, args, user);
-    RefreshIfNeeded();
-}
-
 void P5::SetTagProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
 }
@@ -276,6 +271,12 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template reconcile::FstatCollector P5::Run<reconcile::FstatCollector>(const std::string &command,
+                                                                      const std::vector<std::string> &stringArguments,
+                                                                      const int commandRetries);
+template reconcile::HaveCollector P5::Run<reconcile::HaveCollector>(const std::string &command,
+                                                                    const std::vector<std::string> &stringArguments,
+                                                                    const int commandRetries);
 
 Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
     ClientApi api;
@@ -328,4 +329,14 @@ Users P5::RunUsers(const std::vector<std::string> &args) {
 Changes P5::RunChanges(const std::vector<std::string> &args) {
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Changes>("changes", args);
+}
+
+reconcile::FstatCollector P5::RunFstat(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<reconcile::FstatCollector>("fstat", args);
+}
+
+reconcile::HaveCollector P5::RunHave(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<reconcile::HaveCollector>("have", args);
 }

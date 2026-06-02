@@ -9,6 +9,8 @@
 #include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
+#include "reconcile/fstat_collector.h"
+#include "reconcile/have_collector.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -43,11 +45,10 @@ public:
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
 
-    /// Run a command with a custom ClientUser (e.g. tag collectors).
-    void RunWithUser(const std::string &command, const std::vector<std::string> &args, ClientUser &user);
-
     void SetTagProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
+    reconcile::FstatCollector RunFstat(const std::vector<std::string> &args = {});
+    reconcile::HaveCollector RunHave(const std::vector<std::string> &args = {});
 };
