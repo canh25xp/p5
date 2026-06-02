@@ -4,6 +4,7 @@
 #include "commands.h"
 #include "utils/client_resolver.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 #include <p4/hostenv.h>
@@ -110,6 +111,7 @@ void Clients::PrintSortedTsv(std::ostream &out) const {
 }
 
 void Clients::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     P5 &p5 = m_commands->p5();
     Clients r = p5.RunClients(args);
     if (r.IsError())

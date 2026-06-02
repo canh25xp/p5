@@ -280,6 +280,7 @@ static void print_env(bool quiet, bool all, const Options &options) {
 }
 
 void Set::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     if (args.empty()) {
         print_env(m_quiet, m_all, m_options);
         return;

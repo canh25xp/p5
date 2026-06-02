@@ -1,6 +1,7 @@
 #include "commands.h"
 #include "p5.h"
 #include "log.h"
+#include "options.h"
 
 Commands::Commands() = default;
 
@@ -66,6 +67,7 @@ void Commands::run_p4_passthrough(const char *command, const std::vector<std::st
 }
 
 void Command::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     if (passthrough) {
         m_commands->run_p4_passthrough(name.c_str(), args);
     } else if (fn) {
