@@ -7,6 +7,9 @@ namespace ClientCommandPolicy {
 
 namespace {
 
+// Commands that never accept file[revRange] / client-view file arguments.
+// If a command can take file paths resolved through P4CLIENT (e.g. p4 changes
+// //client/path), it must not be listed here so AutoResolve still runs.
 const std::unordered_set<std::string> &NoClientCommands() {
     static const std::unordered_set<std::string> commands = {
         // Help / local
@@ -26,53 +29,31 @@ const std::unordered_set<std::string> &NoClientCommands() {
         "group",
         "passwd",
         // Changelist read-only
-        "changes",
         "describe",
         // Spec / server metadata
         "branches",
         "branch",
-        "labels",
         "label",
-        "list",
-        "tag",
         "depots",
         "depot",
         "repos",
         "repo",
         "clients",
         "client",
-        "streams",
         "stream",
         "streamlog",
         "streamspec",
-        "jobs",
         "job",
-        "fixes",
         "fix",
         "counters",
         "counter",
         "keys",
         "key",
         "protect",
-        "protects",
         "review",
-        "reviews",
-        "attribute",
         // Info / logging
         "info",
         "logger",
-        // Depot-side file queries
-        "files",
-        "fstat",
-        "filelog",
-        "print",
-        "dirs",
-        "sizes",
-        "grep",
-        "annotate",
-        "diff2",
-        "integrated",
-        "interchanges",
     };
     return commands;
 }
