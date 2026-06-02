@@ -12,7 +12,7 @@
 #include "log.h"
 #include "options.h"
 #include "utils/cli_helpers.h"
-#include "utils/client_command_policy.h"
+#include "utils/command_policy.h"
 #include "utils/client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
@@ -41,7 +41,7 @@ bool P5::Initialize() {
 
     m_ClientAPI.Init(&e);
 
-    if (g_options.client().empty() && g_options.resolve() && !ClientCommandPolicy::SkipsAutoResolve(g_options.command())) {
+    if (g_options.client().empty() && g_options.resolve() && CommandPolicy::NeedsClientResolve(g_options.command())) {
         std::string resolved = AutoResolve();
         if (!resolved.empty()) {
             g_options.client() = resolved;
