@@ -198,6 +198,15 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
+void P5::RunWithUser(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    Execute(command, args, user);
+    RefreshIfNeeded();
+}
+
+void P5::SetTagProtocol() {
+    m_ClientAPI.SetProtocol("tag", "");
+}
+
 Result P5::Run(const std::string &commandLine) {
     // Split string into tokens
     std::vector<std::string> tokens = SplitCommandLine(commandLine);

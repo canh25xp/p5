@@ -7,6 +7,7 @@
 #include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/set.h"
+#include "commands/fast_reconcile.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
     commands.add("flush", "Synonym for 'sync -k'");
     commands.add("clean", "Synonym for 'reconcile -w'");
     commands.add({"reconcile", "rec"}, "Reconcile client to offline workspace changes; 'rec' is a synonym for 'reconcile'");
+    commands.add(std::make_unique<FastReconcile>());
     commands.add("status", "Synonym for 'reconcile -ead' (output uses local paths)");
     commands.add("have", "List revisions last synced");
     commands.add("opened", "Display list of files opened for pending changelist");
