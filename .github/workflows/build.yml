@@ -13,6 +13,18 @@ on:
       - ".github/**"
       - "source/**"
       - "include/**"
+  pull_request:
+    branches:
+      - main
+      - "release-[0-9]+.[0-9]+"
+    paths:
+      - "**.cmake"
+      - "**/CMakeLists.txt"
+      - "**/CMakePresets.json"
+      - "cmake/**"
+      - ".github/**"
+      - "source/**"
+      - "include/**"
   workflow_dispatch:
 
 permissions:
