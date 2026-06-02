@@ -96,7 +96,7 @@ Clients::ClientMap ClientResolver::FilterByHost(const Clients::ClientMap &client
     return result;
 }
 
-static void WriteClientToConfig(const std::string &configPath, const std::string &resolved) {
+void ClientResolver::WriteClientToConfig(const std::string &configPath, const std::string &resolved) {
     if (configPath.empty() || configPath == "noconfig") {
         return;
     }
@@ -140,59 +140,4 @@ static void WriteClientToConfig(const std::string &configPath, const std::string
     } else {
         WARN("Auto-resolve: could not write to " << configPath);
     }
-}
-
-std::string ClientResolver::AutoResolve(const std::string &port, const std::string &user) {
-    std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
-    if (cwd.empty()) {
-        WARN("Auto-resolve: could not determine current working directory");
-        return {};
-    }
-
-    std::string hostname = ClientResolver::GetCurrentHostname();
-
-    // Fetch clients owned by the current user using a transient API
-    ClientApi bootstrapApi;
-    bootstrapApi.SetPort(port.c_str());
-    bootstrapApi.SetUser(user.c_str());
-    bootstrapApi.SetProtocol("tag", "");
-
-    Error e;
-    bootstrapApi.Init(&e);
-    if (e.Test()) {
-        StrBuf msg;
-        e.Fmt(&msg);
-        WARN("Auto-resolve: could not initialize bootstrap connection: " << msg.Text());
-        return {};
-    }
-
-    Clients clientsResult;
-    const char *args[] = {"--me"};
-    bootstrapApi.SetArgv(1, const_cast<char **>(args));
-    bootstrapApi.Run("clients", &clientsResult);
-
-    bootstrapApi.Final(&e);
-
-    // Filter to clients on the current host
-    Clients::ClientMap filtered = ClientResolver::FilterByHost(clientsResult.GetClients(), hostname);
-
-    if (filtered.empty()) {
-        INFO("Auto-resolve: no clients found for user " << user << " on host " << hostname);
-        return {};
-    }
-
-    // Resolve the best-matching client based on CWD
-    std::string resolved = ClientResolver::Resolve(cwd, filtered);
-    if (!resolved.empty()) {
-        INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
-
-        // Write to P4CONFIG if it exists
-        const char *configPathCstr = bootstrapApi.GetConfig().Text();
-        std::string configPath = (configPathCstr) ? configPathCstr : "";
-        WriteClientToConfig(configPath, resolved);
-    } else {
-        INFO("Auto-resolve: no client root matches CWD " << cwd);
-    }
-
-    return resolved;
 }

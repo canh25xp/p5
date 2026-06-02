@@ -25,7 +25,7 @@ public:
     /// A client with an empty host field is considered to match any host
     /// (some clients like Swarm clients have no host set).
     static Clients::ClientMap FilterByHost(const Clients::ClientMap &clients, const std::string &host);
-    /// Automatically resolve the client based on CWD and hostname.
-    /// Returns the resolved client name, or empty string if none found.
-    static std::string AutoResolve(const std::string &port, const std::string &user);
+
+    /// Update P4CLIENT in the P4CONFIG file at configPath, if the file exists.
+    static void WriteClientToConfig(const std::string &configPath, const std::string &resolved);
 };

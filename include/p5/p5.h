@@ -18,12 +18,15 @@ class P5 {
     bool Deinitialize();
     bool Reinitialize();
     bool CheckErrors(Error &e, StrBuf &msg);
+    ClientUser &Execute(const std::string &command, const std::vector<std::string> &argv, ClientUser &user);
+    void RefreshIfNeeded();
+    std::string AutoResolve();
 
-    static const int COMMAND_RETRIES = 3;             // Specify how many times a command should be retried before the process exits in a failure.
+    static const int COMMAND_RETRIES = 0;             // Specify how many times a command should be retried before the process exits in a failure.
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.
 
     template <class T>
-    T Run(const char *command, const std::vector<std::string> &stringArguments, const int commandRetries = COMMAND_RETRIES);
+    T Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries = COMMAND_RETRIES);
 
 public:
     static bool InitializeLibraries();
@@ -32,8 +35,8 @@ public:
     P5();
     ~P5();
 
-    Result Run(const char *command, int argc, char **argv);
+    Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
-    Users ListUsers(const std::vector<std::string> &extraArgs = {});
-    Clients ListClients(const std::vector<std::string> &extraArgs = {});
+    Users RunUsers(const std::vector<std::string> &args = {});
+    Clients RunClients(const std::vector<std::string> &args = {});
 };
