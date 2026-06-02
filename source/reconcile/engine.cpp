@@ -211,13 +211,19 @@ AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std:
     }
 
     auto processDigest = [&](const std::vector<DigestWorkItem> &work, auto onMatch, auto onMismatch) {
-        for (const auto &item : work) {
-            const WorkspaceFile *file = item.first;
+        if (work.empty()) {
+            return;
+        }
+        const std::vector<DigestResult> digests = ParallelComputeDigests(work, cache);
+        for (size_t i = 0; i < work.size(); ++i) {
+            const WorkspaceFile *file = work[i].first;
             const DepotFileRecord *rec = depot.getByClientLower(file->pathLower);
             if (!rec || !rec->digest || !rec->headType) {
                 continue;
             }
-            if (DigestMatches(*file, *rec->headType, *rec->digest)) {
+            const auto &computed = std::get<1>(digests[i]);
+            const bool matches = computed == *rec->digest || DigestMatches(*file, *rec->headType, *rec->digest);
+            if (matches) {
                 onMatch(*file, *rec);
             } else {
                 onMismatch(*file, *rec);
