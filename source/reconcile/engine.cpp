@@ -4,8 +4,8 @@
 #include "options.h"
 #include "reconcile/batch_p4.h"
 #include "reconcile/digest.h"
-#include "reconcile/fstat_collector.h"
-#include "reconcile/have_collector.h"
+#include "commands/fstat_collector.h"
+#include "commands/have_collector.h"
 #include "reconcile/workspace_scan.h"
 
 #include <cstdio>

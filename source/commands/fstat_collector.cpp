@@ -1,4 +1,4 @@
-#include "reconcile/fstat_collector.h"
+#include "commands/fstat_collector.h"
 
 #include "p5.h"
 
@@ -7,9 +7,12 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace reconcile {
-
 namespace {
+
+using reconcile::DepotFileRecord;
+using reconcile::DepotState;
+using reconcile::ParseFileAction;
+using reconcile::ParseFileType;
 
 std::string ToLower(std::string s) {
     for (char &c : s) {
@@ -137,5 +140,3 @@ DepotState FstatCollector::Load(P5 &p5, const std::vector<std::string> &paths) {
 
     return collector.state();
 }
-
-} // namespace reconcile

@@ -1,4 +1,4 @@
-#include "reconcile/have_collector.h"
+#include "commands/have_collector.h"
 
 #include "p5.h"
 
@@ -7,9 +7,9 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace reconcile {
-
 namespace {
+
+using reconcile::HaveRecord;
 
 std::string ToLower(std::string s) {
     for (char &c : s) {
@@ -53,5 +53,3 @@ std::unordered_map<std::string, HaveRecord> HaveCollector::Load(P5 &p5, const st
 
     return p5.RunHave(args).records();
 }
-
-} // namespace reconcile
