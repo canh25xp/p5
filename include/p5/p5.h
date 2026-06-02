@@ -6,6 +6,7 @@
 #include <p4/clientapi.h>
 
 #include "commands/result.h"
+#include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
 
@@ -43,4 +44,5 @@ public:
     Result Run(const std::string &commandLine);
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
+    Changes RunChanges(const std::vector<std::string> &args = {});
 };
