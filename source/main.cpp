@@ -3,6 +3,7 @@
 
 #include "commands.h"
 #include "options.h"
+#include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/set.h"
@@ -39,7 +40,7 @@ int main(int argc, char **argv) {
 
     // --- Changelist operations ---
     commands.add({"change", "changelist"}, "Create or edit a changelist description");
-    commands.add({"changes", "changelists"}, "Display list of pending and submitted changelists");
+    commands.add(std::make_unique<Changes>());
     commands.add("describe", "Display a changelist description");
     commands.add("shelve", "Store files from a pending changelist into the depot");
     commands.add("unshelve", "Restore shelved files from a pending changelist");
