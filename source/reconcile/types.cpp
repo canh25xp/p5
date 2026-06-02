@@ -6,14 +6,41 @@ namespace reconcile {
 
 namespace {
 
-std::string ToLower(std::string s) {
-    for (char &c : s) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
-    return s;
-}
+struct FileActionMapping {
+    const char *name;
+    FileAction action;
+};
+
+constexpr FileActionMapping kFileActions[] = {
+    {"add", FileAction::Add},
+    {"edit", FileAction::Edit},
+    {"delete", FileAction::Delete},
+    {"branch", FileAction::Branch},
+    {"move/add", FileAction::MoveAdd},
+    {"move/delete", FileAction::MoveDelete},
+    {"integrate", FileAction::Integrate},
+    {"import", FileAction::Import},
+    {"purge", FileAction::Purge},
+    {"archive", FileAction::Archive},
+};
+
+struct FileTypePrefix {
+    const char *prefix;
+    size_t len;
+    FileType type;
+};
+
+// Prefix match (Perforce types may include suffixes, e.g. "text+k").
+constexpr FileTypePrefix kFileTypePrefixes[] = {
+    {"binary", 6, FileType::Binary},
+    {"text", 4, FileType::Text},
+    {"utf8", 4, FileType::Utf8},
+    {"symlink", 7, FileType::Symlink},
+    {"utf16", 5, FileType::Utf16},
+    {"apple", 5, FileType::Apple},
+    {"resource", 8, FileType::Resource},
+    {"unicode", 7, FileType::Unicode},
+};
 
 } // namespace
 
@@ -21,35 +48,10 @@ FileAction ParseFileAction(const char *value) {
     if (!value) {
         return FileAction::Unknown;
     }
-    if (std::strcmp(value, "add") == 0) {
-        return FileAction::Add;
-    }
-    if (std::strcmp(value, "edit") == 0) {
-        return FileAction::Edit;
-    }
-    if (std::strcmp(value, "delete") == 0) {
-        return FileAction::Delete;
-    }
-    if (std::strcmp(value, "branch") == 0) {
-        return FileAction::Branch;
-    }
-    if (std::strcmp(value, "move/add") == 0) {
-        return FileAction::MoveAdd;
-    }
-    if (std::strcmp(value, "move/delete") == 0) {
-        return FileAction::MoveDelete;
-    }
-    if (std::strcmp(value, "integrate") == 0) {
-        return FileAction::Integrate;
-    }
-    if (std::strcmp(value, "import") == 0) {
-        return FileAction::Import;
-    }
-    if (std::strcmp(value, "purge") == 0) {
-        return FileAction::Purge;
-    }
-    if (std::strcmp(value, "archive") == 0) {
-        return FileAction::Archive;
+    for (const auto &entry : kFileActions) {
+        if (std::strcmp(value, entry.name) == 0) {
+            return entry.action;
+        }
     }
     return FileAction::Unknown;
 }
@@ -58,29 +60,10 @@ FileType ParseFileType(const char *value) {
     if (!value) {
         return FileType::Unknown;
     }
-    if (std::strncmp(value, "binary", 6) == 0) {
-        return FileType::Binary;
-    }
-    if (std::strncmp(value, "text", 4) == 0) {
-        return FileType::Text;
-    }
-    if (std::strncmp(value, "utf8", 4) == 0) {
-        return FileType::Utf8;
-    }
-    if (std::strncmp(value, "symlink", 7) == 0) {
-        return FileType::Symlink;
-    }
-    if (std::strncmp(value, "utf16", 5) == 0) {
-        return FileType::Utf16;
-    }
-    if (std::strncmp(value, "apple", 5) == 0) {
-        return FileType::Apple;
-    }
-    if (std::strncmp(value, "resource", 8) == 0) {
-        return FileType::Resource;
-    }
-    if (std::strncmp(value, "unicode", 7) == 0) {
-        return FileType::Unicode;
+    for (const auto &entry : kFileTypePrefixes) {
+        if (std::strncmp(value, entry.prefix, entry.len) == 0) {
+            return entry.type;
+        }
     }
     return FileType::Unknown;
 }
