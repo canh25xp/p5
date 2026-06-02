@@ -21,6 +21,10 @@ class P5 {
     ClientUser &Execute(const std::string &command, const std::vector<std::string> &argv, ClientUser &user);
     void RefreshIfNeeded();
     std::string AutoResolve();
+    // Using ephemeral ClientApi with tag protocol only on temp connection.
+    // We will use RunClients directly if all commands is implemented with tag protocol.
+    // Until then, we use this as a work-around
+    Clients FetchClientsTagged(const std::vector<std::string> &args);
 
     static const int COMMAND_RETRIES = 0;             // Specify how many times a command should be retried before the process exits in a failure.
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.
