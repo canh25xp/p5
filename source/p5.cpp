@@ -77,8 +77,10 @@ std::string P5::AutoResolve() {
 
     // Resolve the best-matching client based on CWD
     std::string resolved = ClientResolver::Resolve(cwd, filtered);
-    if (resolved.empty())
+    if (resolved.empty()) {
         INFO("Auto-resolve: no client root matches CWD " << cwd);
+        return {};
+    }
 
     INFO("Auto-resolve: matched client " << resolved << " for CWD " << cwd);
     return resolved;
@@ -256,13 +258,11 @@ template Users P5::Run<Users>(const std::string &command, const std::vector<std:
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 
 Clients P5::RunClients(const std::vector<std::string> &args) {
-    // Use tag protocol by default so OutputStat is called with structured data
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Clients>("clients", args);
 }
 
 Users P5::RunUsers(const std::vector<std::string> &args) {
-    // Use tag protocol by default so OutputStat is called with structured data
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Users>("users", args);
 }
