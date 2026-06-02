@@ -171,7 +171,6 @@ const std::unordered_set<std::string> &NoNeedClientResolve() {
         "repos",
         "repo",
         "clients",
-        "client",
         "stream",
         "streamlog",
         "streamspec",
