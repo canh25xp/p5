@@ -225,6 +225,10 @@ std::vector<std::string> Changes::buildP4Args(const std::vector<std::string> &fi
         args.push_back("-s");
         args.push_back(m_status);
     }
+    if (m_me) {
+        args.push_back("-u");
+        args.push_back(g_options.user());
+    }
     for (const std::string &user : m_user) {
         args.push_back("-u");
         args.push_back(user);
@@ -279,6 +283,7 @@ void Changes::register_cli(CLI::App &app) {
     sub->add_option("-m,--max", m_max, "Limit output to the specified number of changelists");
     sub->add_option("-s,--status", m_status, "Limit output to changelists with the specified status")
         ->check(CLI::IsMember({"pending", "shelved", "submitted"}));
+    sub->add_flag("--me", m_me, "Display only changes owned by the current user");
     sub->add_option("-u,--user", m_user, "Display only changes owned by the specified user")->expected(0, -1);
     sub->add_flag("--user-case-insensitive", m_userCaseInsensitive,
                   "Treat -u user patterns as case-insensitive (p4 -E with -u)");
