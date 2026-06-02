@@ -7,6 +7,7 @@
 #include <p4/clientapi.h>
 
 #include "log.h"
+#include "utils/text_width.h"
 
 #include <algorithm>
 #include <iostream>
@@ -52,14 +53,14 @@ void Users::PrintSortedTsv(std::ostream &out) const {
     size_t maxNameWidth = 0;
     for (const UserID &id : ids) {
         const UserData &data = m_Users.at(id);
-        maxIdWidth = std::max(maxIdWidth, id.size());
-        maxNameWidth = std::max(maxNameWidth, data.fullName.size());
+        maxIdWidth = std::max(maxIdWidth, p5::DisplayWidth(id));
+        maxNameWidth = std::max(maxNameWidth, p5::DisplayWidth(data.fullName));
     }
 
     for (const UserID &id : ids) {
         const UserData &data = m_Users.at(id);
-        out << id << std::string(maxIdWidth - id.size() + 2, ' ')
-            << data.fullName << std::string(maxNameWidth - data.fullName.size() + 2, ' ')
+        out << id << std::string(maxIdWidth - p5::DisplayWidth(id) + 2, ' ')
+            << data.fullName << std::string(maxNameWidth - p5::DisplayWidth(data.fullName) + 2, ' ')
             << data.email << '\n';
     }
 }
