@@ -93,6 +93,8 @@ init_git_submodules()
 
 add_subdirectory(vendor)
 
+find_package(OpenSSL REQUIRED)
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     include/p5
     vendor/dbg-macro
@@ -107,7 +109,7 @@ if(MSVC)
   set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE P4API::client CLI11::CLI11)
+target_link_libraries(${PROJECT_NAME} PRIVATE P4API::client CLI11::CLI11 OpenSSL::Crypto)
 
 if(DBG_MACRO_DISABLE)
   target_compile_definitions(${PROJECT_NAME} PRIVATE DBG_MACRO_DISABLE)
