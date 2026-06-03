@@ -126,7 +126,6 @@ std::size_t resolveInsertIndex(const Position &pos, const std::size_t count) {
 void Map::run(const std::vector<std::string> & /*args*/) {
     g_options.set_command(name);
     CLI_ERROR("map: use a subcommand (list, add, insert, edit, delete)");
-    throw CLI::RuntimeError(1);
 }
 
 void Map::register_cli(CLI::App &app) {
@@ -137,7 +136,6 @@ void Map::register_cli(CLI::App &app) {
         const std::string clientName = resolveClientName();
         if (clientName.empty()) {
             CLI_ERROR("map: P4CLIENT is not set (use -c or set P4CLIENT)");
-            throw CLI::RuntimeError(1);
         }
 
         P5 &p5 = m_commands->p5();
@@ -145,11 +143,9 @@ void Map::register_cli(CLI::App &app) {
         std::string err;
         if (!p5::client_spec::Fetch(p5, clientName, spec, err)) {
             CLI_ERROR("map: " << err);
-            throw CLI::RuntimeError(1);
         }
         if (HasNonEmptyStream(spec)) {
             CLI_ERROR("map: client has a Stream; view is managed by the stream (use p4 client)");
-            throw CLI::RuntimeError(1);
         }
 
         printViewList(clientName, ViewMap::fromLines(GetViewLines(spec)));
@@ -162,7 +158,6 @@ void Map::register_cli(CLI::App &app) {
         const std::string clientName = resolveClientName();
         if (clientName.empty()) {
             CLI_ERROR("map: P4CLIENT is not set (use -c or set P4CLIENT)");
-            throw CLI::RuntimeError(1);
         }
 
         P5 &p5 = m_commands->p5();
@@ -170,11 +165,9 @@ void Map::register_cli(CLI::App &app) {
         std::string err;
         if (!p5::client_spec::Fetch(p5, clientName, spec, err)) {
             CLI_ERROR("map: " << err);
-            throw CLI::RuntimeError(1);
         }
         if (HasNonEmptyStream(spec)) {
             CLI_ERROR("map: client has a Stream; view is managed by the stream (use p4 client)");
-            throw CLI::RuntimeError(1);
         }
 
         ViewMap view = ViewMap::fromLines(GetViewLines(spec));
@@ -182,13 +175,11 @@ void Map::register_cli(CLI::App &app) {
             mutator(view, clientName);
         } catch (const std::exception &ex) {
             CLI_ERROR("map: " << ex.what());
-            throw CLI::RuntimeError(1);
         }
 
         SetViewLines(spec, view.lines());
         if (!p5::client_spec::Save(p5, spec, err)) {
             CLI_ERROR("map: " << err);
-            throw CLI::RuntimeError(1);
         }
 
         std::cout << "map: client " << clientName << " view now " << view.size() << " line(s)\n";
@@ -253,12 +244,15 @@ void Map::register_cli(CLI::App &app) {
         int index = deleteIndex;
         if (!first && !last && index == 0) {
             CLI_ERROR("map delete: specify --first, --last, or -i/--index");
-            throw CLI::RuntimeError(1);
         }
         const Position pos = parsePosition(first, last, index);
         mutate([&](ViewMap &view, const std::string & /*clientName*/) { view.eraseAt(toZeroBasedIndex(pos, view.size())); });
     });
 
     // `p5 map` with no subcommand lists mappings (same as `p5 map list`).
-    sub->callback(runList);
+    sub->callback([sub, runList]() {
+        if (sub->get_subcommands().empty()) {
+            runList();
+        }
+    });
 }

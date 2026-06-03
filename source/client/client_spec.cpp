@@ -26,7 +26,7 @@ bool Fetch(P5 &p5, const std::string &clientName, Spec &spec, std::string &err) 
         args.push_back(clientName);
     }
 
-    p5.SetTagProtocol();
+    p5.SetFormProtocol();
     ClientSpecFetchHandler handler;
     p5.ExecuteCommand("client", args, handler);
 

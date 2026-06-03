@@ -26,6 +26,7 @@ public:
 
     const std::map<std::string, Value> &fields() const { return m_fields; }
     const std::vector<std::string> &fieldOrder() const { return m_fieldOrder; }
+    const std::string &specFormatted() const { return m_specFormatted; }
 
     static Spec FromStrDict(StrDict *dict);
 
@@ -39,6 +40,7 @@ private:
     std::map<std::string, Value> m_fields;
     std::vector<std::string> m_fieldOrder;
     std::string m_comment;
+    std::string m_specFormatted;
 };
 
 std::vector<std::string> GetViewLines(const Spec &spec);

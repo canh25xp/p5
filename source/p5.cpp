@@ -202,6 +202,11 @@ void P5::SetTagProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
 }
 
+void P5::SetFormProtocol() {
+    m_ClientAPI.SetProtocol("specstring", "");
+    m_ClientAPI.SetProtocol("tag", "");
+}
+
 Result P5::Run(const std::string &commandLine) {
     // Split string into tokens
     std::vector<std::string> tokens = SplitCommandLine(commandLine);

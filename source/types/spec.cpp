@@ -14,7 +14,51 @@ bool IsListKey(const std::string &key) {
 }
 
 bool IsMetaKey(const std::string &key) {
-    return key == "func" || key == "code" || key == "data" || key == "specdef" || key == "specFormatted" || key == "specstring" || key == "spectype";
+    return key == "func" || key == "code" || key == "data" || key == "specdef" || key == "specstring" || key == "spectype";
+}
+
+std::vector<std::string> parseViewFromFormText(const std::string &form) {
+    std::vector<std::string> lines;
+    const std::string marker = "View:";
+    const std::size_t start = form.find(marker);
+    if (start == std::string::npos) {
+        return lines;
+    }
+
+    std::size_t pos = start + marker.size();
+    while (pos < form.size() && (form[pos] == '\n' || form[pos] == '\r' || form[pos] == ' ' || form[pos] == '\t')) {
+        ++pos;
+    }
+
+    while (pos < form.size()) {
+        std::size_t lineEnd = form.find('\n', pos);
+        if (lineEnd == std::string::npos) {
+            lineEnd = form.size();
+        }
+
+        std::string line = form.substr(pos, lineEnd - pos);
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+
+        if (!line.empty() && line[0] != '\t' && line.find(':') != std::string::npos) {
+            break;
+        }
+
+        if (!line.empty() && line[0] == '\t') {
+            line.erase(0, 1);
+            while (!line.empty() && line[0] == '\t') {
+                line.erase(0, 1);
+            }
+            if (!line.empty()) {
+                lines.push_back(line);
+            }
+        }
+
+        pos = lineEnd + 1;
+    }
+
+    return lines;
 }
 
 void appendFieldOrder(std::vector<std::string> &order, const std::string &key) {
@@ -130,6 +174,10 @@ Spec Spec::FromStrDict(StrDict *dict) {
             spec.m_comment = val.Text();
             continue;
         }
+        if (key == "specFormatted") {
+            spec.m_specFormatted = val.Text();
+            continue;
+        }
         if (IsMetaKey(key)) {
             continue;
         }
@@ -151,6 +199,36 @@ Spec Spec::FromStrDict(StrDict *dict) {
             spec.m_fields[key] = std::string(val.Text());
         }
     }
+
+    const auto mergeListField = [&](const char *key) {
+        if (spec.contains(key)) {
+            return;
+        }
+        StrRef keyRef(key);
+        if (!dict->GetVar(keyRef, 0)) {
+            return;
+        }
+        std::vector<std::string> list;
+        for (int j = 0;; ++j) {
+            StrPtr *line = dict->GetVar(keyRef, j);
+            if (!line) {
+                break;
+            }
+            const std::string text = line->Text();
+            if (!text.empty()) {
+                list.push_back(text);
+            }
+        }
+        if (!list.empty()) {
+            spec.set(key, list);
+        }
+    };
+
+    mergeListField("View");
+    mergeListField("SyncView");
+    mergeListField("UpdateView");
+    mergeListField("ChangeView");
+    mergeListField("LimitView");
 
     return spec;
 }
@@ -187,18 +265,22 @@ std::string Spec::toFormText() const {
 
 std::vector<std::string> GetViewLines(const Spec &spec) {
     const auto view = spec.get("View");
-    if (!view) {
-        return {};
-    }
-    if (const auto *list = std::get_if<std::vector<std::string>>(&(*view))) {
-        return *list;
-    }
-    if (const auto *scalar = std::get_if<std::string>(&(*view))) {
-        if (scalar->empty()) {
-            return {};
+    if (view) {
+        if (const auto *list = std::get_if<std::vector<std::string>>(&(*view))) {
+            if (!list->empty()) {
+                return *list;
+            }
+        } else if (const auto *scalar = std::get_if<std::string>(&(*view))) {
+            if (!scalar->empty()) {
+                return {*scalar};
+            }
         }
-        return {*scalar};
     }
+
+    if (!spec.specFormatted().empty()) {
+        return parseViewFromFormText(spec.specFormatted());
+    }
+
     return {};
 }
 

@@ -49,6 +49,7 @@ public:
     Result Run(const std::string &commandLine);
 
     void SetTagProtocol();
+    void SetFormProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
