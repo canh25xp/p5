@@ -82,4 +82,64 @@ size_t DisplayWidth(const std::string &text) {
     return width;
 }
 
+std::string TruncateToDisplayWidth(const std::string &text, size_t maxColumns) {
+    if (maxColumns == 0) {
+        return {};
+    }
+    if (DisplayWidth(text) <= maxColumns) {
+        return text;
+    }
+
+    static constexpr char kEllipsis[] = "...";
+    const size_t ellipsisWidth = 3;
+    if (maxColumns <= ellipsisWidth) {
+        std::string out;
+        size_t used = 0;
+        for (size_t i = 0; i < text.size() && used < maxColumns;) {
+            char32_t codepoint = 0;
+            size_t bytes = 0;
+            if (!DecodeUtf8(text, i, codepoint, bytes)) {
+                out.push_back(text[i]);
+                used += 1;
+                i += 1;
+                continue;
+            }
+            const int w = CodepointWidth(codepoint);
+            if (used + static_cast<size_t>(w) > maxColumns) {
+                break;
+            }
+            out.append(text, i, bytes);
+            used += static_cast<size_t>(w);
+            i += bytes;
+        }
+        return out;
+    }
+
+    const size_t budget = maxColumns - ellipsisWidth;
+    std::string out;
+    size_t used = 0;
+    for (size_t i = 0; i < text.size();) {
+        char32_t codepoint = 0;
+        size_t bytes = 0;
+        if (!DecodeUtf8(text, i, codepoint, bytes)) {
+            if (used + 1 > budget) {
+                break;
+            }
+            out.push_back(text[i]);
+            used += 1;
+            i += 1;
+            continue;
+        }
+        const int w = CodepointWidth(codepoint);
+        if (used + static_cast<size_t>(w) > budget) {
+            break;
+        }
+        out.append(text, i, bytes);
+        used += static_cast<size_t>(w);
+        i += bytes;
+    }
+    out += kEllipsis;
+    return out;
+}
+
 } // namespace p5
