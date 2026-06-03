@@ -48,6 +48,7 @@ public:
     ClientUser &Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user);
 
     void SetTagProtocol();
+    void SetSpecProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});

@@ -7,6 +7,7 @@
 #include "mirror/sync_plan.h"
 #include "options.h"
 #include "p5.h"
+#include "types/spec.h"
 #include "utils/client_resolver.h"
 
 #include <p4/clientapi.h>
@@ -17,19 +18,113 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace fs = std::filesystem;
 
 namespace {
 
+bool ParseIndexedFieldKey(const std::string &key, std::string &base, int &index) {
+    size_t split = key.size();
+    while (split > 0 && std::isdigit(static_cast<unsigned char>(key[split - 1]))) {
+        --split;
+    }
+    if (split == key.size() || split == 0) {
+        return false;
+    }
+    base = key.substr(0, split);
+    index = std::atoi(key.c_str() + static_cast<int>(split));
+    return true;
+}
+
+Spec SpecFromTaggedStat(StrDict *varList) {
+    Spec spec = Spec::FromStrDict(varList);
+    if (!varList) {
+        return spec;
+    }
+
+    std::map<std::string, std::map<int, std::string>> indexedLists;
+    StrRef var;
+    StrRef val;
+    for (int i = 0; varList->GetVar(i, var, val); ++i) {
+        const std::string key = var.Text();
+        if (key == "code" || key == "status" || key == "action") {
+            continue;
+        }
+
+        std::string base;
+        int index = 0;
+        if (!ParseIndexedFieldKey(key, base, index)) {
+            continue;
+        }
+
+        indexedLists[base][index] = val.Text();
+    }
+
+    for (const auto &[base, entries] : indexedLists) {
+        if (spec.contains(base)) {
+            continue;
+        }
+        std::vector<std::pair<int, std::string>> sorted(entries.begin(), entries.end());
+        std::sort(sorted.begin(), sorted.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
+        std::vector<std::string> lines;
+        lines.reserve(sorted.size());
+        for (const auto &[_, line] : sorted) {
+            lines.push_back(line);
+        }
+        if (!lines.empty()) {
+            spec.set(base, lines);
+        }
+    }
+
+    return spec;
+}
+
+std::string FormatClientSpecForm(const Spec &spec) {
+    static const std::unordered_set<std::string> kListFields = {
+        "View",
+        "SyncView",
+        "UpdateView",
+        "Revision",
+        "Files",
+        "Jobs",
+        "Paths",
+        "AltRoots",
+    };
+
+    std::ostringstream out;
+    for (const auto &[key, value] : spec.fields()) {
+        if (std::holds_alternative<std::string>(value)) {
+            out << key << ":\t" << std::get<std::string>(value) << '\n';
+            continue;
+        }
+
+        const auto &lines = std::get<std::vector<std::string>>(value);
+        if (kListFields.count(key) > 0 || lines.size() > 1) {
+            out << key << ":\n";
+            for (const std::string &line : lines) {
+                out << '\t' << line << '\n';
+            }
+        } else if (!lines.empty()) {
+            out << key << ":\t" << lines.front() << '\n';
+        }
+    }
+    return out.str();
+}
+
 class SpecCaptureUser : public Result {
-    std::string m_spec;
+    Spec m_spec;
+    bool m_hasSpec{false};
 
 public:
-    void OutputText(const char *data, int length) override { m_spec.append(data, length); }
+    void OutputStat(StrDict *varList) override {
+        m_spec = SpecFromTaggedStat(varList);
+        m_hasSpec = true;
+    }
 
-    const std::string &spec() const { return m_spec; }
+    const Spec &spec() const { return m_spec; }
+    bool hasSpec() const { return m_hasSpec; }
 };
 
 class SpecInputUser : public Result {
@@ -69,27 +164,11 @@ bool IsValidClientName(const std::string &name) {
     return true;
 }
 
-std::string PatchClientSpec(const std::string &spec, const std::string &clientName, const std::string &root, const std::string &host) {
-    std::istringstream in(spec);
-    std::ostringstream out;
-    std::string line;
-
-    while (std::getline(in, line)) {
-        if (!line.empty() && line.back() == '\r') {
-            line.pop_back();
-        }
-        if (line.rfind("Client:", 0) == 0) {
-            out << "Client:\t" << clientName << '\n';
-        } else if (line.rfind("Root:", 0) == 0) {
-            out << "Root:\t" << root << '\n';
-        } else if (line.rfind("Host:", 0) == 0) {
-            out << "Host:\t" << host << '\n';
-        } else {
-            out << line << '\n';
-        }
-    }
-
-    return out.str();
+std::string PatchClientSpec(Spec spec, const std::string &clientName, const std::string &root, const std::string &host) {
+    spec.set("Client", clientName);
+    spec.set("Root", root);
+    spec.set("Host", host);
+    return FormatClientSpecForm(spec);
 }
 
 std::string HaveChangesPath(const std::string &client) {
@@ -146,11 +225,12 @@ void Mirror::run(const std::vector<std::string> &args) {
     INFO("Creating mirror client " << mirrorClient << " from template " << templateClient);
 
     SpecCaptureUser capture;
+    p5.SetSpecProtocol();
     p5.Run("client", {"-o", "-t", templateClient, mirrorClient}, capture);
     if (capture.IsError()) {
         CLI_ERROR("Failed to read client spec for template " << templateClient);
     }
-    if (capture.spec().empty()) {
+    if (!capture.hasSpec() || capture.spec().fields().empty()) {
         CLI_ERROR("Empty client spec returned for template " << templateClient);
     }
 
