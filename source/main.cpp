@@ -10,6 +10,7 @@
 #include "commands/fast_reconcile.h"
 #include "commands/have.h"
 #include "commands/fstat.h"
+#include "commands/filelog.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -72,7 +73,7 @@ int main(int argc, char **argv) {
     // --- Depot / file info ---
     commands.add("files", "List files in the depot");
     commands.add(std::make_unique<Fstat>());
-    commands.add("filelog", "List revision history of files");
+    commands.add(std::make_unique<Filelog>());
     commands.add("annotate", "Print file lines along with their revisions");
     commands.add("diff", "Display diff of client file with depot file");
     commands.add("diff2", "Display diff of two depot files");

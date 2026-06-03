@@ -10,6 +10,7 @@
 #include "commands/clients.h"
 #include "commands/users.h"
 #include "commands/fstat.h"
+#include "commands/filelog.h"
 #include "commands/have.h"
 
 class P5 {
@@ -50,5 +51,6 @@ public:
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
     Fstat RunFstat(const std::vector<std::string> &args = {});
+    Filelog RunFilelog(const std::vector<std::string> &args = {});
     Have RunHave(const std::vector<std::string> &args = {});
 };
