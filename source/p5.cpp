@@ -198,6 +198,10 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
+void P5::SetTagProtocol() {
+    m_ClientAPI.SetProtocol("tag", "");
+}
+
 Result P5::Run(const std::string &commandLine) {
     // Split string into tokens
     std::vector<std::string> tokens = SplitCommandLine(commandLine);
@@ -267,6 +271,8 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 
 Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
     ClientApi api;
@@ -319,4 +325,14 @@ Users P5::RunUsers(const std::vector<std::string> &args) {
 Changes P5::RunChanges(const std::vector<std::string> &args) {
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Changes>("changes", args);
+}
+
+Fstat P5::RunFstat(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Fstat>("fstat", args);
+}
+
+Have P5::RunHave(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Have>("have", args);
 }

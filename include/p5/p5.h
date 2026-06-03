@@ -9,6 +9,8 @@
 #include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
+#include "commands/fstat.h"
+#include "commands/have.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -42,7 +44,11 @@ public:
 
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
+
+    void SetTagProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
+    Fstat RunFstat(const std::vector<std::string> &args = {});
+    Have RunHave(const std::vector<std::string> &args = {});
 };
