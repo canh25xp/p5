@@ -12,6 +12,8 @@
 #include <thread>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 namespace reconcile {
 
 namespace {
@@ -230,7 +232,7 @@ void SaveDigestCache(const std::string &clientName, const WorkspaceCache &cache)
     const auto slash = path.find_last_of('/');
     if (slash != std::string::npos) {
         std::error_code ec;
-        std::filesystem::create_directories(path.substr(0, slash), ec);
+        fs::create_directories(path.substr(0, slash), ec);
     }
 
     std::ofstream out(path, std::ios::binary | std::ios::trunc);
