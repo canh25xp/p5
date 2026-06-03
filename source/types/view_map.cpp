@@ -210,7 +210,15 @@ std::vector<std::string> ViewMap::lines() const {
             continue;
         }
         if (right && right->Length() > 0) {
-            result.push_back(std::string(left->Text()) + " " + right->Text());
+            const std::string l = left->Text();
+            const std::string r = right->Text();
+            if (l.size() >= r.size() && l.compare(l.size() - r.size(), r.size(), r) == 0) {
+                result.push_back(l);
+            } else if (l.find(r) != std::string::npos && l.find(' ') != std::string::npos) {
+                result.push_back(l);
+            } else {
+                result.push_back(l + " " + r);
+            }
         } else {
             result.push_back(left->Text());
         }

@@ -151,7 +151,7 @@ void Map::register_cli(CLI::App &app) {
         printViewList(clientName, ViewMap::fromLines(GetViewLines(spec)));
     };
 
-    sub->add_subcommand("list", "List view mappings with line numbers")->callback(runList);
+    sub->add_subcommand("list", "List view mappings with line numbers");
 
     auto mutate = [this](auto &&mutator) {
         g_options.set_command(name);
@@ -249,10 +249,11 @@ void Map::register_cli(CLI::App &app) {
         mutate([&](ViewMap &view, const std::string & /*clientName*/) { view.eraseAt(toZeroBasedIndex(pos, view.size())); });
     });
 
-    // `p5 map` with no subcommand lists mappings (same as `p5 map list`).
+    // List by default for `p5 map` / `p5 map list`; mutating subcommands use their own callbacks.
     sub->callback([sub, runList]() {
-        if (sub->get_subcommands().empty()) {
-            runList();
+        if (sub->got_subcommand("add") || sub->got_subcommand("insert") || sub->got_subcommand("edit") || sub->got_subcommand("delete")) {
+            return;
         }
+        runList();
     });
 }

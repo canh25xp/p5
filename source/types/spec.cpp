@@ -67,6 +67,58 @@ void appendFieldOrder(std::vector<std::string> &order, const std::string &key) {
     }
 }
 
+std::vector<std::string> collectListField(StrDict *dict, const char *key) {
+    std::vector<std::string> list;
+    if (!dict) {
+        return list;
+    }
+
+    StrRef keyRef(key);
+    for (int j = 0;; ++j) {
+        StrPtr *line = dict->GetVar(keyRef, j);
+        if (!line) {
+            break;
+        }
+        const std::string text = line->Text();
+        if (text.empty()) {
+            continue;
+        }
+        if (!list.empty() && list.back() == text) {
+            continue;
+        }
+        list.push_back(text);
+    }
+    return list;
+}
+
+std::string normalizeViewLine(const std::string &line) {
+    if (line.size() < 4) {
+        return line;
+    }
+    for (std::size_t half = line.size() / 2; half >= 4; --half) {
+        if (line.size() >= half * 2 && line.compare(0, half, line, half, half) == 0) {
+            return line.substr(0, half);
+        }
+        if (line.size() > half && line[half] == ' ' && line.size() >= half * 2 + 1 && line.compare(0, half, line, half + 1, half) == 0) {
+            return line.substr(0, half);
+        }
+    }
+    return line;
+}
+
+std::vector<std::string> dedupeLines(std::vector<std::string> lines) {
+    std::vector<std::string> out;
+    out.reserve(lines.size());
+    for (std::string &line : lines) {
+        line = normalizeViewLine(line);
+        if (!out.empty() && out.back() == line) {
+            continue;
+        }
+        out.push_back(std::move(line));
+    }
+    return out;
+}
+
 void writeIndentedField(std::ostream &out, const std::string &value) {
     std::istringstream lines(value);
     std::string line;
@@ -182,18 +234,7 @@ Spec Spec::FromStrDict(StrDict *dict) {
             continue;
         }
         if (IsListKey(key)) {
-            std::vector<std::string> list;
-            list.push_back(val.Text());
-            StrRef keyRef(key.c_str());
-            for (int j = 1;; ++j) {
-                StrPtr *next = dict->GetVar(keyRef, j);
-                if (!next) {
-                    break;
-                }
-                list.push_back(next->Text());
-            }
-            appendFieldOrder(spec.m_fieldOrder, key);
-            spec.m_fields[key] = list;
+            continue;
         } else {
             appendFieldOrder(spec.m_fieldOrder, key);
             spec.m_fields[key] = std::string(val.Text());
@@ -201,26 +242,9 @@ Spec Spec::FromStrDict(StrDict *dict) {
     }
 
     const auto mergeListField = [&](const char *key) {
-        if (spec.contains(key)) {
-            return;
-        }
-        StrRef keyRef(key);
-        if (!dict->GetVar(keyRef, 0)) {
-            return;
-        }
-        std::vector<std::string> list;
-        for (int j = 0;; ++j) {
-            StrPtr *line = dict->GetVar(keyRef, j);
-            if (!line) {
-                break;
-            }
-            const std::string text = line->Text();
-            if (!text.empty()) {
-                list.push_back(text);
-            }
-        }
+        std::vector<std::string> list = collectListField(dict, key);
         if (!list.empty()) {
-            spec.set(key, list);
+            spec.set(key, std::move(list));
         }
     };
 
@@ -268,7 +292,7 @@ std::vector<std::string> GetViewLines(const Spec &spec) {
     if (view) {
         if (const auto *list = std::get_if<std::vector<std::string>>(&(*view))) {
             if (!list->empty()) {
-                return *list;
+                return dedupeLines(*list);
             }
         } else if (const auto *scalar = std::get_if<std::string>(&(*view))) {
             if (!scalar->empty()) {
@@ -278,7 +302,7 @@ std::vector<std::string> GetViewLines(const Spec &spec) {
     }
 
     if (!spec.specFormatted().empty()) {
-        return parseViewFromFormText(spec.specFormatted());
+        return dedupeLines(parseViewFromFormText(spec.specFormatted()));
     }
 
     return {};
