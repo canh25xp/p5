@@ -4,11 +4,44 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
+#include <sstream>
+#include <unordered_set>
 
 namespace {
 
 bool IsListKey(const std::string &key) {
-    return key == "View" || key == "SyncView" || key == "UpdateView" || key == "Revision" || key == "Files" || key == "Jobs" || key == "Paths";
+    return key == "View" || key == "SyncView" || key == "UpdateView" || key == "Revision" || key == "Files" || key == "Jobs" || key == "Paths" ||
+           key == "AltRoots" || key == "ChangeView" || key == "LimitView";
+}
+
+bool ParseIndexedFieldKey(const std::string &key, std::string &base, int &index) {
+    size_t split = key.size();
+    while (split > 0 && std::isdigit(static_cast<unsigned char>(key[split - 1]))) {
+        --split;
+    }
+    if (split == key.size() || split == 0) {
+        return false;
+    }
+    base = key.substr(0, split);
+    index = std::atoi(key.c_str() + static_cast<int>(split));
+    return true;
+}
+
+const std::unordered_set<std::string> &FormListFields() {
+    static const std::unordered_set<std::string> fields = {
+        "View",
+        "SyncView",
+        "UpdateView",
+        "Revision",
+        "Files",
+        "Jobs",
+        "Paths",
+        "AltRoots",
+        "ChangeView",
+        "LimitView",
+    };
+    return fields;
 }
 
 } // namespace
@@ -115,4 +148,68 @@ Spec Spec::FromStrDict(StrDict *dict) {
     }
 
     return spec;
+}
+
+Spec Spec::FromTaggedStat(StrDict *varList) {
+    Spec spec = FromStrDict(varList);
+    if (!varList) {
+        return spec;
+    }
+
+    std::map<std::string, std::map<int, std::string>> indexedLists;
+    StrRef var;
+    StrRef val;
+    for (int i = 0; varList->GetVar(i, var, val); ++i) {
+        const std::string key = var.Text();
+        if (key == "code" || key == "status" || key == "action") {
+            continue;
+        }
+
+        std::string base;
+        int index = 0;
+        if (!ParseIndexedFieldKey(key, base, index)) {
+            continue;
+        }
+
+        indexedLists[base][index] = val.Text();
+    }
+
+    for (const auto &[base, entries] : indexedLists) {
+        if (spec.contains(base)) {
+            continue;
+        }
+        std::vector<std::pair<int, std::string>> sorted(entries.begin(), entries.end());
+        std::sort(sorted.begin(), sorted.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
+        std::vector<std::string> lines;
+        lines.reserve(sorted.size());
+        for (const auto &[_, line] : sorted) {
+            lines.push_back(line);
+        }
+        if (!lines.empty()) {
+            spec.set(base, lines);
+        }
+    }
+
+    return spec;
+}
+
+std::string Spec::ToForm() const {
+    std::ostringstream out;
+    for (const auto &[key, value] : m_fields) {
+        if (std::holds_alternative<std::string>(value)) {
+            out << key << ":\t" << std::get<std::string>(value) << '\n';
+            continue;
+        }
+
+        const auto &lines = std::get<std::vector<std::string>>(value);
+        if (FormListFields().count(key) > 0 || lines.size() > 1) {
+            out << key << ":\n";
+            for (const std::string &line : lines) {
+                out << '\t' << line << '\n';
+            }
+        } else if (!lines.empty()) {
+            out << key << ":\t" << lines.front() << '\n';
+        }
+    }
+    return out.str();
 }

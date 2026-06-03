@@ -9,6 +9,8 @@
 #include <p4/clientapi.h>
 #include <p4/p4libs.h>
 
+#include "commands/changes.h"
+#include "commands/client.h"
 #include "log.h"
 #include "options.h"
 #include "utils/cli_helpers.h"
@@ -280,6 +282,7 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template p5::Client P5::Run<p5::Client>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Filelog P5::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
@@ -335,6 +338,11 @@ Users P5::RunUsers(const std::vector<std::string> &args) {
 Changes P5::RunChanges(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Changes>("changes", args);
+}
+
+p5::Client P5::RunClient(const std::vector<std::string> &args) {
+    SetSpecProtocol();
+    return Run<p5::Client>("client", args);
 }
 
 Fstat P5::RunFstat(const std::vector<std::string> &args) {
