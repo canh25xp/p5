@@ -1,6 +1,10 @@
-#include "commands/have.h"
+#include <CLI/CLI.hpp>
 
+#include "commands/have.h"
+#include "commands.h"
+#include "log.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 
@@ -61,4 +65,28 @@ std::unordered_map<std::string, HaveRecord> Have::Load(P5 &p5, const std::vector
     }
 
     return p5.RunHave(args).records();
+}
+
+void Have::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
+    P5 &p5 = m_commands->p5();
+
+    Have r = p5.RunHave(args);
+    if (r.IsError()) {
+        CLI_ERROR("have command failed");
+        std::exit(1);
+    }
+
+    for (const auto &[_, rec] : r.records()) {
+        PRINT(rec.depotFile << (rec.haveRev ? ("#" + std::to_string(*rec.haveRev)) : "") << " - " << rec.clientFile);
+    }
+}
+
+void Have::register_cli(CLI::App &app) {
+    auto *sub = app.add_subcommand(name, description);
+    sub->prefix_command();
+
+    sub->callback([this, sub]() {
+        this->run(sub->remaining());
+    });
 }

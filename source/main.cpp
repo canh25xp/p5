@@ -8,6 +8,8 @@
 #include "commands/users.h"
 #include "commands/set.h"
 #include "commands/fast_reconcile.h"
+#include "commands/have.h"
+#include "commands/fstat.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -58,7 +60,7 @@ int main(int argc, char **argv) {
     commands.add({"reconcile", "rec"}, "Reconcile client to offline workspace changes; 'rec' is a synonym for 'reconcile'");
     commands.add(std::make_unique<FastReconcile>());
     commands.add("status", "Synonym for 'reconcile -ead' (output uses local paths)");
-    commands.add("have", "List revisions last synced");
+    commands.add(std::make_unique<Have>());
     commands.add("opened", "Display list of files opened for pending changelist");
     commands.add("where", "Show how file names map through the client view");
     commands.add("ignores", "List P4IGNORE mappings");
@@ -69,7 +71,7 @@ int main(int argc, char **argv) {
 
     // --- Depot / file info ---
     commands.add("files", "List files in the depot");
-    commands.add("fstat", "Dump file info");
+    commands.add(std::make_unique<Fstat>());
     commands.add("filelog", "List revision history of files");
     commands.add("annotate", "Print file lines along with their revisions");
     commands.add("diff", "Display diff of client file with depot file");

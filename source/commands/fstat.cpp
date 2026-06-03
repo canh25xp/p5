@@ -1,6 +1,10 @@
-#include "commands/fstat.h"
+#include <CLI/CLI.hpp>
 
+#include "commands/fstat.h"
+#include "commands.h"
+#include "log.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 
@@ -139,4 +143,28 @@ DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
     }
 
     return fstat.state();
+}
+
+void Fstat::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
+    P5 &p5 = m_commands->p5();
+
+    Fstat r = p5.RunFstat(args);
+    if (r.IsError()) {
+        CLI_ERROR("fstat command failed");
+        std::exit(1);
+    }
+
+    for (const auto &record : r.state().fileRecords) {
+        PRINT(record.depotFile << (record.haveRev ? ("#" + std::to_string(*record.haveRev)) : "") << " - " << record.clientFile);
+    }
+}
+
+void Fstat::register_cli(CLI::App &app) {
+    auto *sub = app.add_subcommand(name, description);
+    sub->prefix_command();
+
+    sub->callback([this, sub]() {
+        this->run(sub->remaining());
+    });
 }
