@@ -45,6 +45,12 @@ struct FilelogFile {
 
 FilelogFile ParseFilelogStat(StrDict *varList);
 
-std::string FormatFilelog(const FilelogFile &file);
+struct FilelogFormatOptions {
+    bool includeTime{false};
+    bool longDesc{false};
+    bool truncDesc{false};
+};
+
+std::string FormatFilelog(const FilelogFile &file, const FilelogFormatOptions &opts = {});
 
 } // namespace p5

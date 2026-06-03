@@ -26,7 +26,7 @@ int ParseIntegrationRev(const char *value) {
     return std::atoi(value);
 }
 
-std::string FormatRevisionTime(int64_t unixTime) {
+std::string FormatRevisionTime(int64_t unixTime, bool includeTime) {
     if (unixTime <= 0) {
         return {};
     }
@@ -38,17 +38,41 @@ std::string FormatRevisionTime(int64_t unixTime) {
     localtime_r(&t, &tm_buf);
 #endif
     char buf[64];
-    if (std::strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", &tm_buf) == 0) {
+    const char *fmt = includeTime ? "%Y/%m/%d %H:%M:%S" : "%Y/%m/%d";
+    if (std::strftime(buf, sizeof(buf), fmt, &tm_buf) == 0) {
         return std::to_string(unixTime);
     }
     return buf;
 }
 
-std::string FormatRevisionLine(const FileRevision &rev, int revWidth, int changeWidth) {
+void TruncateDescription(std::string &desc, size_t maxLen) {
+    if (desc.size() > maxLen) {
+        desc.resize(maxLen);
+    }
+}
+
+std::string FormatRevisionDescription(const std::string &desc, const FilelogFormatOptions &opts) {
+    if (opts.longDesc) {
+        return desc;
+    }
+    if (opts.truncDesc) {
+        std::string truncated = desc;
+        TruncateDescription(truncated, 250);
+        return truncated;
+    }
+    const size_t newline = desc.find('\n');
+    if (newline == std::string::npos) {
+        return desc;
+    }
+    return desc.substr(0, newline);
+}
+
+std::string FormatRevisionLine(const FileRevision &rev, int revWidth, int changeWidth, const FilelogFormatOptions &opts) {
     std::ostringstream out;
+    const std::string formattedDesc = FormatRevisionDescription(rev.desc, opts);
     out << "... #" << std::setw(revWidth) << std::left << rev.rev << std::right << " change " << std::setw(changeWidth) << std::left << rev.change << std::right << " "
-        << std::setw(9) << std::left << rev.action << std::right << " on " << FormatRevisionTime(rev.time) << "  by " << rev.user << "@" << rev.client << " (" << rev.type
-        << ") '" << rev.desc << "'";
+        << std::setw(9) << std::left << rev.action << std::right << " on " << FormatRevisionTime(rev.time, opts.includeTime) << "  by " << rev.user << "@" << rev.client
+        << " (" << rev.type << ") '" << formattedDesc << "'";
     return out.str();
 }
 
@@ -125,7 +149,7 @@ FilelogFile ParseFilelogStat(StrDict *varList) {
     return file;
 }
 
-std::string FormatFilelog(const FilelogFile &file) {
+std::string FormatFilelog(const FilelogFile &file, const FilelogFormatOptions &opts) {
     if (file.revisions.empty()) {
         return file.depotFile;
     }
@@ -142,7 +166,7 @@ std::string FormatFilelog(const FilelogFile &file) {
     out << file.depotFile;
     for (const FileRevision &revision : file.revisions) {
         out << '\n'
-            << FormatRevisionLine(revision, revWidth, changeWidth);
+            << FormatRevisionLine(revision, revWidth, changeWidth, opts);
         for (const FileIntegration &integration : revision.integrations) {
             out << '\n'
                 << FormatIntegrationLine(integration);

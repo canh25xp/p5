@@ -3,6 +3,7 @@
 #include "commands/command.h"
 #include "types/filelog.h"
 
+#include <string>
 #include <vector>
 
 class P5;
@@ -20,6 +21,18 @@ public:
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
 
+    std::vector<std::string> buildP4Args(const std::vector<std::string> &files) const;
+
 private:
     std::vector<p5::FilelogFile> m_files;
+
+    int m_changelist{0};
+    bool m_contentHistory{false};
+    bool m_inherited{false};
+    bool m_long{false};
+    bool m_longTrunc{false};
+    bool m_time{false};
+    int m_max{0};
+    bool m_noPromote{false};
+    bool m_short{false};
 };
