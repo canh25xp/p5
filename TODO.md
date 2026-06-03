@@ -22,6 +22,7 @@
     - [ ] Convenience way to add and remove workspace mapping
     - [ ] Helix Swarm integration
     - [ ] Code Grok integration to replace `p4 grep`
+    - [ ] `p4 mirror`. See [mirror.md](./docs/improvements/mirror.md)
   - [ ] Improve Feature:
     - [ ] `p4 blame` filter by lines
     - [ ] `p4 login` remember password and auto login
