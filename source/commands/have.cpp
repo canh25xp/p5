@@ -16,11 +16,7 @@ namespace {
 using p5::HaveRecord;
 
 std::string ToLower(std::string s) {
-    for (char &c : s) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c; });
     return s;
 }
 
