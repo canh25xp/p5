@@ -9,6 +9,11 @@
 #include <sstream>
 #include <unordered_set>
 
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
+
 namespace reconcile {
 
 using p5::WorkspaceFile;

@@ -260,11 +260,10 @@ void SaveDigestCache(const std::string &clientName, const WorkspaceCache &cache)
         return;
     }
 
-    const std::string path = CachePath(clientName);
-    const auto slash = path.find_last_of('/');
-    if (slash != std::string::npos) {
+    const fs::path path = CachePath(clientName);
+    {
         std::error_code ec;
-        fs::create_directories(path.substr(0, slash), ec);
+        fs::create_directories(path.parent_path(), ec);
     }
 
     std::ofstream out(path, std::ios::binary | std::ios::trunc);

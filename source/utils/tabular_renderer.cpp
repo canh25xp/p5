@@ -88,7 +88,7 @@ void PrintTable(std::ostream &out, const std::vector<std::string> &headers, cons
     std::vector<size_t> colWidths(numCols, 0);
     const auto updateWidth = [&](size_t col, const std::string &text) {
         if (col < numCols) {
-            colWidths[col] = std::max(colWidths[col], DisplayWidth(text));
+            colWidths[col] = (std::max)(colWidths[col], DisplayWidth(text));
         }
     };
 
