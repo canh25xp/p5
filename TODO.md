@@ -25,7 +25,7 @@
   - [ ] Improve Feature:
     - [ ] `p4 blame` filter by lines
     - [ ] `p4 login` remember password and auto login
-    - [ ] `p4 rec` Faster implementation
+    - [x] `p4 rec` Faster implementation (`p5 fast-rec`)
   - [ ] Improve Visual
     - [ ] Output coloring
     - [ ] Diff coloring
