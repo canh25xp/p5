@@ -102,11 +102,9 @@ void Changes::PrintSortedTable(std::ostream &out, bool includeTime, bool truncat
     for (size_t i = 0; i < indices.size(); ++i) {
         indices[i] = i;
     }
-    if (!reverse) {
-        std::sort(indices.begin(), indices.end(), [this](size_t a, size_t b) {
-            return m_order[a] < m_order[b];
-        });
-    }
+    std::sort(indices.begin(), indices.end(), [this, reverse](size_t a, size_t b) {
+        return reverse ? m_order[a] < m_order[b] : m_order[a] > m_order[b];
+    });
 
     std::vector<std::vector<std::string>> rows;
     rows.reserve(indices.size());
@@ -129,11 +127,9 @@ void Changes::PrintFormatted(std::ostream &out, bool includeTime, bool reverse) 
     for (size_t i = 0; i < indices.size(); ++i) {
         indices[i] = i;
     }
-    if (!reverse) {
-        std::sort(indices.begin(), indices.end(), [this](size_t a, size_t b) {
-            return m_order[a] < m_order[b];
-        });
-    }
+    std::sort(indices.begin(), indices.end(), [this, reverse](size_t a, size_t b) {
+        return reverse ? m_order[a] < m_order[b] : m_order[a] > m_order[b];
+    });
 
     for (size_t idx : indices) {
         const ChangeData &data = m_changes[idx];
