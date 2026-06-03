@@ -1,8 +1,9 @@
 #pragma once
 
 #include "p5.h"
-#include "../types.h"
-#include "reconcile/types.h"
+#include "types/depot.h"
+#include "types/reconcile.h"
+#include "types/workspace.h"
 
 #include <string>
 #include <vector>

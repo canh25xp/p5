@@ -1,7 +1,7 @@
 #pragma once
 
 #include "commands/command.h"
-#include "types.h"
+#include "types/have.h"
 
 #include <string>
 #include <unordered_map>

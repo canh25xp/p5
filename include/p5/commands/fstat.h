@@ -1,7 +1,7 @@
 #pragma once
 
 #include "commands/command.h"
-#include "types.h"
+#include "types/depot.h"
 
 #include <string>
 #include <vector>

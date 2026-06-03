@@ -1,7 +1,7 @@
 #pragma once
 
 #include "p5.h"
-#include "../types.h"
+#include "types/workspace.h"
 
 #include <string>
 #include <vector>

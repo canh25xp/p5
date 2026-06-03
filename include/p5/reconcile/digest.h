@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../types.h"
+#include "types/depot.h"
+#include "types/have.h"
+#include "types/workspace.h"
 
 #include <array>
 #include <cstdint>
