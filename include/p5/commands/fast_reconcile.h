@@ -4,7 +4,7 @@
 
 class FastReconcile : public Command {
 public:
-    FastReconcile() : Command("fast-reconcile", "Fast offline reconcile (same as rec, optimized)", {"fast-rec"}) {}
+    FastReconcile() : Command("freconcile", "Fast reconcile (same as rec, optimized)", {"frec"}) {}
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
