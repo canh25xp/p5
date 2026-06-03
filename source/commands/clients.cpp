@@ -86,7 +86,7 @@ void Clients::PrintFormatted(std::ostream &out) const {
     }
 }
 
-void Clients::PrintSortedTsv(std::ostream &out) const {
+void Clients::PrintSortedTable(std::ostream &out) const {
     if (m_Clients.empty()) {
         return;
     }
@@ -130,7 +130,7 @@ void Clients::run(const std::vector<std::string> &args) {
         // Rebuild m_Clients with filtered data and print
         r.m_Clients = std::move(toPrint);
     }
-    r.PrintSortedTsv(std::cout);
+    r.PrintSortedTable(std::cout);
 }
 
 void Clients::register_cli(CLI::App &app) {

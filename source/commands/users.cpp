@@ -40,7 +40,7 @@ void Users::OutputStat(StrDict *varList) {
     m_Users.insert({userID, userData});
 }
 
-void Users::PrintSortedTsv(std::ostream &out) const {
+void Users::PrintSortedTable(std::ostream &out) const {
     if (m_Users.empty()) {
         return;
     }
@@ -70,5 +70,5 @@ void Users::run(const std::vector<std::string> &args) {
     if (r.IsError())
         throw CLI::RuntimeError(1);
 
-    r.PrintSortedTsv(std::cout);
+    r.PrintSortedTable(std::cout);
 }
