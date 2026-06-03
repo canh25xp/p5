@@ -7,6 +7,7 @@
 #include "commands/fstat.h"
 #include "commands/have.h"
 #include "reconcile/workspace_scan.h"
+#include "utils/std_helper.h"
 
 #include <cstdio>
 #include <iostream>
@@ -279,19 +280,6 @@ void PrintAction(const std::string &depotFile, int rev, const char *message) {
     }
 }
 
-std::string ShellQuote(const std::string &arg) {
-    std::string out = "'";
-    for (char c : arg) {
-        if (c == '\'') {
-            out += "'\\''";
-        } else {
-            out += c;
-        }
-    }
-    out += "'";
-    return out;
-}
-
 std::string DepotPathForClientFile(const std::string &clientPath) {
     std::ostringstream cmd;
     cmd << "p4";
@@ -330,13 +318,7 @@ std::string DepotPathForClientFile(const std::string &clientPath) {
 }
 
 const DepotFileRecord *FindByClientPath(const DepotState &depot, const std::string &clientPath) {
-    std::string lower = clientPath;
-    for (char &c : lower) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
-    return depot.getByClientLower(lower);
+    return depot.getByClientLower(ToLower(clientPath));
 }
 
 } // namespace

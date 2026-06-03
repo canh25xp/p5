@@ -5,22 +5,14 @@
 #include "log.h"
 #include "p5.h"
 #include "options.h"
+#include "utils/std_helper.h"
 
 #include <p4/clientapi.h>
 
 #include <cstdlib>
 #include <cstring>
 
-namespace {
-
 using p5::HaveRecord;
-
-std::string ToLower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
-    return s;
-}
-
-} // namespace
 
 void Have::OutputStat(StrDict *varList) {
     if (!varList) {

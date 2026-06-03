@@ -11,39 +11,12 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace {
+#include "utils/std_helper.h"
 
 using p5::DepotFileRecord;
 using p5::DepotState;
 using p5::ParseFileAction;
 using p5::ParseFileType;
-
-std::string ToLower(std::string s) {
-    for (char &c : s) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
-    return s;
-}
-
-bool ParseDigestHex(const char *hex, std::array<uint8_t, 16> &out) {
-    if (!hex || std::strlen(hex) != 32) {
-        return false;
-    }
-    for (int i = 0; i < 16; ++i) {
-        char buf[3] = {hex[i * 2], hex[i * 2 + 1], '\0'};
-        char *end = nullptr;
-        unsigned long v = std::strtoul(buf, &end, 16);
-        if (end != buf + 2) {
-            return false;
-        }
-        out[static_cast<size_t>(i)] = static_cast<uint8_t>(v);
-    }
-    return true;
-}
-
-} // namespace
 
 void Fstat::OutputStat(StrDict *varList) {
     if (!varList) {

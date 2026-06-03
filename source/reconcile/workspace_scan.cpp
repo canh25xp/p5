@@ -2,6 +2,7 @@
 
 #include "commands/result.h"
 #include "options.h"
+#include "utils/std_helper.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -16,15 +17,6 @@ using p5::WorkspaceState;
 namespace fs = std::filesystem;
 
 namespace {
-
-std::string ToLower(std::string s) {
-    for (char &c : s) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
-    return s;
-}
 
 class IgnoreResult : public Result {
 public:
@@ -66,19 +58,6 @@ public:
 };
 
 namespace {
-
-std::string ShellQuote(const std::string &arg) {
-    std::string out = "'";
-    for (char c : arg) {
-        if (c == '\'') {
-            out += "'\\''";
-        } else {
-            out += c;
-        }
-    }
-    out += "'";
-    return out;
-}
 
 void RunIgnoresBatch(const std::vector<std::string> &paths, IgnoreResult &ignoreResult) {
     if (paths.empty()) {
