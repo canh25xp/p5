@@ -58,6 +58,7 @@ struct DepotFileRecord {
 };
 
 struct HaveRecord {
+    std::string path;
     std::string depotFile;
     std::string clientFile;
     std::optional<int> haveRev;

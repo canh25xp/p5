@@ -42,6 +42,7 @@ void Have::OutputStat(StrDict *varList) {
     }
 
     HaveRecord rec;
+    rec.path = path->Text();
     if (StrPtr *depotFile = varList->GetVar("depotFile")) {
         rec.depotFile = depotFile->Text();
     }
@@ -55,7 +56,7 @@ void Have::OutputStat(StrDict *varList) {
         rec.syncTime = std::strtoll(syncTime->Text(), nullptr, 10);
     }
 
-    m_records[ToLower(path->Text())] = rec;
+    m_records[ToLower(rec.path)] = rec;
 }
 
 std::unordered_map<std::string, HaveRecord> Have::Load(P5 &p5, const std::vector<std::string> &paths) {
