@@ -57,3 +57,47 @@ p4 sync ...@123456
 p5 mirror TEMPLATE_CLIENT
 p5 mirror TEMPLATE_CLIENT MIRRORED_CLIENT # optionally specify mirror client name
 ```
+
+First get all synced CLs from template client
+
+```sh
+p4 -c TEMPLATE_CLIENT changes //TEMPLATE_CLIENT/...#have
+Change 10
+Change 7
+Change 6
+Change 5
+Change 4
+Change 3
+Change 2
+Change 1
+```
+
+```sh
+p4 sync ...@1,2,3,4,5,6,7,10 # this DOES NOT work
+
+# this works but inefficient
+p4 sync ...@1
+p4 sync ...@2
+p4 sync ...@3
+p4 sync ...@4
+p4 sync ...@5
+p4 sync ...@7
+p4 sync ...@10
+```
+
+We need an algorithm to optimizing sync to a list of CLs.
+
+```sh
+p4 sync ...@7
+p4 sync ...@=10
+```
+
+compare synced CLs with template to confirm
+
+```sh
+# These two list of CLs should match
+p4 -c TEMPLATE_CLIENT changes //TEMPLATE_CLIENT/...#have
+p4 changes ...#have
+```
+
+
