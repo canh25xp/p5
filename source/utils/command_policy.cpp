@@ -35,6 +35,7 @@ const std::unordered_set<std::string> &AllCommandsImpl() {
         "flush",
         "clean",
         "reconcile",
+        "fast-reconcile",
         "status",
         "have",
         "opened",
@@ -128,6 +129,7 @@ const std::unordered_map<std::string, std::string> &AliasMap() {
         {"changelist", "change"},
         {"changelists", "changes"},
         {"rec", "reconcile"},
+        {"fast-rec", "fast-reconcile"},
         {"workspace", "client"},
         {"workspaces", "clients"},
     };
