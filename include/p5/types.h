@@ -3,4 +3,5 @@
 #include "types/depot.h"
 #include "types/filelog.h"
 #include "types/have.h"
+#include "types/spec.h"
 #include "types/workspace.h"
