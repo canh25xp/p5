@@ -251,6 +251,8 @@ void Changes::register_cli(CLI::App &app) {
     sub->add_flag("--stream", m_stream, "Display only changes that contain a stream spec");
     sub->add_flag("--nostream", m_nostream, "Display only changes that do not contain a stream spec");
 
+    sub->allow_extras();
+
     sub->callback([this, sub]() {
         std::vector<std::string> args = buildP4Args(sub->remaining());
         this->run(args);
