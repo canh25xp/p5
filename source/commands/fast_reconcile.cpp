@@ -71,7 +71,7 @@ void FastReconcile::run(const std::vector<std::string> &args) {
 
     const std::string workDir = fs::current_path().string();
 
-    reconcile::WorkspaceCache cache;
+    p5::WorkspaceCache cache;
     const std::string clientName = g_options.client();
     if (!clientName.empty()) {
         reconcile::LoadDigestCache(clientName, cache);

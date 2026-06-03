@@ -1,7 +1,7 @@
 #pragma once
 
 #include "commands/command.h"
-#include "reconcile/types.h"
+#include "types.h"
 
 #include <string>
 #include <vector>
@@ -14,14 +14,14 @@ public:
 
     void OutputStat(StrDict *varList) override;
 
-    const reconcile::DepotState &state() const { return m_state; }
-    reconcile::DepotState &state() { return m_state; }
+    const p5::DepotState &state() const { return m_state; }
+    p5::DepotState &state() { return m_state; }
 
-    static reconcile::DepotState Load(P5 &p5, const std::vector<std::string> &paths);
+    static p5::DepotState Load(P5 &p5, const std::vector<std::string> &paths);
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
 
 private:
-    reconcile::DepotState m_state;
+    p5::DepotState m_state;
 };

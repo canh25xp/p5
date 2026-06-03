@@ -60,8 +60,9 @@ High-level flow:
 | [`source/commands/fstat.cpp`](../../source/commands/fstat.cpp) | `Fstat::OutputStat`, `Fstat::Load` (bulk + stale-rev refresh) |
 | [`include/p5/commands/have.h`](../../include/p5/commands/have.h) | Tag `have` collector (`Have` extends `Result`) |
 | [`source/commands/have.cpp`](../../source/commands/have.cpp) | `Have::OutputStat`, `Have::Load` |
-| [`include/p5/reconcile/types.h`](../../include/p5/reconcile/types.h) | Depot/workspace records, `ReconcilePlan`, options |
-| [`source/reconcile/types.cpp`](../../source/reconcile/types.cpp) | P4 action/type parsing, depot/workspace maps |
+| [`include/p5/types.h`](../../include/p5/types.h) | Shared depot/workspace records, P4 enums and parsers (`namespace p5`) |
+| [`source/types.cpp`](../../source/types.cpp) | P4 action/type parsing, depot/workspace maps |
+| [`include/p5/reconcile/types.h`](../../include/p5/reconcile/types.h) | `ReconcilePlan`, `ReconcileOptions` |
 | [`include/p5/reconcile/engine.h`](../../include/p5/reconcile/engine.h) | `Analyze`, `ApplyPlan` |
 | [`source/reconcile/engine.cpp`](../../source/reconcile/engine.cpp) | Classification, preview output, apply |
 | [`include/p5/reconcile/digest.h`](../../include/p5/reconcile/digest.h) | MD5, cache, `DigestMatches` |

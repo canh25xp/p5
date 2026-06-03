@@ -1,6 +1,7 @@
 #pragma once
 
 #include "p5.h"
+#include "../types.h"
 #include "reconcile/types.h"
 
 #include <string>
@@ -10,11 +11,11 @@ namespace reconcile {
 
 struct AnalyzeResult {
     ReconcilePlan plan;
-    DepotState depot;
+    p5::DepotState depot;
 };
 
-AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, WorkspaceCache &cache);
+AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, p5::WorkspaceCache &cache);
 
-void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const ReconcileOptions &opts);
+void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const p5::DepotState &depot, const ReconcileOptions &opts);
 
 } // namespace reconcile

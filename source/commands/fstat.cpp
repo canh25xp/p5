@@ -13,10 +13,10 @@
 
 namespace {
 
-using reconcile::DepotFileRecord;
-using reconcile::DepotState;
-using reconcile::ParseFileAction;
-using reconcile::ParseFileType;
+using p5::DepotFileRecord;
+using p5::DepotState;
+using p5::ParseFileAction;
+using p5::ParseFileType;
 
 std::string ToLower(std::string s) {
     for (char &c : s) {

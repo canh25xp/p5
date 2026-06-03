@@ -16,6 +16,14 @@ namespace fs = std::filesystem;
 
 namespace reconcile {
 
+using p5::DigestType;
+using p5::DigestTypeFor;
+using p5::FileType;
+using p5::HaveRecord;
+using p5::WorkspaceCache;
+using p5::WorkspaceCacheEntry;
+using p5::WorkspaceFile;
+
 namespace {
 
 fs::path GetCacheDir() {

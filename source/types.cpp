@@ -1,8 +1,8 @@
-#include "reconcile/types.h"
+#include "types.h"
 
 #include <cstring>
 
-namespace reconcile {
+namespace p5 {
 
 namespace {
 
@@ -173,4 +173,4 @@ const WorkspaceFile *WorkspaceState::getFiltered(const std::string &pathLower) c
     return &file;
 }
 
-} // namespace reconcile
+} // namespace p5

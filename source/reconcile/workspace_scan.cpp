@@ -10,6 +10,9 @@
 
 namespace reconcile {
 
+using p5::WorkspaceFile;
+using p5::WorkspaceState;
+
 namespace fs = std::filesystem;
 
 namespace {

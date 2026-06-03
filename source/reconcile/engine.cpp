@@ -15,6 +15,17 @@
 
 namespace reconcile {
 
+using p5::DepotFileRecord;
+using p5::DepotState;
+using p5::DigestType;
+using p5::DigestTypeFor;
+using p5::FileAction;
+using p5::FileType;
+using p5::HaveRecord;
+using p5::WorkspaceCache;
+using p5::WorkspaceFile;
+using p5::WorkspaceState;
+
 namespace {
 
 bool IsDeletedHead(FileAction a) {

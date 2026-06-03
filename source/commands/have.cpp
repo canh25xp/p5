@@ -13,7 +13,7 @@
 
 namespace {
 
-using reconcile::HaveRecord;
+using p5::HaveRecord;
 
 std::string ToLower(std::string s) {
     for (char &c : s) {
