@@ -63,7 +63,6 @@ void Have::run(const std::vector<std::string> &args) {
     Have r = p5.RunHave(args);
     if (r.IsError()) {
         CLI_ERROR("have command failed");
-        std::exit(1);
     }
 
     for (const auto &[_, rec] : r.records()) {

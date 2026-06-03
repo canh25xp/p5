@@ -1,5 +1,7 @@
 #pragma once
 
+#include <CLI/Error.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -53,7 +55,11 @@ public:
 
 #define CLI_INFO(x) LOG_INTERNAL(LogLevel::Info, LogSource::CLI, x)
 #define CLI_WARN(x) LOG_INTERNAL(LogLevel::Warn, LogSource::CLI, x)
-#define CLI_ERROR(x) LOG_INTERNAL(LogLevel::Error, LogSource::CLI, x)
+#define CLI_ERROR(x)                                      \
+    do {                                                  \
+        LOG_INTERNAL(LogLevel::Error, LogSource::CLI, x); \
+        throw CLI::RuntimeError(1);                       \
+    } while (0)
 #define CLI_FATAL(x)                                      \
     do {                                                  \
         LOG_INTERNAL(LogLevel::Fatal, LogSource::CLI, x); \

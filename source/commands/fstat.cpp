@@ -125,7 +125,6 @@ void Fstat::run(const std::vector<std::string> &args) {
     Fstat r = p5.RunFstat(args);
     if (r.IsError()) {
         CLI_ERROR("fstat command failed");
-        std::exit(1);
     }
 
     for (const auto &record : r.state().fileRecords) {

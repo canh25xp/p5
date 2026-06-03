@@ -288,7 +288,6 @@ void Set::run(const std::vector<std::string> &args) {
 
     if (m_all) {
         CLI_ERROR("p5 set: -a/--all cannot be used with variable arguments");
-        throw CLI::RuntimeError(1);
     }
 
     for (const std::string &arg : args) {
@@ -296,11 +295,9 @@ void Set::run(const std::vector<std::string> &args) {
         if (eq == std::string::npos) {
             if (!arg.empty() && arg[0] == '-') {
                 CLI_ERROR("p5 set: unknown option: " << arg);
-                throw CLI::RuntimeError(1);
             }
         } else if (eq > 0 && arg[0] == '-') {
             CLI_ERROR("p5 set: invalid variable name: " << arg.substr(0, eq));
-            throw CLI::RuntimeError(1);
         }
     }
 
@@ -319,13 +316,11 @@ void Set::run(const std::vector<std::string> &args) {
         }
         if (eq == 0) {
             CLI_ERROR("p5 set: empty variable name");
-            throw CLI::RuntimeError(1);
         }
         const std::string name = arg.substr(0, eq);
         const std::string value = arg.substr(eq + 1);
 #if defined(_WIN32)
         CLI_ERROR("p5 set: updating Perforce variables (NAME=value) is currently not supported on Windows");
-        throw CLI::RuntimeError(1);
 #else
         if (!p4_set_persistent_unix(*env, name, value)) {
             throw CLI::RuntimeError(1);

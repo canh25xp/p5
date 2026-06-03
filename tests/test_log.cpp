@@ -13,7 +13,7 @@ int main() {
 
     CLI_INFO("This is a CLI INFO message.");
     CLI_WARN("This is a CLI WARN message.");
-    CLI_ERROR("This is a CLI ERROR message.");
+    LOG_INTERNAL(LogLevel::Error, LogSource::CLI, "This is a CLI ERROR message.");
 
     API_INFO("This is a API INFO message.");
     API_WARN("This is a API WARN message.");
@@ -29,7 +29,7 @@ int main() {
 
     CLI_INFO("This is a CLI INFO message.");
     CLI_WARN("This is a CLI WARN message.");
-    CLI_ERROR("This is a CLI ERROR message.");
+    LOG_INTERNAL(LogLevel::Error, LogSource::CLI, "This is a CLI ERROR message.");
 
     API_INFO("This is a API INFO message.");
     API_WARN("This is a API WARN message.");
@@ -45,7 +45,7 @@ int main() {
 
     CLI_INFO("This is a CLI INFO message.");
     CLI_WARN("This is a CLI WARN message.");
-    CLI_ERROR("This is a CLI ERROR message.");
+    LOG_INTERNAL(LogLevel::Error, LogSource::CLI, "This is a CLI ERROR message.");
 
     API_INFO("This is a API INFO message.");
     API_WARN("This is a API WARN message.");

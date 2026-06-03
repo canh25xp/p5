@@ -77,7 +77,6 @@ void Filelog::run(const std::vector<std::string> &args) {
     Filelog result = p5.RunFilelog(args);
     if (result.IsError()) {
         CLI_ERROR("filelog command failed");
-        std::exit(1);
     }
 
     p5::FilelogFormatOptions opts;
@@ -111,7 +110,6 @@ void Filelog::register_cli(CLI::App &app) {
     sub->callback([this, sub]() {
         if (m_noPromote && !m_contentHistory) {
             CLI_ERROR("The -p flag requires -h");
-            throw CLI::RuntimeError(1);
         }
         this->run(buildP4Args(sub->remaining()));
     });
