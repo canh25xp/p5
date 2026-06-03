@@ -18,13 +18,37 @@ namespace reconcile {
 
 namespace {
 
-std::string CachePath(const std::string &clientName) {
-    const char *home = std::getenv("HOME");
-    if (!home) {
-        home = std::getenv("USERPROFILE");
+fs::path GetCacheDir() {
+#ifdef _WIN32
+    if (const char *localAppData = std::getenv("LOCALAPPDATA")) {
+        return fs::path(localAppData) / "p5";
     }
-    std::string base = home ? home : ".";
-    return base + "/.cache/p5/digests_" + clientName + ".bin";
+
+    if (const char *userProfile = std::getenv("USERPROFILE")) {
+        return fs::path(userProfile) / "AppData" / "Local" / "p5";
+    }
+#else
+    // Linux / WSL
+    if (const char *xdgCacheHome = std::getenv("XDG_CACHE_HOME")) {
+        return fs::path(xdgCacheHome) / "p5";
+    }
+
+    if (const char *home = std::getenv("HOME")) {
+        return fs::path(home) / ".cache" / "p5";
+    }
+#endif
+
+    return fs::temp_directory_path() / "p5";
+}
+
+fs::path CachePath(const std::string &clientName) {
+    auto cacheDir = GetCacheDir();
+
+    std::error_code ec;
+    fs::create_directories(cacheDir, ec);
+
+    fs::path cachePath = cacheDir / ("digests_" + clientName + ".bin");
+    return cachePath;
 }
 
 class Md5Context {
