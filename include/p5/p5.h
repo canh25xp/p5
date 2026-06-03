@@ -13,6 +13,8 @@
 #include "commands/filelog.h"
 #include "commands/have.h"
 
+class ClientUser;
+
 class P5 {
     ClientApi m_ClientAPI;
     int m_Usage;
@@ -53,4 +55,6 @@ public:
     Fstat RunFstat(const std::vector<std::string> &args = {});
     Filelog RunFilelog(const std::vector<std::string> &args = {});
     Have RunHave(const std::vector<std::string> &args = {});
+
+    void ExecuteCommand(const std::string &command, const std::vector<std::string> &args, ClientUser &user);
 };

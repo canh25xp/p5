@@ -11,6 +11,7 @@
 #include "commands/have.h"
 #include "commands/fstat.h"
 #include "commands/filelog.h"
+#include "commands/map.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -68,6 +69,7 @@ int main(int argc, char **argv) {
 
     // --- Client / workspace ---
     commands.add({"client", "workspace"}, "Create or edit a client specification and its view");
+    commands.add(std::make_unique<Map>());
     commands.add(std::make_unique<Clients>());
 
     // --- Depot / file info ---

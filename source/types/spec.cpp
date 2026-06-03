@@ -4,11 +4,34 @@
 
 #include <algorithm>
 #include <cctype>
+#include <sstream>
+#include <cstring>
 
 namespace {
 
 bool IsListKey(const std::string &key) {
     return key == "View" || key == "SyncView" || key == "UpdateView" || key == "Revision" || key == "Files" || key == "Jobs" || key == "Paths";
+}
+
+bool IsMetaKey(const std::string &key) {
+    return key == "func" || key == "code" || key == "data" || key == "specdef" || key == "specFormatted" || key == "specstring" || key == "spectype";
+}
+
+void appendFieldOrder(std::vector<std::string> &order, const std::string &key) {
+    if (std::find(order.begin(), order.end(), key) == order.end()) {
+        order.push_back(key);
+    }
+}
+
+void writeIndentedField(std::ostream &out, const std::string &value) {
+    std::istringstream lines(value);
+    std::string line;
+    while (std::getline(lines, line)) {
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        out << '\t' << line << '\n';
+    }
 }
 
 } // namespace
@@ -48,11 +71,17 @@ void Spec::set(const std::string &key, Value value) {
     }
 
     if (m_fields.count(key) > 0 || m_fieldMap.empty()) {
+        if (m_fields.count(key) == 0) {
+            appendFieldOrder(m_fieldOrder, key);
+        }
         m_fields[key] = std::move(value);
         return;
     }
 
     const std::string canonical = canonicalKey(key);
+    if (m_fields.count(canonical) == 0) {
+        appendFieldOrder(m_fieldOrder, canonical);
+    }
     m_fields[canonical] = std::move(value);
 }
 
@@ -97,6 +126,13 @@ Spec Spec::FromStrDict(StrDict *dict) {
     StrRef val;
     for (int i = 0; dict->GetVar(i, var, val); ++i) {
         const std::string key = var.Text();
+        if (key == "speccomment") {
+            spec.m_comment = val.Text();
+            continue;
+        }
+        if (IsMetaKey(key)) {
+            continue;
+        }
         if (IsListKey(key)) {
             std::vector<std::string> list;
             list.push_back(val.Text());
@@ -108,11 +144,80 @@ Spec Spec::FromStrDict(StrDict *dict) {
                 }
                 list.push_back(next->Text());
             }
-            spec.set(key, list);
+            appendFieldOrder(spec.m_fieldOrder, key);
+            spec.m_fields[key] = list;
         } else {
-            spec.set(key, std::string(val.Text()));
+            appendFieldOrder(spec.m_fieldOrder, key);
+            spec.m_fields[key] = std::string(val.Text());
         }
     }
 
     return spec;
+}
+
+std::string Spec::toFormText() const {
+    std::ostringstream out;
+    if (!m_comment.empty()) {
+        out << m_comment;
+        if (m_comment.back() != '\n') {
+            out << '\n';
+        }
+        out << '\n';
+    }
+
+    for (const std::string &key : m_fieldOrder) {
+        const auto it = m_fields.find(key);
+        if (it == m_fields.end()) {
+            continue;
+        }
+
+        out << key << ":\n";
+        if (const auto *scalar = std::get_if<std::string>(&it->second)) {
+            writeIndentedField(out, *scalar);
+        } else if (const auto *list = std::get_if<std::vector<std::string>>(&it->second)) {
+            for (const std::string &line : *list) {
+                out << '\t' << line << '\n';
+            }
+        }
+        out << '\n';
+    }
+
+    return out.str();
+}
+
+std::vector<std::string> GetViewLines(const Spec &spec) {
+    const auto view = spec.get("View");
+    if (!view) {
+        return {};
+    }
+    if (const auto *list = std::get_if<std::vector<std::string>>(&(*view))) {
+        return *list;
+    }
+    if (const auto *scalar = std::get_if<std::string>(&(*view))) {
+        if (scalar->empty()) {
+            return {};
+        }
+        return {*scalar};
+    }
+    return {};
+}
+
+void SetViewLines(Spec &spec, const std::vector<std::string> &lines) {
+    spec.set("View", lines);
+}
+
+std::optional<std::string> GetSpecStringField(const Spec &spec, const std::string &key) {
+    const auto value = spec.get(key);
+    if (!value) {
+        return std::nullopt;
+    }
+    if (const auto *scalar = std::get_if<std::string>(&(*value))) {
+        return *scalar;
+    }
+    return std::nullopt;
+}
+
+bool HasNonEmptyStream(const Spec &spec) {
+    const auto stream = GetSpecStringField(spec, "Stream");
+    return stream.has_value() && !stream->empty();
 }

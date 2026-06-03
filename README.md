@@ -127,4 +127,4 @@ SUBCOMMANDS:
 
 ## Changes
 
-<!-- TODO: Add changes compare to `p4` -->
+- `p5 map` — list and edit client View mappings without an editor (see [docs/improvements/map.md](docs/improvements/map.md))

@@ -43,6 +43,7 @@ const std::unordered_set<std::string> &AllCommandsImpl() {
         "ignores",
         // Client / workspace
         "client",
+        "map",
         "clients",
         // Depot / file info
         "files",
@@ -119,6 +120,7 @@ const std::unordered_set<std::string> &AllCommandsImpl() {
         "aliases",
         "help",
         "set",
+        "map",
     };
     return commands;
 }

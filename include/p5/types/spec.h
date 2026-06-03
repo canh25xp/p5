@@ -25,13 +25,23 @@ public:
     bool contains(const std::string &key) const;
 
     const std::map<std::string, Value> &fields() const { return m_fields; }
+    const std::vector<std::string> &fieldOrder() const { return m_fieldOrder; }
 
     static Spec FromStrDict(StrDict *dict);
+
+    /// Format as a p4 spec form suitable for `p4 <spec-cmd> -i`.
+    std::string toFormText() const;
 
 private:
     std::string canonicalKey(const std::string &key) const;
 
     std::map<std::string, std::string> m_fieldMap;
     std::map<std::string, Value> m_fields;
+    std::vector<std::string> m_fieldOrder;
     std::string m_comment;
 };
+
+std::vector<std::string> GetViewLines(const Spec &spec);
+void SetViewLines(Spec &spec, const std::vector<std::string> &lines);
+std::optional<std::string> GetSpecStringField(const Spec &spec, const std::string &key);
+bool HasNonEmptyStream(const Spec &spec);

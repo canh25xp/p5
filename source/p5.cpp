@@ -342,3 +342,8 @@ Have P5::RunHave(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Have>("have", args);
 }
+
+void P5::ExecuteCommand(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    Execute(command, args, user);
+    RefreshIfNeeded();
+}
