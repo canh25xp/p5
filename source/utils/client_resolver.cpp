@@ -141,3 +141,24 @@ void ClientResolver::WriteClientToConfig(const std::string &configPath, const st
         WARN("Auto-resolve: could not write to " << configPath);
     }
 }
+
+void ClientResolver::WriteP4Config(const std::string &rootDir, const std::string &clientName) {
+    if (rootDir.empty() || clientName.empty()) {
+        return;
+    }
+
+    const std::string configPath = rootDir + "/.p4config";
+    WriteClientToConfig(configPath, clientName);
+
+    // WriteClientToConfig only writes when the file already exists; create it if missing.
+    std::ifstream check(configPath);
+    if (!check.is_open()) {
+        std::ofstream out(configPath, std::ios::binary);
+        if (out.is_open()) {
+            out << "P4CLIENT=" << clientName << "\n";
+            INFO("Created " << configPath << " with P4CLIENT=" << clientName);
+        } else {
+            WARN("Could not create " << configPath);
+        }
+    }
+}

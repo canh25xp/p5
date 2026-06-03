@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+class P5;
+
 class Changes : public Command {
 public:
     using ChangeNumber = int;
@@ -32,6 +34,10 @@ public:
 
     /// Block format with full description (used when -l is set).
     void PrintFormatted(std::ostream &out, bool includeTime, bool reverse) const;
+
+    const std::vector<ChangeNumber> &changelists() const { return m_order; }
+
+    static std::vector<ChangeNumber> Load(P5 &p5, const std::vector<std::string> &args);
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

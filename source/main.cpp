@@ -11,6 +11,7 @@
 #include "commands/have.h"
 #include "commands/fstat.h"
 #include "commands/filelog.h"
+#include "commands/mirror.h"
 
 #ifndef P5_APP_DESCRIPTION
 #define P5_APP_DESCRIPTION "p5"
@@ -69,6 +70,7 @@ int main(int argc, char **argv) {
     // --- Client / workspace ---
     commands.add({"client", "workspace"}, "Create or edit a client specification and its view");
     commands.add(std::make_unique<Clients>());
+    commands.add(std::make_unique<Mirror>());
 
     // --- Depot / file info ---
     commands.add("files", "List files in the depot");

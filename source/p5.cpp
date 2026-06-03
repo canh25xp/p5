@@ -198,6 +198,10 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
+ClientUser &P5::Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    return Execute(command, args, user);
+}
+
 void P5::SetTagProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
 }

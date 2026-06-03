@@ -44,6 +44,7 @@ const std::unordered_set<std::string> &AllCommandsImpl() {
         // Client / workspace
         "client",
         "clients",
+        "mirror",
         // Depot / file info
         "files",
         "fstat",
@@ -173,6 +174,7 @@ const std::unordered_set<std::string> &NoNeedClientResolve() {
         "repos",
         "repo",
         "clients",
+        "mirror",
         "stream",
         "streamlog",
         "streamspec",

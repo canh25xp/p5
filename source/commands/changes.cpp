@@ -208,6 +208,14 @@ std::vector<std::string> Changes::buildP4Args(const std::vector<std::string> &fi
     return args;
 }
 
+std::vector<Changes::ChangeNumber> Changes::Load(P5 &p5, const std::vector<std::string> &args) {
+    Changes r = p5.RunChanges(args);
+    if (r.IsError()) {
+        return {};
+    }
+    return r.changelists();
+}
+
 void Changes::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
     P5 &p5 = m_commands->p5();

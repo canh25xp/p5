@@ -28,4 +28,7 @@ public:
 
     /// Update P4CLIENT in the P4CONFIG file at configPath, if the file exists.
     static void WriteClientToConfig(const std::string &configPath, const std::string &resolved);
+
+    /// Create or update .p4config in rootDir with P4CLIENT=clientName.
+    static void WriteP4Config(const std::string &rootDir, const std::string &clientName);
 };
