@@ -58,6 +58,9 @@ struct DepotFileRecord {
 };
 
 struct HaveRecord {
+    std::string depotFile;
+    std::string clientFile;
+    std::optional<int> haveRev;
     int64_t syncTime{0};
 };
 

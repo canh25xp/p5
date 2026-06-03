@@ -38,6 +38,15 @@ void Have::OutputStat(StrDict *varList) {
     }
 
     HaveRecord rec;
+    if (StrPtr *depotFile = varList->GetVar("depotFile")) {
+        rec.depotFile = depotFile->Text();
+    }
+    if (StrPtr *clientFile = varList->GetVar("clientFile")) {
+        rec.clientFile = clientFile->Text();
+    }
+    if (StrPtr *haveRev = varList->GetVar("haveRev")) {
+        rec.haveRev = std::atoi(haveRev->Text());
+    }
     if (StrPtr *syncTime = varList->GetVar("syncTime")) {
         rec.syncTime = std::strtoll(syncTime->Text(), nullptr, 10);
     }
