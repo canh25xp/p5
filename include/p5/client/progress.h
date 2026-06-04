@@ -5,7 +5,8 @@
 
 #include <string>
 
-/// P4Python Progress base class.
+// Abstract base class for tracking operation progress (file transfers, sync, submit, etc.).
+// Subclass and override the callbacks (init, setDescription, setTotal, update, done) to receive progress updates from P4API operations.
 class Progress {
 public:
     static constexpr int TYPE_SENDFILE = 1;
@@ -34,7 +35,8 @@ protected:
     long m_position{0};
 };
 
-/// Simple stderr progress logger (P4Python TextProgress).
+// Concrete Progress subclass that logs each progress callback to stderr.
+// Prints init type, description, total, position updates, and completion status as human-readable lines.
 class TextProgress : public Progress {
 public:
     void init(int type) override;
@@ -48,7 +50,7 @@ private:
     static const char *UnitName(int units);
 };
 
-/// Bridges p5::Progress to P4API ClientProgress.
+// Bridges p5::Progress to P4API ClientProgress.
 class ProgressClientAdapter : public ClientProgress {
 public:
     explicit ProgressClientAdapter(Progress *progress) : m_progress(progress) {}

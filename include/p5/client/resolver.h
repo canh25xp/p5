@@ -2,12 +2,16 @@
 
 #include <string>
 
-/// Merge metadata for resolve callbacks (P4Python mergeInfo).
+// Carries the merge hint from a P4API resolve callback.
+// The hint indicates the auto-resolve result:
+// "m" merged, "e" edit/conflict, "t" theirs, "y" yours, "s" skip, "q" quit.
 struct MergeInfo {
     std::string mergeHint;
 };
 
-/// P4Python Resolver — override for automatic/content resolve.
+// Abstract base for handling file-merge and action resolve callbacks during sync/submit.
+// Override resolve() for file merge resolution and actionResolve() for action resolution.
+// The default implementation skips conflicts and accepts auto-resolved results.
 class Resolver {
 public:
     virtual ~Resolver() = default;

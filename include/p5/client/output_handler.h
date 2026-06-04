@@ -10,7 +10,7 @@ enum class OutputAction {
     Cancel = 2,
 };
 
-/// OutputHandler — hooks for ClientUser output callbacks.
+// OutputHandler — hooks for ClientUser output callbacks.
 class OutputHandler : public Result {
 public:
     void setResolver(class Resolver *resolver) { m_resolver = resolver; }
@@ -44,7 +44,8 @@ private:
     class ProgressClientAdapter *m_progressAdapter{nullptr};
 };
 
-/// Debug handler that prints all tagged output (P4Python ReportHandler).
+// Debug OutputHandler that prints all P4API output callbacks (text, binary, stat, info, message)
+// to stdout with type-prefixed labels. Useful for inspecting raw server responses during development.
 class ReportHandler : public OutputHandler {
 protected:
     OutputAction onOutputText(const char *data, int length) override;

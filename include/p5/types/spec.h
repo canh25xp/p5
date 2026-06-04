@@ -9,7 +9,9 @@
 
 class StrDict;
 
-/// P4Python Spec — validated spec field dictionary.
+// Represents a Perforce spec (client, label, branch, etc.) as a validated dictionary of named fields.
+// Supports case-insensitive field lookup via an alias map, list-valued fields (View, AltRoots, etc.),
+// and conversion to/from P4API StrDict and form format.
 class Spec {
 public:
     using Value = std::variant<std::string, std::vector<std::string>>;

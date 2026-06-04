@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 
-/// P4Python Map wrapper around P4API MapApi.
+// Represents a Perforce view mapping (client/branch/label view).
+// Wraps P4API MapApi to provide mapping insertion, path inclusion testing, reversal, and serialization.
+// Insert entries as "left right" pairs or single lines, then query with includes() or dump with asArray()/toString().
 class ViewMap {
 public:
     ViewMap() = default;

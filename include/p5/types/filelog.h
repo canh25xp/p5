@@ -9,7 +9,8 @@ class StrDict;
 
 namespace p5 {
 
-/// Integration record from `p4 filelog` (P4Python Integration).
+// One integration record within a filelog revision — how the file was integrated (branch/copy/merge/edit),
+// the source file path, and the start/end revision range.
 struct FileIntegration {
     std::string how;
     std::string file;
@@ -17,7 +18,8 @@ struct FileIntegration {
     int erev{0};
 };
 
-/// One revision in a filelog result (P4Python Revision).
+// One revision of a depot file from p4 filelog output, including:
+// change number, action, file type, timestamp, user, client, description, and any integration records.
 struct FileRevision {
     std::string depotFile;
     int rev{0};
@@ -35,7 +37,7 @@ struct FileRevision {
     void addIntegration(std::string how, std::string file, int srev, int erev);
 };
 
-/// Filelog history for one depot file (P4Python DepotFile; not fstat DepotFileRecord).
+// Top-level container for the filelog history of a single depot file, holding an ordered list of FileRevision entries.
 struct FilelogFile {
     std::string depotFile;
     std::vector<FileRevision> revisions;
