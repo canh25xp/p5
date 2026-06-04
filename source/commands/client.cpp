@@ -46,8 +46,7 @@ std::string ReadStdin() {
 } // namespace
 
 void ClientCommand::OutputStat(StrDict *varList) {
-    m_spec = Spec::FromTaggedStat(varList);
-    m_hasSpec = true;
+    Spec m_spec = Spec::FromTaggedStat(varList);
     m_clientSpec = p5::ParseClientSpec(m_spec);
 }
 
@@ -101,16 +100,12 @@ std::vector<std::string> ClientCommand::buildP4Args() const {
     return args;
 }
 
-Spec ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
+void ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
     ClientCommand r = p5.RunClient(args);
     if (r.IsError()) {
         CLI_ERROR("Failed to read client spec");
     }
-    if (!r.hasSpec() || r.spec().fields().empty()) {
-        CLI_ERROR("Empty client spec returned");
-    }
     r.Print();
-    return r.spec();
 }
 
 void ClientCommand::Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args) {
@@ -154,7 +149,7 @@ void ClientCommand::run(const std::vector<std::string> &args) {
     P5 &p5 = m_commands->p5();
 
     if (m_output) {
-        const Spec spec = Load(p5, args);
+        Load(p5, args);
         return;
     }
 

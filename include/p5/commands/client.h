@@ -29,8 +29,6 @@ class ClientCommand : public Command {
     bool m_forceDeleteShelves{false};
     std::string m_clientName;
 
-    Spec m_spec;
-    bool m_hasSpec{false};
     p5::ClientSpec m_clientSpec;
 
 public:
@@ -38,14 +36,9 @@ public:
 
     void OutputStat(StrDict *varList) override;
 
-    const Spec &spec() const { return m_spec; }
-    bool hasSpec() const { return m_hasSpec; }
     const p5::ClientSpec &clientSpec() const { return m_clientSpec; }
 
-    /// Fetch client spec via `p4 client -o ...` (tag + specstring protocol).
-    static Spec Load(P5 &p5, const std::vector<std::string> &args);
-
-    /// Submit spec form via `p4 client -i ...` (default args {"-i"}; caller may add `-f`, etc.).
+    static void Load(P5 &p5, const std::vector<std::string> &args);
     static void Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args = {"-i"});
     static void Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args = {"-i"});
 
