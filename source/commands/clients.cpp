@@ -4,11 +4,13 @@
 #include "commands.h"
 #include "utils/client_resolver.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 #include <p4/hostenv.h>
 
 #include "log.h"
+#include "utils/tabular_renderer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -84,7 +86,11 @@ void Clients::PrintFormatted(std::ostream &out) const {
     }
 }
 
-void Clients::PrintSortedTsv(std::ostream &out) const {
+void Clients::PrintSortedTable(std::ostream &out) const {
+    if (m_Clients.empty()) {
+        return;
+    }
+
     std::vector<ClientName> names;
     names.reserve(m_Clients.size());
     for (const auto &entry : m_Clients) {
@@ -92,24 +98,19 @@ void Clients::PrintSortedTsv(std::ostream &out) const {
     }
     std::sort(names.begin(), names.end());
 
-    // Compute column widths
-    size_t maxNameWidth = 0;
-    size_t maxRootWidth = 0;
+    std::vector<std::vector<std::string>> rows;
+    rows.reserve(names.size());
     for (const ClientName &name : names) {
         const ClientData &data = m_Clients.at(name);
-        maxNameWidth = std::max(maxNameWidth, name.size());
-        maxRootWidth = std::max(maxRootWidth, data.root.size());
+        rows.push_back({name, data.root, data.owner});
     }
 
-    for (const ClientName &name : names) {
-        const ClientData &data = m_Clients.at(name);
-        out << "Client " << name << std::string(maxNameWidth - name.size() + 2, ' ')
-            << data.root << std::string(maxRootWidth - data.root.size() + 2, ' ')
-            << data.owner << '\n';
-    }
+    const std::vector<std::string> headers = {"Client", "Root", "Owner"};
+    p5::PrintTable(out, headers, rows);
 }
 
 void Clients::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     P5 &p5 = m_commands->p5();
     Clients r = p5.RunClients(args);
     if (r.IsError())
@@ -129,7 +130,7 @@ void Clients::run(const std::vector<std::string> &args) {
         // Rebuild m_Clients with filtered data and print
         r.m_Clients = std::move(toPrint);
     }
-    r.PrintSortedTsv(std::cout);
+    r.PrintSortedTable(std::cout);
 }
 
 void Clients::register_cli(CLI::App &app) {

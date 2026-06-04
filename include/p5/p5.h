@@ -6,8 +6,12 @@
 #include <p4/clientapi.h>
 
 #include "commands/result.h"
+#include "commands/changes.h"
 #include "commands/clients.h"
 #include "commands/users.h"
+#include "commands/fstat.h"
+#include "commands/filelog.h"
+#include "commands/have.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -21,6 +25,10 @@ class P5 {
     ClientUser &Execute(const std::string &command, const std::vector<std::string> &argv, ClientUser &user);
     void RefreshIfNeeded();
     std::string AutoResolve();
+    // Using ephemeral ClientApi with tag protocol only on temp connection.
+    // We will use RunClients directly if all commands is implemented with tag protocol.
+    // Until then, we use this as a work-around
+    Clients FetchClientsTagged(const std::vector<std::string> &args);
 
     static const int COMMAND_RETRIES = 0;             // Specify how many times a command should be retried before the process exits in a failure.
     static const int COMMAND_REFRESH_THRESHOLD = 100; // Specify how many times a connection should be reused before it is refreshed.
@@ -37,6 +45,12 @@ public:
 
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
+
+    void SetTagProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
+    Changes RunChanges(const std::vector<std::string> &args = {});
+    Fstat RunFstat(const std::vector<std::string> &args = {});
+    Filelog RunFilelog(const std::vector<std::string> &args = {});
+    Have RunHave(const std::vector<std::string> &args = {});
 };

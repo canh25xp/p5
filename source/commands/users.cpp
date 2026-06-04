@@ -2,10 +2,12 @@
 
 #include "commands.h"
 #include "p5.h"
+#include "options.h"
 
 #include <p4/clientapi.h>
 
 #include "log.h"
+#include "utils/tabular_renderer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -38,7 +40,11 @@ void Users::OutputStat(StrDict *varList) {
     m_Users.insert({userID, userData});
 }
 
-void Users::PrintSortedTsv(std::ostream &out) const {
+void Users::PrintSortedTable(std::ostream &out) const {
+    if (m_Users.empty()) {
+        return;
+    }
+
     std::vector<UserID> ids;
     ids.reserve(m_Users.size());
     for (const auto &entry : m_Users) {
@@ -46,28 +52,23 @@ void Users::PrintSortedTsv(std::ostream &out) const {
     }
     std::sort(ids.begin(), ids.end());
 
-    // Compute column widths
-    size_t maxIdWidth = 0;
-    size_t maxNameWidth = 0;
+    std::vector<std::vector<std::string>> rows;
+    rows.reserve(ids.size());
     for (const UserID &id : ids) {
         const UserData &data = m_Users.at(id);
-        maxIdWidth = std::max(maxIdWidth, id.size());
-        maxNameWidth = std::max(maxNameWidth, data.fullName.size());
+        rows.push_back({id, data.fullName, data.email});
     }
 
-    for (const UserID &id : ids) {
-        const UserData &data = m_Users.at(id);
-        out << id << std::string(maxIdWidth - id.size() + 2, ' ')
-            << data.fullName << std::string(maxNameWidth - data.fullName.size() + 2, ' ')
-            << data.email << '\n';
-    }
+    const std::vector<std::string> headers = {"User", "FullName", "Email"};
+    p5::PrintTable(out, headers, rows);
 }
 
 void Users::run(const std::vector<std::string> &args) {
+    g_options.set_command(name);
     P5 &p5 = m_commands->p5();
     Users r = p5.RunUsers(args);
     if (r.IsError())
         throw CLI::RuntimeError(1);
 
-    r.PrintSortedTsv(std::cout);
+    r.PrintSortedTable(std::cout);
 }

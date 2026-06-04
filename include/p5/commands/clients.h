@@ -35,7 +35,7 @@ public:
     void PrintFormatted(std::ostream &out) const;
 
     /// Single-line per client with column alignment, sorted by client name.
-    void PrintSortedTsv(std::ostream &out) const;
+    void PrintSortedTable(std::ostream &out) const;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

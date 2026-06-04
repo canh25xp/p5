@@ -12,6 +12,7 @@
 #include "log.h"
 #include "options.h"
 #include "utils/cli_helpers.h"
+#include "utils/command_policy.h"
 #include "utils/client_resolver.h"
 
 P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
@@ -40,7 +41,7 @@ bool P5::Initialize() {
 
     m_ClientAPI.Init(&e);
 
-    if (g_options.client().empty() && g_options.resolve()) {
+    if (g_options.client().empty() && g_options.resolve() && CommandPolicy::NeedsClientResolve(g_options.command())) {
         std::string resolved = AutoResolve();
         if (!resolved.empty()) {
             g_options.client() = resolved;
@@ -64,8 +65,12 @@ std::string P5::AutoResolve() {
 
     std::string hostname = ClientResolver::GetCurrentHostname();
 
-    // Fetch clients owned by the current user
-    Clients clientsResult = RunClients({"--me"});
+    // Fetch clients owned by the current user (isolated API so tag protocol does not leak)
+    Clients clientsResult = FetchClientsTagged({"--me"});
+    if (clientsResult.IsError()) {
+        WARN("Auto-resolve: could not fetch clients list");
+        return {};
+    }
 
     // Filter to clients on the current host
     Clients::ClientMap filtered = ClientResolver::FilterByHost(clientsResult.GetClients(), hostname);
@@ -193,6 +198,10 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
+void P5::SetTagProtocol() {
+    m_ClientAPI.SetProtocol("tag", "");
+}
+
 Result P5::Run(const std::string &commandLine) {
     // Split string into tokens
     std::vector<std::string> tokens = SplitCommandLine(commandLine);
@@ -261,6 +270,48 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 // Explicit instantiations
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Filelog P5::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+
+Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
+    ClientApi api;
+    Error e;
+    StrBuf msg;
+
+    api.SetPort(g_options.port().c_str());
+    api.SetUser(g_options.user().c_str());
+    api.SetProtocol("tag", "");
+    api.Init(&e);
+
+    if (e.Test()) {
+        e.Fmt(&msg);
+        ERROR(msg.Text());
+        return Clients();
+    }
+
+    std::vector<char *> argv;
+    argv.reserve(args.size());
+    for (const auto &arg : args) {
+        argv.push_back(const_cast<char *>(arg.c_str()));
+    }
+    api.SetArgv(static_cast<int>(argv.size()), argv.empty() ? nullptr : argv.data());
+
+    std::string argsString;
+    for (const std::string &stringArg : args) {
+        argsString = argsString + " " + stringArg;
+    }
+    INFO("FetchClientsTagged: p4 clients" << argsString);
+
+    Clients clients;
+    api.Run("clients", &clients);
+
+    api.Final(&e);
+    CheckErrors(e, msg);
+
+    return clients;
+}
 
 Clients P5::RunClients(const std::vector<std::string> &args) {
     m_ClientAPI.SetProtocol("tag", "");
@@ -270,4 +321,24 @@ Clients P5::RunClients(const std::vector<std::string> &args) {
 Users P5::RunUsers(const std::vector<std::string> &args) {
     m_ClientAPI.SetProtocol("tag", "");
     return Run<Users>("users", args);
+}
+
+Changes P5::RunChanges(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Changes>("changes", args);
+}
+
+Fstat P5::RunFstat(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Fstat>("fstat", args);
+}
+
+Filelog P5::RunFilelog(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Filelog>("filelog", args);
+}
+
+Have P5::RunHave(const std::vector<std::string> &args) {
+    m_ClientAPI.SetProtocol("tag", "");
+    return Run<Have>("have", args);
 }
