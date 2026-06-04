@@ -177,13 +177,46 @@ bool ClientCommand::IsValidName(const std::string &name) {
     return true;
 }
 
+void ClientCommand::Print() const {
+    const size_t labelWidth = 14;
+
+    // TODO: replace with PrintTable method from tabular_renderer
+    auto printField = [&labelWidth](const std::string &label, const std::string &value) {
+        if (!value.empty()) {
+            std::cout << std::left << std::setw(labelWidth) << (label + ":") << value << '\n';
+        }
+    };
+
+    printField("Client", client);
+    printField("Update", update);
+    printField("Access", access);
+    printField("Owner", owner);
+    printField("Host", host);
+    printField("Description", description);
+    printField("Root", root);
+    printField("Options", options);
+    printField("SubmitOptions", submitOptions);
+    printField("LineEnd", lineEnd);
+    printField("Type", type);
+    printField("Backup", backup);
+
+    // Print View
+    if (!view.isEmpty()) {
+        std::cout << "View:\n";
+        for (const auto &line : view.asArray()) {
+            std::cout << "    " << line << '\n';
+        }
+    }
+}
+
 void ClientCommand::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
     P5 &p5 = m_commands->p5();
 
     if (m_output) {
         const Spec spec = Load(p5, args);
-        std::cout << spec.ToForm();
+        populateFromSpec(spec);
+        Print();
         return;
     }
 
