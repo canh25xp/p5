@@ -6,7 +6,7 @@
 
 void ViewMap::insert(const std::string &line) {
     StrRef ref(line.c_str());
-    m_map.Insert(ref);
+    m_map->Insert(ref);
 }
 
 void ViewMap::insert(const std::vector<std::string> &lines) {
@@ -18,25 +18,24 @@ void ViewMap::insert(const std::vector<std::string> &lines) {
 void ViewMap::insert(const std::string &left, const std::string &right) {
     StrRef leftRef(left.c_str());
     StrRef rightRef(right.c_str());
-    m_map.Insert(leftRef, rightRef);
+    m_map->Insert(leftRef, rightRef);
 }
 
 bool ViewMap::isEmpty() const {
-    return const_cast<MapApi &>(m_map).Count() == 0;
+    return m_map->Count() == 0;
 }
 
 bool ViewMap::includes(const std::string &path) const {
     StrBuf translated;
     StrRef pathRef(path.c_str());
-    return const_cast<MapApi &>(m_map).Translate(pathRef, translated) != 0;
+    return m_map->Translate(pathRef, translated) != 0;
 }
 
 ViewMap ViewMap::reverse() const {
     ViewMap reversed;
-    MapApi &source = const_cast<MapApi &>(m_map);
-    for (int i = 0; i < source.Count(); ++i) {
-        const StrPtr *left = source.GetLeft(i);
-        const StrPtr *right = source.GetRight(i);
+    for (int i = 0; i < m_map->Count(); ++i) {
+        const StrPtr *left = m_map->GetLeft(i);
+        const StrPtr *right = m_map->GetRight(i);
         if (left && right) {
             reversed.insert(left->Text(), right->Text());
         } else if (left) {
@@ -48,10 +47,9 @@ ViewMap ViewMap::reverse() const {
 
 std::vector<std::string> ViewMap::asArray() const {
     std::vector<std::string> lines;
-    MapApi &source = const_cast<MapApi &>(m_map);
-    for (int i = 0; i < source.Count(); ++i) {
-        const StrPtr *left = source.GetLeft(i);
-        const StrPtr *right = source.GetRight(i);
+    for (int i = 0; i < m_map->Count(); ++i) {
+        const StrPtr *left = m_map->GetLeft(i);
+        const StrPtr *right = m_map->GetRight(i);
         if (!left) {
             continue;
         }

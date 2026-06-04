@@ -77,7 +77,7 @@ void ClientCommand::populateFromSpec(const Spec &spec) {
     auto viewVal = spec.get("View");
     if (viewVal && std::holds_alternative<std::vector<std::string>>(*viewVal)) {
         const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-        view = ViewMap();
+        view.clear();
         for (const std::string &line : viewLines) {
             view.insert(line);
         }
