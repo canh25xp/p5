@@ -143,8 +143,8 @@ bool ClientCommand::IsValidName(const std::string &name) {
     return true;
 }
 
-void ClientCommand::Print() const {
-    const p5::ClientSpec clientSpec = p5::ParseClientSpec(m_spec);
+void ClientCommand::Print(const Spec& spec) const {
+    const p5::ClientSpec clientSpec = p5::ParseClientSpec(spec);
     clientSpec.Print();
 }
 
@@ -154,8 +154,7 @@ void ClientCommand::run(const std::vector<std::string> &args) {
 
     if (m_output) {
         const Spec spec = Load(p5, args);
-        const p5::ClientSpec clientSpec = p5::ParseClientSpec(spec);
-        clientSpec.Print();
+        Print(spec);
         return;
     }
 

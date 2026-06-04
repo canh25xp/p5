@@ -53,7 +53,7 @@ public:
     static bool IsValidName(const std::string &name);
 
     /// Print formatted client spec to stdout
-    void Print() const;
+    void Print(const Spec& spec) const;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
