@@ -38,4 +38,44 @@
 
 ## [v1.0.0](https://github.com/canh25xp/p5/compare/v0.2.0...v1.0.0) (2026-04-25)
 
-TODO
+### Features
+
+- **Auto-Resolve Client** - Automatic client workspace resolution
+  - Client resolver with pattern matching
+  - Write resolved client to P4CONFIG
+- **Logging System** - Comprehensive 4-level logging with configurable conciseness
+  - Configurable concise log levels
+  - Log P4 commands and arguments
+  - Improved log tag formatting
+- **Clients Command** - Enhanced with long version aliases for all short flags
+  - Explicit arguments definition
+  - Improved descriptions and variable names
+
+### Fixes
+
+- **Error Handling** - Fixed reversed `IsError` logic
+- **CLI** - Improved error messages for unrecognized subcommands or arguments
+- **CMake** - Fixed zlib_dev detection and OpenSSL root directory handling
+
+### Internal
+
+- **Refactoring** - Major codebase reorganization
+  - Moved commands to respective source files
+  - Decoupled `AutoResolveClient` from `P5` class
+  - Replaced raw C strings with `std::string`
+  - Organized header includes with proper prefixes
+  - Removed unused utilities (`time_helpers`, `std_helpers`)
+- **P5 Connection** - Refactored connection and execution methods
+  - Dependency injection for connection reuse
+  - Changed `P5.Run()` method signature
+  - Refresh connection method improvements
+- **Commands Policy** - Removed nested check error logic
+  - Removed manual error logging (`CLI::SetError`)
+  - Disabled default arguments injection
+  - Disabled command retry by default
+- **Result Type** - Added `IsFatal` method
+
+### CI
+
+- **CI** - Added build workflow for pull requests
+- **CMake** - Changed P4 root directory check logic
