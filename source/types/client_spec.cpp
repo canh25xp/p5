@@ -1,6 +1,7 @@
 #include "types/client_spec.h"
 
 #include "types/spec.h"
+#include "types/view_map.h"
 
 #include <iomanip>
 #include <iostream>
