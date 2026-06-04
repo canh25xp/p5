@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types/client_spec.h"
 #include "types/depot.h"
 #include "types/filelog.h"
 #include "types/have.h"
