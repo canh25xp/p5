@@ -37,7 +37,7 @@ client.SetProtocol("tag", "");
 client.Init(&e);
 ```
 
-Official reference: [ClientApi::SetProtocol](https://www.perforce.com/manuals/v15.1/p4api/chapter.methods.html#clientapi.setprotocol) (content is carried forward in current Helix P4API docs).
+Official reference: [ClientApi::SetProtocol](https://help.perforce.com/helix-core/apis/p4api/current/Content/P4API/clientapi.setprotocol.html)
 
 ### Other protocol keys
 
