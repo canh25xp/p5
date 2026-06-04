@@ -37,10 +37,7 @@ ClientSpec ParseClientSpec(const Spec &spec) {
     auto viewVal = spec.get("View");
     if (viewVal && std::holds_alternative<std::vector<std::string>>(*viewVal)) {
         const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-        clientSpec.view.clear();
-        for (const std::string &line : viewLines) {
-            clientSpec.view.insert(line);
-        }
+        clientSpec.view.InsertTranslationMapping(viewLines);
     }
 
     return clientSpec;
