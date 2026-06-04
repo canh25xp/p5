@@ -198,8 +198,17 @@ Result P5::Run(const std::string &command, const std::vector<std::string> &args)
     return clientUser;
 }
 
+ClientUser &P5::Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+    return Execute(command, args, user);
+}
+
 void P5::SetTagProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
+}
+
+void P5::SetSpecProtocol() {
+    m_ClientAPI.SetProtocol("tag", "");
+    m_ClientAPI.SetProtocol("specstring", "");
 }
 
 Result P5::Run(const std::string &commandLine) {
@@ -271,6 +280,7 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template ClientCommand P5::Run<ClientCommand>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Filelog P5::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
@@ -326,6 +336,11 @@ Users P5::RunUsers(const std::vector<std::string> &args) {
 Changes P5::RunChanges(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Changes>("changes", args);
+}
+
+ClientCommand P5::RunClient(const std::vector<std::string> &args) {
+    SetSpecProtocol();
+    return Run<ClientCommand>("client", args);
 }
 
 Fstat P5::RunFstat(const std::vector<std::string> &args) {

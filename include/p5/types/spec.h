@@ -27,6 +27,8 @@ public:
     const std::map<std::string, Value> &fields() const { return m_fields; }
 
     static Spec FromStrDict(StrDict *dict);
+    static Spec FromTaggedStat(StrDict *dict);
+    std::string ToForm() const;
 
 private:
     std::string canonicalKey(const std::string &key) const;

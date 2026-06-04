@@ -12,6 +12,7 @@
 #include "commands/fstat.h"
 #include "commands/filelog.h"
 #include "commands/have.h"
+#include "commands/client.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -45,11 +46,14 @@ public:
 
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);
+    ClientUser &Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user);
 
     void SetTagProtocol();
+    void SetSpecProtocol();
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
+    ClientCommand RunClient(const std::vector<std::string> &args = {});
     Fstat RunFstat(const std::vector<std::string> &args = {});
     Filelog RunFilelog(const std::vector<std::string> &args = {});
     Have RunHave(const std::vector<std::string> &args = {});

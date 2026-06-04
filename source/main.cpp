@@ -5,6 +5,7 @@
 #include "options.h"
 #include "commands/changes.h"
 #include "commands/clients.h"
+#include "commands/client.h"
 #include "commands/users.h"
 #include "commands/set.h"
 #include "commands/fast_reconcile.h"
@@ -67,7 +68,7 @@ int main(int argc, char **argv) {
     commands.add("ignores", "List P4IGNORE mappings");
 
     // --- Client / workspace ---
-    commands.add({"client", "workspace"}, "Create or edit a client specification and its view");
+    commands.add(std::make_unique<ClientCommand>());
     commands.add(std::make_unique<Clients>());
 
     // --- Depot / file info ---
