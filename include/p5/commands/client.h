@@ -38,7 +38,7 @@ public:
 
     const p5::ClientSpec &clientSpec() const { return m_clientSpec; }
 
-    static void Load(P5 &p5, const std::vector<std::string> &args);
+    static void Load(P5 &p5, const std::vector<std::string> &args = {"-o"});
     static void Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args = {"-i"});
     static void Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args = {"-i"});
 
