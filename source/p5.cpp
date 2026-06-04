@@ -282,7 +282,7 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template p5::Client P5::Run<p5::Client>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template ClientCommand P5::Run<ClientCommand>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Filelog P5::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
@@ -340,9 +340,9 @@ Changes P5::RunChanges(const std::vector<std::string> &args) {
     return Run<Changes>("changes", args);
 }
 
-p5::Client P5::RunClient(const std::vector<std::string> &args) {
+ClientCommand P5::RunClient(const std::vector<std::string> &args) {
     SetSpecProtocol();
-    return Run<p5::Client>("client", args);
+    return Run<ClientCommand>("client", args);
 }
 
 Fstat P5::RunFstat(const std::vector<std::string> &args) {

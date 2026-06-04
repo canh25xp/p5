@@ -44,13 +44,13 @@ std::string ReadStdin() {
 
 } // namespace
 
-void p5::Client::OutputStat(StrDict *varList) {
+void ClientCommand::OutputStat(StrDict *varList) {
     m_spec = Spec::FromTaggedStat(varList);
     m_hasSpec = true;
 }
 
-Spec p5::Client::Load(P5 &p5, const std::vector<std::string> &args) {
-    p5::Client r = p5.RunClient(args);
+Spec ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
+    ClientCommand r = p5.RunClient(args);
     if (r.IsError()) {
         CLI_ERROR("Failed to read client spec");
     }
@@ -60,7 +60,7 @@ Spec p5::Client::Load(P5 &p5, const std::vector<std::string> &args) {
     return r.spec();
 }
 
-void p5::Client::Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args) {
+void ClientCommand::Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args) {
     SpecInputUser input(specForm);
     p5.SetSpecProtocol();
     p5.Run("client", args, input);
@@ -69,18 +69,18 @@ void p5::Client::Save(P5 &p5, const std::string &specForm, const std::vector<std
     }
 }
 
-void p5::Client::Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args) {
+void ClientCommand::Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args) {
     Save(p5, spec.ToForm(), args);
 }
 
-Spec p5::Client::Patch(Spec spec, const std::string &clientName, const std::string &root, const std::string &host) {
+Spec ClientCommand::Patch(Spec spec, const std::string &clientName, const std::string &root, const std::string &host) {
     spec.set("Client", clientName);
     spec.set("Root", root);
     spec.set("Host", host);
     return spec;
 }
 
-bool p5::Client::IsValidName(const std::string &name) {
+bool ClientCommand::IsValidName(const std::string &name) {
     if (name.empty()) {
         return false;
     }
@@ -92,7 +92,7 @@ bool p5::Client::IsValidName(const std::string &name) {
     return true;
 }
 
-void p5::Client::run(const std::vector<std::string> &args) {
+void ClientCommand::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
     P5 &p5 = m_commands->p5();
 
@@ -110,7 +110,7 @@ void p5::Client::run(const std::vector<std::string> &args) {
     m_commands->run_p4_passthrough(name.c_str(), args);
 }
 
-void p5::Client::register_cli(CLI::App &app) {
+void ClientCommand::register_cli(CLI::App &app) {
     auto *sub = app.add_subcommand(name, description);
     sub->prefix_command();
 

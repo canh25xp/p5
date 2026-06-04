@@ -9,15 +9,15 @@
 class P5;
 class StrDict;
 
-namespace p5 {
-
-/// p5 `client` / `workspace` command (in namespace p5 to avoid P4API's global `::Client`).
-class Client : public Command {
+// p5 `client` / `workspace` command.
+// Renamed to ClientComman to avoid P4API's global `::Client`
+// Maybe we should put everything in p5 namespace ?
+class ClientCommand : public Command {
     Spec m_spec;
     bool m_hasSpec{false};
 
 public:
-    Client() : Command("client", "Create or edit a client specification and its view", {"workspace"}) {}
+    ClientCommand() : Command("client", "Create or edit a client specification and its view", {"workspace"}) {}
 
     void OutputStat(StrDict *varList) override;
 
@@ -39,5 +39,3 @@ public:
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
 };
-
-} // namespace p5

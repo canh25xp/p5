@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     commands.add("ignores", "List P4IGNORE mappings");
 
     // --- Client / workspace ---
-    commands.add(std::make_unique<p5::Client>());
+    commands.add(std::make_unique<ClientCommand>());
     commands.add(std::make_unique<Clients>());
     commands.add(std::make_unique<Mirror>());
 

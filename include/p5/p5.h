@@ -12,10 +12,7 @@
 #include "commands/fstat.h"
 #include "commands/filelog.h"
 #include "commands/have.h"
-
-namespace p5 {
-class Client;
-}
+#include "commands/client.h"
 
 class P5 {
     ClientApi m_ClientAPI;
@@ -56,7 +53,7 @@ public:
     Users RunUsers(const std::vector<std::string> &args = {});
     Clients RunClients(const std::vector<std::string> &args = {});
     Changes RunChanges(const std::vector<std::string> &args = {});
-    p5::Client RunClient(const std::vector<std::string> &args = {});
+    ClientCommand RunClient(const std::vector<std::string> &args = {});
     Fstat RunFstat(const std::vector<std::string> &args = {});
     Filelog RunFilelog(const std::vector<std::string> &args = {});
     Have RunHave(const std::vector<std::string> &args = {});

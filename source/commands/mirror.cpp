@@ -70,7 +70,7 @@ void Mirror::run(const std::vector<std::string> &args) {
         mirrorClient = DefaultMirrorName(g_options.user(), templateClient);
     }
 
-    if (!p5::Client::IsValidName(mirrorClient)) {
+    if (!ClientCommand::IsValidName(mirrorClient)) {
         CLI_ERROR("Invalid mirror client name: " << mirrorClient);
     }
 
@@ -87,9 +87,9 @@ void Mirror::run(const std::vector<std::string> &args) {
 
     INFO("Creating mirror client " << mirrorClient << " from template " << templateClient);
 
-    Spec spec = p5::Client::Load(p5, {"-o", "-t", templateClient, mirrorClient});
-    spec = p5::Client::Patch(spec, mirrorClient, root, host);
-    p5::Client::Save(p5, spec);
+    Spec spec = ClientCommand::Load(p5, {"-o", "-t", templateClient, mirrorClient});
+    spec = ClientCommand::Patch(spec, mirrorClient, root, host);
+    ClientCommand::Save(p5, spec);
 
     std::error_code ec;
     fs::create_directories(rootPath, ec);
