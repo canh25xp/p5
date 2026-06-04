@@ -47,6 +47,91 @@ std::string ReadStdin() {
 void ClientCommand::OutputStat(StrDict *varList) {
     m_spec = Spec::FromTaggedStat(varList);
     m_hasSpec = true;
+    populateFromSpec(m_spec);
+}
+
+void ClientCommand::populateFromSpec(const Spec &spec) {
+    // Extract string fields from spec
+    auto getString = [&spec](const std::string &key) -> std::string {
+        auto val = spec.get(key);
+        if (val && std::holds_alternative<std::string>(*val)) {
+            return std::get<std::string>(*val);
+        }
+        return "";
+    };
+
+    client = getString("Client");
+    update = getString("Update");
+    access = getString("Access");
+    owner = getString("Owner");
+    host = getString("Host");
+    description = getString("Description");
+    root = getString("Root");
+    options = getString("Options");
+    submitOptions = getString("SubmitOptions");
+    lineEnd = getString("LineEnd");
+    type = getString("Type");
+    backup = getString("Backup");
+
+    // Extract View as ViewMap
+    auto viewVal = spec.get("View");
+    if (viewVal && std::holds_alternative<std::vector<std::string>>(*viewVal)) {
+        const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
+        view = ViewMap();
+        for (const std::string &line : viewLines) {
+            view.insert(line);
+        }
+    }
+}
+
+std::vector<std::string> ClientCommand::buildP4Args() const {
+    std::vector<std::string> args;
+
+    if (m_force) {
+        args.push_back("-f");
+    }
+    if (!m_template.empty()) {
+        args.push_back("-t");
+        args.push_back(m_template);
+    }
+    if (!m_type.empty()) {
+        args.push_back("-T");
+        args.push_back(m_type);
+    }
+    if (m_delete) {
+        args.push_back("-d");
+    }
+    if (m_output) {
+        args.push_back("-o");
+    }
+    if (m_input) {
+        args.push_back("-i");
+    }
+    if (!m_stream.empty()) {
+        args.push_back("-S");
+        args.push_back(m_stream);
+    }
+    if (m_switch) {
+        args.push_back("-s");
+    }
+    if (m_change != 0) {
+        args.push_back("-c");
+        args.push_back(std::to_string(m_change));
+    }
+    if (!m_serverId.empty()) {
+        args.push_back("--serverid=" + m_serverId);
+    }
+    if (m_forceShelved) {
+        args.push_back("-Fs");
+    }
+    if (m_forceDeleteShelves) {
+        args.push_back("-Fd");
+    }
+    if (!m_clientName.empty()) {
+        args.push_back(m_clientName);
+    }
+
+    return args;
 }
 
 Spec ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
@@ -96,13 +181,13 @@ void ClientCommand::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
     P5 &p5 = m_commands->p5();
 
-    if (HasFlag(args, "-o")) {
+    if (m_output) {
         const Spec spec = Load(p5, args);
         std::cout << spec.ToForm();
         return;
     }
 
-    if (HasFlag(args, "-i")) {
+    if (m_input) {
         Save(p5, ReadStdin(), args);
         return;
     }
@@ -112,11 +197,38 @@ void ClientCommand::run(const std::vector<std::string> &args) {
 
 void ClientCommand::register_cli(CLI::App &app) {
     auto *sub = app.add_subcommand(name, description);
-    sub->prefix_command();
 
     for (const std::string &alias : aliases) {
         sub->alias(alias);
     }
 
-    sub->callback([this, sub]() { this->run(sub->remaining()); });
+    // Flag options
+    sub->add_flag("-f", m_force, "Force operation (requires admin access)");
+    sub->add_flag("-d", m_delete, "Delete the specified client");
+    sub->add_flag("-o", m_output, "Output the client spec to stdout");
+    sub->add_flag("-i", m_input, "Read client spec from stdin");
+    sub->add_flag("-s", m_switch, "Switch client view without invoking editor");
+    sub->add_flag("-F", m_forceShelved, "Force with shelved changes");
+    sub->add_flag("--force-delete-shelves", m_forceDeleteShelves, "Force delete client and all shelved changes");
+
+    // Option arguments
+    sub->add_option("-t", m_template, "Use template client's View and Options");
+    sub->add_option("-T", m_type, "Set client type (writeable, readonly, partitioned)");
+    sub->add_option("-S", m_stream, "Bind client to a stream");
+    sub->add_option("-c,--change", m_change, "Changelist number for stream view inspection (use with -S -o)");
+    sub->add_option("--serverid", m_serverId, "Server ID for restricted operations");
+
+    // Positional client name
+    sub->add_option("name", m_clientName, "Client name");
+
+    sub->allow_extras();
+
+    sub->callback([this, sub]() {
+        std::vector<std::string> args = buildP4Args();
+        // Append any extra args that weren't parsed
+        for (const auto &extra : sub->remaining()) {
+            args.push_back(extra);
+        }
+        this->run(args);
+    });
 }

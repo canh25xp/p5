@@ -2,6 +2,7 @@
 
 #include "commands/command.h"
 #include "types/spec.h"
+#include "types/view_map.h"
 
 #include <string>
 #include <vector>
@@ -13,6 +14,36 @@ class StrDict;
 // Renamed to ClientComman to avoid P4API's global `::Client`
 // Maybe we should put everything in p5 namespace ?
 class ClientCommand : public Command {
+    // Typed fields from client spec
+    std::string client;
+    std::string update;
+    std::string access;
+    std::string owner;
+    std::string host;
+    std::string description;
+    std::string root;
+    std::string options;
+    std::string submitOptions;
+    std::string lineEnd;
+    ViewMap view;
+    std::string type;
+    std::string backup;
+
+    // CLI flags
+    bool m_force{false};
+    std::string m_template;
+    std::string m_type;
+    bool m_delete{false};
+    bool m_output{false};
+    bool m_input{false};
+    std::string m_stream;
+    bool m_switch{false};
+    int m_change{0};
+    std::string m_serverId;
+    bool m_forceShelved{false};
+    bool m_forceDeleteShelves{false};
+    std::string m_clientName;
+
     Spec m_spec;
     bool m_hasSpec{false};
 
@@ -38,4 +69,8 @@ public:
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
+
+private:
+    void populateFromSpec(const Spec &spec);
+    std::vector<std::string> buildP4Args() const;
 };
