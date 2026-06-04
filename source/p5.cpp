@@ -314,31 +314,31 @@ Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
 }
 
 Clients P5::RunClients(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Clients>("clients", args);
 }
 
 Users P5::RunUsers(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Users>("users", args);
 }
 
 Changes P5::RunChanges(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Changes>("changes", args);
 }
 
 Fstat P5::RunFstat(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Fstat>("fstat", args);
 }
 
 Filelog P5::RunFilelog(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Filelog>("filelog", args);
 }
 
 Have P5::RunHave(const std::vector<std::string> &args) {
-    m_ClientAPI.SetProtocol("tag", "");
+    SetTagProtocol();
     return Run<Have>("have", args);
 }
