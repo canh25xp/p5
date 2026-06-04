@@ -136,3 +136,31 @@ cmake --build build
 ```
 
 The first configure step downloads and extracts the Helix C++ API into `vendor/p4api/`; that requires network access and matches the selected toolchain (Visual Studio generator vs MinGW).
+
+## CI/CD
+
+```sh
+# List workflows
+gh workflow list
+
+# Trigger a workflow manually
+gh workflow run <workflow> [--ref <branch>]
+
+# List recent runs (optionally filter by workflow)
+gh run list [--workflow <workflow>]
+
+# Check a specific run status
+gh run view <run-id>
+
+# Watch a run in real-time
+gh run watch <run-id>
+
+# Get logs for a run (failed or otherwise)
+gh run view <run-id> --log
+
+# Download logs for a failed run
+gh run view <run-id> --log-failed
+
+# Re-run a failed workflow
+gh run rerun <run-id> [--failed]
+```
