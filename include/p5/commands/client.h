@@ -31,6 +31,7 @@ class ClientCommand : public Command {
 
     Spec m_spec;
     bool m_hasSpec{false};
+    p5::ClientSpec m_clientSpec;
 
 public:
     ClientCommand() : Command("client", "Create or edit a client specification and its view", {"workspace"}) {}
@@ -39,6 +40,7 @@ public:
 
     const Spec &spec() const { return m_spec; }
     bool hasSpec() const { return m_hasSpec; }
+    const p5::ClientSpec &clientSpec() const { return m_clientSpec; }
 
     /// Fetch client spec via `p4 client -o ...` (tag + specstring protocol).
     static Spec Load(P5 &p5, const std::vector<std::string> &args);
@@ -53,7 +55,7 @@ public:
     static bool IsValidName(const std::string &name);
 
     /// Print formatted client spec to stdout
-    void Print(const Spec& spec) const;
+    void Print() const;
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

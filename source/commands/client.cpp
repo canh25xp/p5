@@ -48,6 +48,7 @@ std::string ReadStdin() {
 void ClientCommand::OutputStat(StrDict *varList) {
     m_spec = Spec::FromTaggedStat(varList);
     m_hasSpec = true;
+    m_clientSpec = p5::ParseClientSpec(m_spec);
 }
 
 std::vector<std::string> ClientCommand::buildP4Args() const {
@@ -108,6 +109,7 @@ Spec ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
     if (!r.hasSpec() || r.spec().fields().empty()) {
         CLI_ERROR("Empty client spec returned");
     }
+    r.Print();
     return r.spec();
 }
 
@@ -143,9 +145,8 @@ bool ClientCommand::IsValidName(const std::string &name) {
     return true;
 }
 
-void ClientCommand::Print(const Spec& spec) const {
-    const p5::ClientSpec clientSpec = p5::ParseClientSpec(spec);
-    clientSpec.Print();
+void ClientCommand::Print() const {
+    m_clientSpec.Print();
 }
 
 void ClientCommand::run(const std::vector<std::string> &args) {
@@ -154,7 +155,6 @@ void ClientCommand::run(const std::vector<std::string> &args) {
 
     if (m_output) {
         const Spec spec = Load(p5, args);
-        Print(spec);
         return;
     }
 
