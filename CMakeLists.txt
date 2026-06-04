@@ -6,7 +6,7 @@ include(downloadP4api)
 include(Submodules)
 
 set(P5_VERSION_MAJOR 1)
-set(P5_VERSION_MINOR 0)
+set(P5_VERSION_MINOR 1)
 set(P5_VERSION_PATCH 0)
 set(P5_VERSION "${P5_VERSION_MAJOR}.${P5_VERSION_MINOR}.${P5_VERSION_PATCH}")
 
