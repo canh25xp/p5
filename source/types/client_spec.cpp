@@ -67,12 +67,8 @@ void ClientSpec::Print() const {
     printField("Backup", backup);
 
     // Print View
-    if (!view.isEmpty()) {
-        std::cout << "View:\n";
-        for (const auto &line : view.asArray()) {
-            std::cout << "    " << line << '\n';
-        }
-    }
+    std::cout << "View:\n";
+    std::cout << view.toString();
 }
 
 } // namespace p5
