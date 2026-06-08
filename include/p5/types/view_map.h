@@ -57,5 +57,7 @@ public:
     void InsertFileMap(const ViewMap &src);
 
     std::vector<std::string> AsArray() const;
-    std::string ToString() const;
+
+    // Friend declaration for stream output operator
+    friend std::ostream &operator<<(std::ostream &os, const ViewMap &viewMap);
 };

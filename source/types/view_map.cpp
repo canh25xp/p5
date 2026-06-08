@@ -208,10 +208,9 @@ std::vector<std::string> ViewMap::AsArray() const {
     return lines;
 }
 
-std::string ViewMap::ToString() const {
-    std::ostringstream out;
-    for (const std::string &line : AsArray()) {
-        out << line << '\n';
+std::ostream &operator<<(std::ostream &os, const ViewMap &viewMap) {
+    for (const std::string &line : viewMap.AsArray()) {
+        os << line << '\n';
     }
-    return out.str();
+    return os;
 }
