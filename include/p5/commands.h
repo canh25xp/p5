@@ -10,8 +10,8 @@ class P5;
 // Batches CLI11 subcommand definitions; call install to attach them to a root `CLI::App`.
 class Commands {
 public:
-    Commands() {};
-    ~Commands() {};
+    Commands();
+    ~Commands();
 
     // `prefix_command` subcommand: forwards `remaining()` to `run`.
     void add(const char *name, const char *description, void (*run)(const std::vector<std::string> &), std::vector<const char *> aliases = {});
