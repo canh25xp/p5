@@ -2,15 +2,17 @@
 
 #include <p4/mapapi.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
 // Represents a Perforce view mapping (client/branch/label view).
 // Wraps P4API MapApi to provide mapping insertion, path inclusion testing, reversal, and serialization.
 // Insert entries as "left right" pairs or single lines, then query with includes() or dump with asArray()/toString().
+// Note: ViewMap is not copyable (MapApi holds heap-allocated MapTable*), but is moveable.
 class ViewMap {
 private:
-    MapApi m_map;
+    std::unique_ptr<MapApi> m_map;
     MapCase m_sensitivity;
 
     void insertMapping(const std::string &left, const std::string &right, const MapType mapType);
@@ -18,7 +20,10 @@ private:
 
 public:
     ViewMap();
-    ViewMap(const ViewMap &src);
+    ViewMap(const ViewMap &) = delete;
+    ViewMap &operator=(const ViewMap &) = delete;
+    ViewMap(ViewMap &&) noexcept;
+    ViewMap &operator=(ViewMap &&) noexcept;
 
     bool IsInLeft(const std::string fileRevision) const;
     bool IsInRight(const std::string fileRevision) const;
@@ -58,6 +63,6 @@ public:
     std::vector<std::string> asArray() const;
     std::string toString() const;
 
-    MapApi &api() { return m_map; }
-    const MapApi &api() const { return m_map; }
+    MapApi &api() { return *m_map; }
+    const MapApi &api() const { return *m_map; }
 };

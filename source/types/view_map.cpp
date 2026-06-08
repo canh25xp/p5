@@ -15,14 +15,23 @@ const std::vector<std::string> PATH_PREFIX_DESCRIPTIONS = {
 const int PATH_PREFIX_DESCRIPTION_COUNT = 5;
 const int PATH_PREFIX_DESCRIPTION_EXCLUDE_INDEX_START = 4;
 
-ViewMap::ViewMap() : m_sensitivity(MapCase::Sensitive) {
+ViewMap::ViewMap() : m_map(std::make_unique<MapApi>()), m_sensitivity(MapCase::Sensitive) {
     // The constructor line + this m_map set are the equivalent of calling SetCaseSensitivity locally.
-    m_map.SetCaseSensitivity(m_sensitivity);
+    m_map->SetCaseSensitivity(m_sensitivity);
 }
 
-ViewMap::ViewMap(const ViewMap &src) : m_sensitivity(src.GetCaseSensitivity()) {
-    // This call sets the case sensitivity of m_map.
-    src.copyMapApiInto(m_map);
+ViewMap::ViewMap(ViewMap &&other) noexcept
+    : m_map(std::move(other.m_map)), m_sensitivity(other.m_sensitivity) {
+    other.m_sensitivity = MapCase::Sensitive;
+}
+
+ViewMap &ViewMap::operator=(ViewMap &&other) noexcept {
+    if (this != &other) {
+        m_map = std::move(other.m_map);
+        m_sensitivity = other.m_sensitivity;
+        other.m_sensitivity = MapCase::Sensitive;
+    }
+    return *this;
 }
 
 bool ViewMap::IsInLeft(const std::string fileRevision) const {
@@ -31,7 +40,7 @@ bool ViewMap::IsInLeft(const std::string fileRevision) const {
     argMap.Insert(StrBuf(fileRevision.c_str()), MapType::MapInclude);
 
     // MapAPI is poorly written and doesn't declare things as const when it should.
-    std::unique_ptr<MapApi> joinResult(MapApi::Join(const_cast<MapApi *>(&m_map), &argMap));
+    std::unique_ptr<MapApi> joinResult(MapApi::Join(const_cast<MapApi *>(m_map.get()), &argMap));
     return joinResult != nullptr;
 }
 
@@ -40,13 +49,13 @@ bool ViewMap::IsInRight(const std::string fileRevision) const {
     StrBuf from(fileRevision.c_str());
 
     // MapAPI is poorly written and doesn't declare things as const when it should.
-    MapApi *ref = const_cast<MapApi *>(&m_map);
+    MapApi *ref = const_cast<MapApi *>(m_map.get());
     return ref->Translate(from, to);
 }
 
 void ViewMap::SetCaseSensitivity(const MapCase mode) {
     m_sensitivity = mode;
-    m_map.SetCaseSensitivity(mode);
+    m_map->SetCaseSensitivity(mode);
 }
 
 std::string ViewMap::TranslateLeftToRight(const std::string &path) const {
@@ -54,7 +63,7 @@ std::string ViewMap::TranslateLeftToRight(const std::string &path) const {
     StrBuf to;
 
     // MapAPI is poorly written and doesn't declare things as const when it should.
-    MapApi *ref = const_cast<MapApi *>(&m_map);
+    MapApi *ref = const_cast<MapApi *>(m_map.get());
     if (ref->Translate(from, to, MapDir::MapLeftRight)) {
         return to.Text();
     }
@@ -66,7 +75,7 @@ std::string ViewMap::TranslateRightToLeft(const std::string &path) const {
     StrBuf to;
 
     // MapAPI is poorly written and doesn't declare things as const when it should.
-    MapApi *ref = const_cast<MapApi *>(&m_map);
+    MapApi *ref = const_cast<MapApi *>(m_map.get());
     if (ref->Translate(from, to, MapDir::MapRightLeft)) {
         return to.Text();
     }
@@ -82,7 +91,7 @@ void ViewMap::insertMapping(const std::string &left, const std::string &right, c
     mapStrRight.erase(mapStrRight.find_last_not_of(' ') + 1);
     mapStrRight.erase(0, mapStrRight.find_first_not_of(' '));
 
-    m_map.Insert(StrBuf(mapStrLeft.c_str()), StrBuf(mapStrRight.c_str()), mapType);
+    m_map->Insert(StrBuf(mapStrLeft.c_str()), StrBuf(mapStrRight.c_str()), mapType);
 }
 
 void ViewMap::InsertTranslationMapping(const std::vector<std::string> &mapping) {
@@ -125,7 +134,7 @@ void ViewMap::InsertPaths(const std::vector<std::string> &paths) {
 }
 
 void ViewMap::InsertFileMap(const ViewMap &src) {
-    src.copyMapApiInto(m_map);
+    src.copyMapApiInto(*m_map);
 }
 
 void ViewMap::InsertPrefixedPaths(const std::string prefix, const std::vector<std::string> &paths) {
@@ -152,7 +161,7 @@ void ViewMap::InsertPrefixedPaths(const std::string prefix, const std::vector<st
 
 void ViewMap::copyMapApiInto(MapApi &map) const {
     // MapAPI is poorly written and doesn't declare things as const when it should.
-    MapApi *ref = const_cast<MapApi *>(&m_map);
+    MapApi *ref = const_cast<MapApi *>(m_map.get());
 
     map.Clear();
     map.SetCaseSensitivity(m_sensitivity);
@@ -167,12 +176,12 @@ void ViewMap::copyMapApiInto(MapApi &map) const {
 // Convenience methods for backward compatibility
 
 void ViewMap::clear() {
-    m_map.Clear();
+    m_map->Clear();
 }
 
 void ViewMap::insert(const std::string &line) {
     StrRef ref(line.c_str());
-    m_map.Insert(ref);
+    m_map->Insert(ref);
 }
 
 void ViewMap::insert(const std::vector<std::string> &lines) {
@@ -184,22 +193,22 @@ void ViewMap::insert(const std::vector<std::string> &lines) {
 void ViewMap::insert(const std::string &left, const std::string &right) {
     StrRef leftRef(left.c_str());
     StrRef rightRef(right.c_str());
-    m_map.Insert(leftRef, rightRef);
+    m_map->Insert(leftRef, rightRef);
 }
 
 bool ViewMap::isEmpty() const {
-    return const_cast<MapApi &>(m_map).Count() == 0;
+    return m_map->Count() == 0;
 }
 
 bool ViewMap::includes(const std::string &path) const {
     StrBuf translated;
     StrRef pathRef(path.c_str());
-    return const_cast<MapApi &>(m_map).Translate(pathRef, translated) != 0;
+    return m_map->Translate(pathRef, translated) != 0;
 }
 
 ViewMap ViewMap::reverse() const {
     ViewMap reversed;
-    MapApi &source = const_cast<MapApi &>(m_map);
+    MapApi &source = *m_map;
     for (int i = 0; i < source.Count(); ++i) {
         const StrPtr *left = source.GetLeft(i);
         const StrPtr *right = source.GetRight(i);
@@ -214,7 +223,7 @@ ViewMap ViewMap::reverse() const {
 
 std::vector<std::string> ViewMap::asArray() const {
     std::vector<std::string> lines;
-    MapApi &source = const_cast<MapApi &>(m_map);
+    MapApi &source = *m_map;
     for (int i = 0; i < source.Count(); ++i) {
         const StrPtr *left = source.GetLeft(i);
         const StrPtr *right = source.GetRight(i);
