@@ -35,13 +35,13 @@ ClientSpec ParseClientSpec(const Spec &spec) {
 
     // Extract View as ViewMap
     auto viewVal = spec.get("View");
-    if (viewVal && std::holds_alternative<std::vector<std::string>>(*viewVal)) {
-        const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-        clientSpec.view.clear();
-        for (const std::string &line : viewLines) {
-            clientSpec.view.insert(line);
-        }
-    }
+    if (!viewVal || !std::holds_alternative<std::vector<std::string>>(*viewVal))
+        return clientSpec;
+
+    const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
+    clientSpec.view.clear();
+    for (const std::string &line : viewLines)
+        clientSpec.view.insert(line);
 
     return clientSpec;
 }
