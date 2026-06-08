@@ -53,15 +53,6 @@ public:
 
     void InsertFileMap(const ViewMap &src);
 
-    void Clear();
-    void Insert(const std::string &line);
-    void Insert(const std::string &left, const std::string &right);
-    void Insert(const std::vector<std::string> &lines);
-
-    bool IsEmpty() const;
-    bool Includes(const std::string &path) const;
-
-    ViewMap Reverse() const;
     std::vector<std::string> AsArray() const;
     std::string ToString() const;
 };
