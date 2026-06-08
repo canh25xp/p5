@@ -3,10 +3,6 @@
 #include "log.h"
 #include "options.h"
 
-Commands::Commands() = default;
-
-Commands::~Commands() = default;
-
 void Commands::add(const char *name, const char *description, void (*run)(const std::vector<std::string> &), std::vector<const char *> aliases) {
     std::vector<std::string> aliases_str;
     for (const char *alias : aliases) {
