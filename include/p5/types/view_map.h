@@ -13,6 +13,8 @@
 // References: https://help.perforce.com/helix-core/apis/p4api/2025.1/Content/P4API/mapapi.html
 class ViewMap {
 private:
+    // MapApi holds a table of mapping which output similar to the `p4 where` output.
+    // It does NOT equals to the `View` field in `p4 client -o` Spec output.
     std::unique_ptr<MapApi> m_map;
     MapCase m_sensitivity;
 
