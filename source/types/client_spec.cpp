@@ -40,8 +40,7 @@ ClientSpec ParseClientSpec(const Spec &spec) {
 
     const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
     clientSpec.view.clear();
-    for (const std::string &line : viewLines)
-        clientSpec.view.insert(line);
+    clientSpec.view.insert(viewLines);
 
     return clientSpec;
 }
