@@ -3,7 +3,7 @@
 #include "commands/fast_reconcile.h"
 #include "commands.h"
 #include "options.h"
-#include "p5.h"
+#include "p4api.h"
 #include "reconcile/digest.h"
 #include "reconcile/engine.h"
 
@@ -57,7 +57,7 @@ void FastReconcile::run(const std::vector<std::string> &args) {
         return;
     }
 
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
     const bool anyRestrict = m_flagEdit || m_flagAdd || m_flagDelete;
     reconcile::ReconcileOptions opts;
@@ -77,13 +77,13 @@ void FastReconcile::run(const std::vector<std::string> &args) {
         reconcile::LoadDigestCache(clientName, cache);
     }
 
-    const auto analyzed = reconcile::Analyze(p5, workDir, args, opts, cache);
+    const auto analyzed = reconcile::Analyze(p4api, workDir, args, opts, cache);
 
     if (!clientName.empty()) {
         reconcile::SaveDigestCache(clientName, cache);
     }
 
-    reconcile::ApplyPlan(p5, analyzed.plan, analyzed.depot, opts);
+    reconcile::ApplyPlan(p4api, analyzed.plan, analyzed.depot, opts);
 }
 
 void FastReconcile::register_cli(CLI::App &app) {

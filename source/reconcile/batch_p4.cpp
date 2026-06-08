@@ -12,7 +12,7 @@ constexpr size_t kArgLengthMax = 32767 - 2048;
 constexpr size_t kArgLengthMax = 1024 * 1024;
 #endif
 
-void RunSlice(P5 &p5, const std::vector<std::string> &alwaysArgs, const std::vector<std::string> &fileSlice, bool useChangelist, int changelist) {
+void RunSlice(P4API &p4api, const std::vector<std::string> &alwaysArgs, const std::vector<std::string> &fileSlice, bool useChangelist, int changelist) {
     if (alwaysArgs.empty()) {
         return;
     }
@@ -22,18 +22,18 @@ void RunSlice(P5 &p5, const std::vector<std::string> &alwaysArgs, const std::vec
         args.push_back(std::to_string(changelist));
     }
     args.insert(args.end(), fileSlice.begin(), fileSlice.end());
-    p5.Run(alwaysArgs[0], args);
+    p4api.Run(alwaysArgs[0], args);
 }
 
 } // namespace
 
-void RunBatched(P5 &p5, const std::vector<std::string> &alwaysArgs, const std::vector<std::string> &fileArgs, bool useChangelist, int changelist) {
+void RunBatched(P4API &p4api, const std::vector<std::string> &alwaysArgs, const std::vector<std::string> &fileArgs, bool useChangelist, int changelist) {
     if (alwaysArgs.empty()) {
         return;
     }
 
     if (fileArgs.empty()) {
-        RunSlice(p5, alwaysArgs, {}, useChangelist, changelist);
+        RunSlice(p4api, alwaysArgs, {}, useChangelist, changelist);
         return;
     }
 
@@ -45,7 +45,7 @@ void RunBatched(P5 &p5, const std::vector<std::string> &alwaysArgs, const std::v
     for (size_t i = 0; i < fileArgs.size(); ++i) {
         const size_t argSize = fileArgs[i].size();
         if (batchSize + argSize > kArgLengthMax && batchEnd > batchStart) {
-            RunSlice(p5, alwaysArgs, {fileArgs.begin() + static_cast<std::ptrdiff_t>(batchStart), fileArgs.begin() + static_cast<std::ptrdiff_t>(batchEnd)}, useChangelist, changelist);
+            RunSlice(p4api, alwaysArgs, {fileArgs.begin() + static_cast<std::ptrdiff_t>(batchStart), fileArgs.begin() + static_cast<std::ptrdiff_t>(batchEnd)}, useChangelist, changelist);
             batchCount++;
             batchStart = batchEnd;
             batchSize = 0;
@@ -55,7 +55,7 @@ void RunBatched(P5 &p5, const std::vector<std::string> &alwaysArgs, const std::v
     }
 
     if (batchEnd > batchStart) {
-        RunSlice(p5, alwaysArgs, {fileArgs.begin() + static_cast<std::ptrdiff_t>(batchStart), fileArgs.begin() + static_cast<std::ptrdiff_t>(batchEnd)}, useChangelist, changelist);
+        RunSlice(p4api, alwaysArgs, {fileArgs.begin() + static_cast<std::ptrdiff_t>(batchStart), fileArgs.begin() + static_cast<std::ptrdiff_t>(batchEnd)}, useChangelist, changelist);
         batchCount++;
     }
 

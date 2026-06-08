@@ -3,7 +3,7 @@
 #include "commands/clients.h"
 #include "commands.h"
 #include "utils/client_resolver.h"
-#include "p5.h"
+#include "p4api.h"
 #include "options.h"
 
 #include <p4/clientapi.h>
@@ -111,8 +111,8 @@ void Clients::PrintSortedTable(std::ostream &out) const {
 
 void Clients::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
-    Clients r = p5.RunClients(args);
+    P4API &p4api = m_commands->p4api();
+    Clients r = p4api.RunClients(args);
     if (r.IsError())
         throw CLI::RuntimeError(1);
 

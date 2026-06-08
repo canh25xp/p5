@@ -1,4 +1,4 @@
-#include "p5.h"
+#include "p4api.h"
 
 #include <cstdlib>
 #include <string>
@@ -15,7 +15,7 @@
 #include "utils/command_policy.h"
 #include "utils/client_resolver.h"
 
-P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
+P4API::P4API() : m_Usage(0), m_LibrariesInitialized(false) {
     if (!InitializeLibraries()) {
         ERROR("Could not initialize P4 libraries");
         return;
@@ -27,7 +27,7 @@ P5::P5() : m_Usage(0), m_LibrariesInitialized(false) {
     }
 }
 
-bool P5::Initialize() {
+bool P4API::Initialize() {
     Error e;
     StrBuf msg;
 
@@ -57,7 +57,7 @@ bool P5::Initialize() {
     return true;
 }
 
-std::string P5::AutoResolve() {
+std::string P4API::AutoResolve() {
     std::string cwd = ClientResolver::GetCurrentWorkingDirectory();
     if (cwd.empty()) {
         WARN("Auto-resolve: could not determine current working directory");
@@ -96,7 +96,7 @@ std::string P5::AutoResolve() {
     return resolved;
 }
 
-bool P5::Deinitialize() {
+bool P4API::Deinitialize() {
     Error e;
     StrBuf msg;
 
@@ -106,12 +106,12 @@ bool P5::Deinitialize() {
     return true;
 }
 
-bool P5::Reinitialize() {
+bool P4API::Reinitialize() {
     bool status = Deinitialize() && Initialize();
     return status;
 }
 
-P5::~P5() {
+P4API::~P4API() {
     if (!Deinitialize()) {
         ERROR("P4 context was not destroyed successfully");
     }
@@ -120,7 +120,7 @@ P5::~P5() {
     }
 }
 
-bool P5::CheckErrors(Error &e, StrBuf &msg) {
+bool P4API::CheckErrors(Error &e, StrBuf &msg) {
     if (e.Test()) {
         e.Fmt(&msg);
         ERROR(msg.Text());
@@ -129,7 +129,7 @@ bool P5::CheckErrors(Error &e, StrBuf &msg) {
     return true;
 }
 
-bool P5::InitializeLibraries() {
+bool P4API::InitializeLibraries() {
     Error e;
     StrBuf msg;
     P4Libraries::Initialize(P4LIBRARIES_INIT_ALL, &e);
@@ -144,7 +144,7 @@ bool P5::InitializeLibraries() {
     return true;
 }
 
-bool P5::ShutdownLibraries() {
+bool P4API::ShutdownLibraries() {
     Error e;
     StrBuf msg;
     P4Libraries::Shutdown(P4LIBRARIES_INIT_ALL, &e);
@@ -158,7 +158,7 @@ bool P5::ShutdownLibraries() {
     return true;
 }
 
-ClientUser &P5::Execute(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+ClientUser &P4API::Execute(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
     std::vector<char *> argv;
     argv.reserve(args.size());
     for (const auto &arg : args) {
@@ -169,7 +169,7 @@ ClientUser &P5::Execute(const std::string &command, const std::vector<std::strin
     return user;
 }
 
-void P5::RefreshIfNeeded() {
+void P4API::RefreshIfNeeded() {
     m_Usage++;
     if (m_Usage <= COMMAND_REFRESH_THRESHOLD) {
         return;
@@ -192,26 +192,26 @@ void P5::RefreshIfNeeded() {
     std::exit(1);
 }
 
-Result P5::Run(const std::string &command, const std::vector<std::string> &args) {
+Result P4API::Run(const std::string &command, const std::vector<std::string> &args) {
     Result clientUser;
     Execute(command.c_str(), args, clientUser);
     return clientUser;
 }
 
-ClientUser &P5::Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
+ClientUser &P4API::Run(const std::string &command, const std::vector<std::string> &args, ClientUser &user) {
     return Execute(command, args, user);
 }
 
-void P5::SetTagProtocol() {
+void P4API::SetTagProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
 }
 
-void P5::SetSpecProtocol() {
+void P4API::SetSpecProtocol() {
     m_ClientAPI.SetProtocol("tag", "");
     m_ClientAPI.SetProtocol("specstring", "");
 }
 
-Result P5::Run(const std::string &commandLine) {
+Result P4API::Run(const std::string &commandLine) {
     // Split string into tokens
     std::vector<std::string> tokens = SplitCommandLine(commandLine);
 
@@ -229,7 +229,7 @@ Result P5::Run(const std::string &commandLine) {
 }
 
 template <class T>
-T P5::Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries) {
+T P4API::Run(const std::string &command, const std::vector<std::string> &args, const int commandRetries) {
     std::string argsString;
     for (const std::string &stringArg : args) {
         argsString = argsString + " " + stringArg;
@@ -277,15 +277,15 @@ T P5::Run(const std::string &command, const std::vector<std::string> &args, cons
 }
 
 // Explicit instantiations
-template Users P5::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Clients P5::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Changes P5::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template ClientCommand P5::Run<ClientCommand>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Fstat P5::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Filelog P5::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
-template Have P5::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Users P4API::Run<Users>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Clients P4API::Run<Clients>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Changes P4API::Run<Changes>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template ClientCommand P4API::Run<ClientCommand>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Fstat P4API::Run<Fstat>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Filelog P4API::Run<Filelog>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
+template Have P4API::Run<Have>(const std::string &command, const std::vector<std::string> &stringArguments, const int commandRetries);
 
-Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
+Clients P4API::FetchClientsTagged(const std::vector<std::string> &args) {
     ClientApi api;
     Error e;
     StrBuf msg;
@@ -323,37 +323,37 @@ Clients P5::FetchClientsTagged(const std::vector<std::string> &args) {
     return clients;
 }
 
-Clients P5::RunClients(const std::vector<std::string> &args) {
+Clients P4API::RunClients(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Clients>("clients", args);
 }
 
-Users P5::RunUsers(const std::vector<std::string> &args) {
+Users P4API::RunUsers(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Users>("users", args);
 }
 
-Changes P5::RunChanges(const std::vector<std::string> &args) {
+Changes P4API::RunChanges(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Changes>("changes", args);
 }
 
-ClientCommand P5::RunClient(const std::vector<std::string> &args) {
+ClientCommand P4API::RunClient(const std::vector<std::string> &args) {
     SetSpecProtocol();
     return Run<ClientCommand>("client", args);
 }
 
-Fstat P5::RunFstat(const std::vector<std::string> &args) {
+Fstat P4API::RunFstat(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Fstat>("fstat", args);
 }
 
-Filelog P5::RunFilelog(const std::vector<std::string> &args) {
+Filelog P4API::RunFilelog(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Filelog>("filelog", args);
 }
 
-Have P5::RunHave(const std::vector<std::string> &args) {
+Have P4API::RunHave(const std::vector<std::string> &args) {
     SetTagProtocol();
     return Run<Have>("have", args);
 }

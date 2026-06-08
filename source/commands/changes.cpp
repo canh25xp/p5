@@ -2,7 +2,7 @@
 
 #include "commands/changes.h"
 #include "commands.h"
-#include "p5.h"
+#include "p4api.h"
 #include "options.h"
 
 #include <p4/clientapi.h>
@@ -210,9 +210,9 @@ std::vector<std::string> Changes::buildP4Args(const std::vector<std::string> &fi
 
 void Changes::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
-    Changes r = p5.RunChanges(args);
+    Changes r = p4api.RunChanges(args);
     if (r.IsError()) {
         throw CLI::RuntimeError(1);
     }

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class P5;
+class P4API;
 class StrDict;
 
 // p5 `client` / `workspace` command.
@@ -38,9 +38,9 @@ public:
 
     const p5::ClientSpec &clientSpec() const { return m_clientSpec; }
 
-    static void Load(P5 &p5, const std::vector<std::string> &args = {"-o"});
-    static void Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args = {"-i"});
-    static void Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args = {"-i"});
+    static void Load(P4API &p4api, const std::vector<std::string> &args = {"-o"});
+    static void Save(P4API &p4api, const std::string &specForm, const std::vector<std::string> &args = {"-i"});
+    static void Save(P4API &p4api, const Spec &spec, const std::vector<std::string> &args = {"-i"});
 
     /// Set Client/Root/Host and return updated spec (mirror use case).
     static Spec Patch(Spec spec, const std::string &clientName, const std::string &root, const std::string &host);

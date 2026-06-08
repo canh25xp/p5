@@ -99,7 +99,7 @@ void RunIgnoresBatch(const std::vector<std::string> &paths, IgnoreResult &ignore
 
 } // namespace
 
-void ApplyIgnores(P5 & /*p5*/, WorkspaceState &state) {
+void ApplyIgnores(P4API & /*p4api*/, WorkspaceState &state) {
     if (state.files.empty()) {
         return;
     }
@@ -126,7 +126,7 @@ void ApplyIgnores(P5 & /*p5*/, WorkspaceState &state) {
 
 } // namespace
 
-WorkspaceState ScanWorkspace(P5 &p5, const std::string &rootDir, bool skipIgnoreCheck) {
+WorkspaceState ScanWorkspace(P4API &p4api, const std::string &rootDir, bool skipIgnoreCheck) {
     WorkspaceState state;
     const fs::path root(rootDir);
 
@@ -164,7 +164,7 @@ WorkspaceState ScanWorkspace(P5 &p5, const std::string &rootDir, bool skipIgnore
     }
 
     if (!skipIgnoreCheck) {
-        ApplyIgnores(p5, state);
+        ApplyIgnores(p4api, state);
     }
 
     size_t active = 0;

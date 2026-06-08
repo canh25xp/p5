@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-class P5;
+class P4API;
 
 class Have : public Command {
 public:
@@ -17,7 +17,7 @@ public:
 
     const std::unordered_map<std::string, p5::HaveRecord> &records() const { return m_records; }
 
-    static std::unordered_map<std::string, p5::HaveRecord> Load(P5 &p5, const std::vector<std::string> &paths);
+    static std::unordered_map<std::string, p5::HaveRecord> Load(P4API &p4api, const std::vector<std::string> &paths);
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

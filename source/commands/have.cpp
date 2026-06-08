@@ -3,7 +3,7 @@
 #include "commands/have.h"
 #include "commands.h"
 #include "log.h"
-#include "p5.h"
+#include "p4api.h"
 #include "options.h"
 #include "utils/std_helper.h"
 
@@ -47,20 +47,20 @@ void Have::OutputStat(StrDict *varList) {
     m_records[ToLower(rec.path)] = rec;
 }
 
-std::unordered_map<std::string, HaveRecord> Have::Load(P5 &p5, const std::vector<std::string> &paths) {
+std::unordered_map<std::string, HaveRecord> Have::Load(P4API &p4api, const std::vector<std::string> &paths) {
     std::vector<std::string> args = paths;
     if (args.empty()) {
         args.push_back("...");
     }
 
-    return p5.RunHave(args).records();
+    return p4api.RunHave(args).records();
 }
 
 void Have::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
-    Have r = p5.RunHave(args);
+    Have r = p4api.RunHave(args);
     if (r.IsError()) {
         CLI_ERROR("have command failed");
     }

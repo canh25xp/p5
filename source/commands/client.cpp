@@ -4,7 +4,7 @@
 #include "commands.h"
 #include "log.h"
 #include "options.h"
-#include "p5.h"
+#include "p4api.h"
 #include "types/client_spec.h"
 
 #include <p4/clientapi.h>
@@ -100,25 +100,25 @@ std::vector<std::string> ClientCommand::buildP4Args() const {
     return args;
 }
 
-void ClientCommand::Load(P5 &p5, const std::vector<std::string> &args) {
-    ClientCommand r = p5.RunClient(args);
+void ClientCommand::Load(P4API &p4pi, const std::vector<std::string> &args) {
+    ClientCommand r = p4pi.RunClient(args);
     if (r.IsError()) {
         CLI_ERROR("Failed to read client spec");
     }
     r.Print();
 }
 
-void ClientCommand::Save(P5 &p5, const std::string &specForm, const std::vector<std::string> &args) {
+void ClientCommand::Save(P4API &p4api, const std::string &specForm, const std::vector<std::string> &args) {
     SpecInputUser input(specForm);
-    p5.SetSpecProtocol();
-    p5.Run("client", args, input);
+    p4api.SetSpecProtocol();
+    p4api.Run("client", args, input);
     if (input.IsError()) {
         CLI_ERROR("Failed to save client spec");
     }
 }
 
-void ClientCommand::Save(P5 &p5, const Spec &spec, const std::vector<std::string> &args) {
-    Save(p5, spec.ToForm(), args);
+void ClientCommand::Save(P4API &p4api, const Spec &spec, const std::vector<std::string> &args) {
+    Save(p4api, spec.ToForm(), args);
 }
 
 Spec ClientCommand::Patch(Spec spec, const std::string &clientName, const std::string &root, const std::string &host) {
@@ -146,15 +146,15 @@ void ClientCommand::Print() const {
 
 void ClientCommand::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
     if (m_output) {
-        Load(p5, args);
+        Load(p4api, args);
         return;
     }
 
     if (m_input) {
-        Save(p5, ReadStdin(), args);
+        Save(p4api, ReadStdin(), args);
         return;
     }
 

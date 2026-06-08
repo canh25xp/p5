@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-class P5;
+class P4API;
 
 class Fstat : public Command {
 public:
@@ -17,7 +17,7 @@ public:
     const p5::DepotState &state() const { return m_state; }
     p5::DepotState &state() { return m_state; }
 
-    static p5::DepotState Load(P5 &p5, const std::vector<std::string> &paths);
+    static p5::DepotState Load(P4API &p4api, const std::vector<std::string> &paths);
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;

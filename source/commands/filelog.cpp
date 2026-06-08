@@ -3,7 +3,7 @@
 #include "commands/filelog.h"
 #include "commands.h"
 #include "log.h"
-#include "p5.h"
+#include "p4api.h"
 #include "options.h"
 
 #include <p4/clientapi.h>
@@ -29,8 +29,8 @@ void Filelog::OutputStat(StrDict *varList) {
     }
 }
 
-std::vector<p5::FilelogFile> Filelog::Load(P5 &p5, const std::vector<std::string> &args) {
-    return p5.RunFilelog(args).files();
+std::vector<p5::FilelogFile> Filelog::Load(P4API &p4api, const std::vector<std::string> &args) {
+    return p4api.RunFilelog(args).files();
 }
 
 std::vector<std::string> Filelog::buildP4Args(const std::vector<std::string> &files) const {
@@ -72,9 +72,9 @@ std::vector<std::string> Filelog::buildP4Args(const std::vector<std::string> &fi
 
 void Filelog::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
-    Filelog result = p5.RunFilelog(args);
+    Filelog result = p4api.RunFilelog(args);
     if (result.IsError()) {
         CLI_ERROR("filelog command failed");
     }

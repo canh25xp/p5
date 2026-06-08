@@ -5,7 +5,7 @@
 #include <CLI/CLI.hpp>
 #include "commands/command.h"
 
-class P5;
+class P4API;
 
 // Batches CLI11 subcommand definitions; call install to attach them to a root `CLI::App`.
 class Commands {
@@ -29,14 +29,14 @@ public:
 
     void clear();
 
-    // Get or create the P5 instance (lazy initialization).
-    // Returns a reference to the shared P5 instance.
-    P5 &p5();
+    // Get or create the P4API instance (lazy initialization).
+    // Returns a reference to the shared P4API instance.
+    P4API &p4api();
 
-    // Passthrough to P5::Run - uses owned P5 instance.
+    // Passthrough to P4API::Run - uses owned P5 instance.
     void run_p4_passthrough(const char *command, const std::vector<std::string> &args);
 
 private:
     std::vector<std::unique_ptr<Command>> m_entries;
-    std::unique_ptr<P5> m_p5; // Owned P5 instance for connection reuse
+    std::unique_ptr<P4API> m_p4api; // Owned P4API instance for connection reuse
 };

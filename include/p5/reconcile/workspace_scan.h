@@ -1,6 +1,6 @@
 #pragma once
 
-#include "p5.h"
+#include "p4api.h"
 #include "types/workspace.h"
 
 #include <string>
@@ -8,6 +8,6 @@
 
 namespace reconcile {
 
-p5::WorkspaceState ScanWorkspace(P5 &p5, const std::string &rootDir, bool skipIgnoreCheck);
+p5::WorkspaceState ScanWorkspace(P4API &p4api, const std::string &rootDir, bool skipIgnoreCheck);
 
 } // namespace reconcile

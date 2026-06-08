@@ -14,7 +14,7 @@
 #include "commands/have.h"
 #include "commands/client.h"
 
-class P5 {
+class P4API {
     ClientApi m_ClientAPI;
     int m_Usage;
     bool m_LibrariesInitialized;
@@ -41,8 +41,8 @@ public:
     static bool InitializeLibraries();
     static bool ShutdownLibraries();
 
-    P5();
-    ~P5();
+    P4API();
+    ~P4API();
 
     Result Run(const std::string &command, const std::vector<std::string> &args);
     Result Run(const std::string &commandLine);

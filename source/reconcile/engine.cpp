@@ -58,7 +58,7 @@ void PartitionUnchanged(std::vector<DigestWorkItem> &items, const std::unordered
 
 } // namespace
 
-AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, WorkspaceCache &cache) {
+AnalyzeResult Analyze(P4API &p4api, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, WorkspaceCache &cache) {
     AnalyzeResult result;
     ReconcilePlan &plan = result.plan;
 
@@ -67,13 +67,13 @@ AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std:
         fstatPaths.push_back("./...");
     }
 
-    result.depot = Fstat::Load(p5, fstatPaths);
+    result.depot = Fstat::Load(p4api, fstatPaths);
     DepotState &depot = result.depot;
-    WorkspaceState workspace = ScanWorkspace(p5, workDir, opts.skipIgnore);
+    WorkspaceState workspace = ScanWorkspace(p4api, workDir, opts.skipIgnore);
 
     std::unordered_map<std::string, HaveRecord> haveRecords;
     if (opts.mtimeOptimize) {
-        haveRecords = Have::Load(p5, fstatPaths);
+        haveRecords = Have::Load(p4api, fstatPaths);
     }
 
     std::vector<std::string> doAdd;
@@ -328,7 +328,7 @@ const DepotFileRecord *FindByClientPath(const DepotState &depot, const std::stri
 
 } // namespace
 
-void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const ReconcileOptions &opts) {
+void ApplyPlan(P4API &p4api, const ReconcilePlan &plan, const DepotState &depot, const ReconcileOptions &opts) {
     if (!plan.unsupportedDepotFiles.empty()) {
         std::vector<std::string> recArgs;
         if (opts.preview) {
@@ -339,7 +339,7 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
             recArgs.push_back(std::to_string(opts.changelist));
         }
         recArgs.insert(recArgs.end(), plan.unsupportedDepotFiles.begin(), plan.unsupportedDepotFiles.end());
-        p5.Run("reconcile", recArgs);
+        p4api.Run("reconcile", recArgs);
     }
 
     const bool useCl = opts.changelist != 0;
@@ -375,7 +375,7 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (opts.add && !plan.doAdd.empty()) {
-        RunBatched(p5, {"add"}, plan.doAdd, useCl, opts.changelist);
+        RunBatched(p4api, {"add"}, plan.doAdd, useCl, opts.changelist);
         for (const auto &path : plan.doAdd) {
             if (const DepotFileRecord *rec = FindByClientPath(depot, path)) {
                 PrintAction(rec->depotFile, rec->haveRev.value_or(1), "opened for add");
@@ -384,7 +384,7 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (opts.edit && !plan.doEdit.empty()) {
-        RunBatched(p5, {"edit"}, plan.doEdit, useCl, opts.changelist);
+        RunBatched(p4api, {"edit"}, plan.doEdit, useCl, opts.changelist);
         for (const auto &path : plan.doEdit) {
             if (const DepotFileRecord *rec = FindByClientPath(depot, path)) {
                 PrintAction(rec->depotFile, rec->haveRev.value_or(1), "opened for edit");
@@ -393,8 +393,8 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (opts.edit && !plan.doReopenEdit.empty()) {
-        RunBatched(p5, {"revert", "-k"}, plan.doReopenEdit, false, 0);
-        RunBatched(p5, {"edit"}, plan.doReopenEdit, useCl, opts.changelist);
+        RunBatched(p4api, {"revert", "-k"}, plan.doReopenEdit, false, 0);
+        RunBatched(p4api, {"edit"}, plan.doReopenEdit, useCl, opts.changelist);
         for (const auto &path : plan.doReopenEdit) {
             if (const DepotFileRecord *rec = FindByClientPath(depot, path)) {
                 PrintAction(rec->depotFile, rec->haveRev.value_or(1), "opened for edit");
@@ -403,7 +403,7 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (opts.deleteFiles && !plan.doDelete.empty()) {
-        RunBatched(p5, {"delete", "-k"}, plan.doDelete, useCl, opts.changelist);
+        RunBatched(p4api, {"delete", "-k"}, plan.doDelete, useCl, opts.changelist);
         for (const auto &path : plan.doDelete) {
             if (const DepotFileRecord *rec = FindByClientPath(depot, path)) {
                 PrintAction(rec->depotFile, rec->haveRev.value_or(1), "opened for delete");
@@ -412,8 +412,8 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (opts.deleteFiles && !plan.doReopenDelete.empty()) {
-        RunBatched(p5, {"revert", "-k"}, plan.doReopenDelete, false, 0);
-        RunBatched(p5, {"delete", "-k"}, plan.doReopenDelete, useCl, opts.changelist);
+        RunBatched(p4api, {"revert", "-k"}, plan.doReopenDelete, false, 0);
+        RunBatched(p4api, {"delete", "-k"}, plan.doReopenDelete, useCl, opts.changelist);
         for (const auto &path : plan.doReopenDelete) {
             if (const DepotFileRecord *rec = FindByClientPath(depot, path)) {
                 PrintAction(rec->depotFile, rec->haveRev.value_or(1), "opened for delete");
@@ -422,13 +422,13 @@ void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const DepotState &depot, const
     }
 
     if (!plan.doRevertAdd.empty()) {
-        RunBatched(p5, {"revert", "-k"}, plan.doRevertAdd, false, 0);
+        RunBatched(p4api, {"revert", "-k"}, plan.doRevertAdd, false, 0);
     }
     if (!plan.doRevertEdit.empty()) {
-        RunBatched(p5, {"revert", "-k"}, plan.doRevertEdit, false, 0);
+        RunBatched(p4api, {"revert", "-k"}, plan.doRevertEdit, false, 0);
     }
     if (!plan.doRevertDelete.empty()) {
-        RunBatched(p5, {"revert", "-k"}, plan.doRevertDelete, false, 0);
+        RunBatched(p4api, {"revert", "-k"}, plan.doRevertDelete, false, 0);
     }
 }
 

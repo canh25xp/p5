@@ -3,7 +3,7 @@
 #include "commands/fstat.h"
 #include "commands.h"
 #include "log.h"
-#include "p5.h"
+#include "p4api.h"
 #include "options.h"
 
 #include <p4/clientapi.h>
@@ -68,7 +68,7 @@ void Fstat::OutputStat(StrDict *varList) {
     }
 }
 
-DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
+DepotState Fstat::Load(P4API &p4api, const std::vector<std::string> &paths) {
     std::vector<std::string> fstatArgs = {
         "-Rc",
         "-Ol",
@@ -77,7 +77,7 @@ DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
     };
     fstatArgs.insert(fstatArgs.end(), paths.begin(), paths.end());
 
-    Fstat fstat = p5.RunFstat(fstatArgs);
+    Fstat fstat = p4api.RunFstat(fstatArgs);
     fstat.state().buildMapping();
 
     std::vector<std::string> staleRefs;
@@ -95,7 +95,7 @@ DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
             "depotFile,headType,headAction,fileSize,digest",
         };
         refreshArgs.insert(refreshArgs.end(), staleRefs.begin(), staleRefs.end());
-        Fstat refresh = p5.RunFstat(refreshArgs);
+        Fstat refresh = p4api.RunFstat(refreshArgs);
 
         for (const auto &refreshed : refresh.state().fileRecords) {
             if (auto *original = fstat.state().getByDepotLower(refreshed.depotFileLower)) {
@@ -120,9 +120,9 @@ DepotState Fstat::Load(P5 &p5, const std::vector<std::string> &paths) {
 
 void Fstat::run(const std::vector<std::string> &args) {
     g_options.set_command(name);
-    P5 &p5 = m_commands->p5();
+    P4API &p4api = m_commands->p4api();
 
-    Fstat r = p5.RunFstat(args);
+    Fstat r = p4api.RunFstat(args);
     if (r.IsError()) {
         CLI_ERROR("fstat command failed");
     }

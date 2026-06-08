@@ -1,5 +1,6 @@
 #include "commands.h"
-#include "p5.h"
+#include "commands/command.h"
+#include "p4api.h"
 #include "log.h"
 #include "options.h"
 
@@ -37,7 +38,7 @@ void Commands::add(std::vector<const char *> commands, const char *description) 
 
 void Commands::clear() {
     m_entries.clear();
-    m_p5.reset();
+    m_p4api.reset();
 }
 
 void Commands::install(CLI::App &app) const {
@@ -47,22 +48,22 @@ void Commands::install(CLI::App &app) const {
     }
 }
 
-P5 &Commands::p5() {
-    if (!m_p5) {
-        m_p5 = std::make_unique<P5>();
+P4API &Commands::p4api() {
+    if (!m_p4api) {
+        m_p4api = std::make_unique<P4API>();
     }
-    return *m_p5;
+    return *m_p4api;
 }
 
 void Commands::run_p4_passthrough(const char *command, const std::vector<std::string> &args) {
-    P5 &p5 = this->p5();
+    P4API &p4api = this->p4api();
 
     std::string argsString;
     for (const std::string &stringArg : args)
         argsString = argsString + " " + stringArg;
     INFO("Run passthrough: p4 " << command << argsString);
 
-    p5.Run(std::string(command), args);
+    p4api.Run(std::string(command), args);
 }
 
 void Command::run(const std::vector<std::string> &args) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "p5.h"
+#include "p4api.h"
 #include "types/depot.h"
 #include "types/reconcile.h"
 #include "types/workspace.h"
@@ -15,8 +15,8 @@ struct AnalyzeResult {
     p5::DepotState depot;
 };
 
-AnalyzeResult Analyze(P5 &p5, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, p5::WorkspaceCache &cache);
+AnalyzeResult Analyze(P4API &p4api, const std::string &workDir, const std::vector<std::string> &paths, const ReconcileOptions &opts, p5::WorkspaceCache &cache);
 
-void ApplyPlan(P5 &p5, const ReconcilePlan &plan, const p5::DepotState &depot, const ReconcileOptions &opts);
+void ApplyPlan(P4API &p4api, const ReconcilePlan &plan, const p5::DepotState &depot, const ReconcileOptions &opts);
 
 } // namespace reconcile

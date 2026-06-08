@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-class P5;
+class P4API;
 
 class Filelog : public Command {
 public:
@@ -16,7 +16,7 @@ public:
 
     const std::vector<p5::FilelogFile> &files() const { return m_files; }
 
-    static std::vector<p5::FilelogFile> Load(P5 &p5, const std::vector<std::string> &args);
+    static std::vector<p5::FilelogFile> Load(P4API &p4api, const std::vector<std::string> &args);
 
     void run(const std::vector<std::string> &args) override;
     void register_cli(CLI::App &app) override;
