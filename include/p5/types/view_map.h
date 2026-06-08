@@ -62,7 +62,4 @@ public:
     ViewMap reverse() const;
     std::vector<std::string> asArray() const;
     std::string toString() const;
-
-    MapApi &api() { return *m_map; }
-    const MapApi &api() const { return *m_map; }
 };
