@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "types/spec.h"
-#include "types/view_map.h"
 
 namespace p5 {
 
@@ -20,7 +20,7 @@ struct ClientSpec {
     std::string options;
     std::string submitOptions;
     std::string lineEnd;
-    ViewMap view;
+    std::vector<std::string> view;
     std::string type;
     std::string backup;
 

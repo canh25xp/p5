@@ -1,7 +1,6 @@
 #include "types/client_spec.h"
 
 #include "types/spec.h"
-#include "types/view_map.h"
 
 #include <iomanip>
 #include <iostream>
@@ -33,13 +32,11 @@ ClientSpec ParseClientSpec(const Spec &spec) {
     clientSpec.type = getString("Type");
     clientSpec.backup = getString("Backup");
 
-    // Extract View as ViewMap
     auto viewVal = spec.get("View");
     if (!viewVal || !std::holds_alternative<std::vector<std::string>>(*viewVal))
         return clientSpec;
 
-    const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-    clientSpec.view.InsertTranslationMapping(viewLines);
+    clientSpec.view = std::get<std::vector<std::string>>(*viewVal);
 
     return clientSpec;
 }
@@ -69,7 +66,9 @@ void ClientSpec::Print() const {
 
     // Print View
     std::cout << "View:\n";
-    std::cout << view.ToString();
+    for (const auto &line : view) {
+        std::cout << line << '\n';
+    }
 }
 
 } // namespace p5
