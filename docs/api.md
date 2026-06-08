@@ -44,3 +44,8 @@ Official reference: [ClientApi::SetProtocol](https://help.perforce.com/helix-cor
 The `p4` client’s **`-z name`** and **`-z name=value`** options set protocol variables for the session. The table above is the small **documented** core. Newer server releases may add more variables; if the server accepts a name, you can set it the same way via `SetProtocol` before `Init()`.
 
 In **p5**, global **`-z`** is parsed into name/value pairs and applied with `SetProtocol` during initialization (see `apply_protocol_options` and `P5::Initialize`).
+
+## References
+
+- [P4API 2025.1](https://help.perforce.com/helix-core/apis/p4api/2025.1/Content/P4API/Home-p4api.html)
+- [Other version](https://help.perforce.com/helix-core/apis/p4api/current/Content/P4API/earlier-versions-p4api.html)
