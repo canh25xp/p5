@@ -10,6 +10,7 @@
 // Wraps P4API MapApi to provide mapping insertion, path inclusion testing, reversal, and serialization.
 // Insert entries as "left right" pairs or single lines, then query with includes() or dump with asArray()/toString().
 // Note: ViewMap is not copyable (MapApi holds heap-allocated MapTable*), but is moveable.
+// References: https://help.perforce.com/helix-core/apis/p4api/2025.1/Content/P4API/mapapi.html
 class ViewMap {
 private:
     std::unique_ptr<MapApi> m_map;
@@ -50,16 +51,15 @@ public:
 
     void InsertFileMap(const ViewMap &src);
 
-    // Convenience methods for backward compatibility
-    void clear();
-    void insert(const std::string &line);
-    void insert(const std::vector<std::string> &lines);
-    void insert(const std::string &left, const std::string &right);
+    void Clear();
+    void Insert(const std::string &line);
+    void Insert(const std::string &left, const std::string &right);
+    void Insert(const std::vector<std::string> &lines);
 
-    bool isEmpty() const;
-    bool includes(const std::string &path) const;
+    bool IsEmpty() const;
+    bool Includes(const std::string &path) const;
 
-    ViewMap reverse() const;
-    std::vector<std::string> asArray() const;
-    std::string toString() const;
+    ViewMap Reverse() const;
+    std::vector<std::string> AsArray() const;
+    std::string ToString() const;
 };

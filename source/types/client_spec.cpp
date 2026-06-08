@@ -39,8 +39,8 @@ ClientSpec ParseClientSpec(const Spec &spec) {
         return clientSpec;
 
     const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-    clientSpec.view.clear();
-    clientSpec.view.insert(viewLines);
+    clientSpec.view.Clear();
+    clientSpec.view.Insert(viewLines);
 
     return clientSpec;
 }
@@ -70,7 +70,7 @@ void ClientSpec::Print() const {
 
     // Print View
     std::cout << "View:\n";
-    std::cout << view.toString();
+    std::cout << view.ToString();
 }
 
 } // namespace p5

@@ -175,53 +175,53 @@ void ViewMap::copyMapApiInto(MapApi &map) const {
 
 // Convenience methods for backward compatibility
 
-void ViewMap::clear() {
+void ViewMap::Clear() {
     m_map->Clear();
 }
 
-void ViewMap::insert(const std::string &line) {
+void ViewMap::Insert(const std::string &line) {
     StrRef ref(line.c_str());
     m_map->Insert(ref);
 }
 
-void ViewMap::insert(const std::vector<std::string> &lines) {
+void ViewMap::Insert(const std::vector<std::string> &lines) {
     for (const std::string &line : lines) {
-        insert(line);
+        Insert(line);
     }
 }
 
-void ViewMap::insert(const std::string &left, const std::string &right) {
+void ViewMap::Insert(const std::string &left, const std::string &right) {
     StrRef leftRef(left.c_str());
     StrRef rightRef(right.c_str());
     m_map->Insert(leftRef, rightRef);
 }
 
-bool ViewMap::isEmpty() const {
+bool ViewMap::IsEmpty() const {
     return m_map->Count() == 0;
 }
 
-bool ViewMap::includes(const std::string &path) const {
+bool ViewMap::Includes(const std::string &path) const {
     StrBuf translated;
     StrRef pathRef(path.c_str());
     return m_map->Translate(pathRef, translated) != 0;
 }
 
-ViewMap ViewMap::reverse() const {
+ViewMap ViewMap::Reverse() const {
     ViewMap reversed;
     MapApi &source = *m_map;
     for (int i = 0; i < source.Count(); ++i) {
         const StrPtr *left = source.GetLeft(i);
         const StrPtr *right = source.GetRight(i);
         if (left && right) {
-            reversed.insert(left->Text(), right->Text());
+            reversed.Insert(left->Text(), right->Text());
         } else if (left) {
-            reversed.insert(left->Text());
+            reversed.Insert(left->Text());
         }
     }
     return reversed;
 }
 
-std::vector<std::string> ViewMap::asArray() const {
+std::vector<std::string> ViewMap::AsArray() const {
     std::vector<std::string> lines;
     MapApi &source = *m_map;
     for (int i = 0; i < source.Count(); ++i) {
@@ -239,9 +239,9 @@ std::vector<std::string> ViewMap::asArray() const {
     return lines;
 }
 
-std::string ViewMap::toString() const {
+std::string ViewMap::ToString() const {
     std::ostringstream out;
-    for (const std::string &line : asArray()) {
+    for (const std::string &line : AsArray()) {
         out << line << '\n';
     }
     return out.str();
