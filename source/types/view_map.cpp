@@ -230,10 +230,25 @@ std::vector<std::string> ViewMap::AsArray() const {
         if (!left) {
             continue;
         }
+        char typePrefix = ' ';
+        switch (source.GetType(i)) {
+        case MapExclude:
+            typePrefix = '-';
+            break;
+        case MapOverlay:
+            typePrefix = '+';
+            break;
+        case MapOneToMany:
+            typePrefix = '&';
+            break;
+        default:
+            break;
+        }
+
         if (right && right->Length() > 0) {
-            lines.push_back(std::string(left->Text()) + " " + right->Text());
+            lines.push_back(std::string(1, typePrefix) + left->Text() + " " + right->Text());
         } else {
-            lines.push_back(left->Text());
+            lines.push_back(std::string(1, typePrefix) + left->Text());
         }
     }
     return lines;
