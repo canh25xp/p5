@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <iosfwd>
 
 #include "types/spec.h"
 
@@ -9,7 +10,12 @@ namespace p5 {
 
 // Represents a Perforce client specification with all typed fields.
 // Mirrors the structure returned by `p4 client -o` command.
-struct ClientSpec {
+class ClientSpec {
+public:
+    ClientSpec() = default;
+    explicit ClientSpec(const Spec &spec);
+
+    // Public data members for direct access
     std::string client;
     std::string update;
     std::string access;
@@ -24,11 +30,8 @@ struct ClientSpec {
     std::string type;
     std::string backup;
 
-    // Print formatted client spec to stdout
-    void Print() const;
+    // Friend declaration for stream output operator
+    friend std::ostream &operator<<(std::ostream &os, const ClientSpec &clientSpec);
 };
-
-// Parse a Spec into a ClientSpec struct
-ClientSpec ParseClientSpec(const Spec &spec);
 
 } // namespace p5

@@ -47,7 +47,7 @@ std::string ReadStdin() {
 
 void ClientCommand::OutputStat(StrDict *varList) {
     Spec m_spec = Spec::FromTaggedStat(varList);
-    m_clientSpec = p5::ParseClientSpec(m_spec);
+    m_clientSpec = p5::ClientSpec(m_spec);
 }
 
 std::vector<std::string> ClientCommand::buildP4Args() const {
@@ -141,7 +141,7 @@ bool ClientCommand::IsValidName(const std::string &name) {
 }
 
 void ClientCommand::Print() const {
-    m_clientSpec.Print();
+    std::cout << m_clientSpec;
 }
 
 void ClientCommand::run(const std::vector<std::string> &args) {
