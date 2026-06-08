@@ -39,8 +39,7 @@ ClientSpec ParseClientSpec(const Spec &spec) {
         return clientSpec;
 
     const auto &viewLines = std::get<std::vector<std::string>>(*viewVal);
-    clientSpec.view.Clear();
-    clientSpec.view.Insert(viewLines);
+    clientSpec.view.InsertTranslationMapping(viewLines);
 
     return clientSpec;
 }
