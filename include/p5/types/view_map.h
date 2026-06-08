@@ -21,6 +21,9 @@ private:
     void insertMapping(const std::string &left, const std::string &right, const MapType mapType);
     void copyMapApiInto(MapApi &map) const;
 
+    static char getPrefix(MapType type);
+    static MapType getMapType(char prefix);
+
 public:
     ViewMap();
     ViewMap(const ViewMap &) = delete;

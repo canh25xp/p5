@@ -100,18 +100,7 @@ void ViewMap::InsertTranslationMapping(const std::vector<std::string> &mapping) 
 
         size_t left = view.find('/');
 
-        MapType mapType = MapType::MapInclude;
-        switch (view.front()) {
-        case '+':
-            mapType = MapType::MapOverlay;
-            break;
-        case '-':
-            mapType = MapType::MapExclude;
-            break;
-        case '&':
-            mapType = MapType::MapOneToMany;
-            break;
-        }
+        MapType mapType = getMapType(view.front());
 
         // TODO This also needs quote handling
 
@@ -159,6 +148,32 @@ void ViewMap::InsertPrefixedPaths(const std::string prefix, const std::vector<st
     }
 }
 
+char ViewMap::getPrefix(MapType type) {
+    switch (type) {
+    case MapOverlay:
+        return '+';
+    case MapExclude:
+        return '-';
+    case MapOneToMany:
+        return '&';
+    default:
+        return ' ';
+    }
+}
+
+MapType ViewMap::getMapType(char prefix) {
+    switch (prefix) {
+    case '+':
+        return MapType::MapOverlay;
+    case '-':
+        return MapType::MapExclude;
+    case '&':
+        return MapType::MapOneToMany;
+    default:
+        return MapType::MapInclude;
+    }
+}
+
 void ViewMap::copyMapApiInto(MapApi &map) const {
     // MapAPI is poorly written and doesn't declare things as const when it should.
     MapApi *ref = const_cast<MapApi *>(m_map.get());
@@ -182,20 +197,7 @@ std::vector<std::string> ViewMap::AsArray() const {
         if (!left) {
             continue;
         }
-        char typePrefix = ' ';
-        switch (source.GetType(i)) {
-        case MapExclude:
-            typePrefix = '-';
-            break;
-        case MapOverlay:
-            typePrefix = '+';
-            break;
-        case MapOneToMany:
-            typePrefix = '&';
-            break;
-        default:
-            break;
-        }
+        char typePrefix = getPrefix(source.GetType(i));
 
         if (right && right->Length() > 0) {
             lines.push_back(std::string(1, typePrefix) + left->Text() + " " + right->Text());
